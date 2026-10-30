@@ -11,5 +11,8 @@
       "firestore.rules",
       "telegram-worker.js"
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
