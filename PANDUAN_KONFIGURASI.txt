@@ -13,7 +13,7 @@ LANGKAH 1 - Aturan Firestore (WAJIB, kerjakan paling awal)
 LANGKAH 2 - Ganti website
   1. Ganti index.html di folder hosting dengan index.html dari zip ini.
   2. Deploy: firebase deploy --only hosting (atau cara deploy yang biasa Anda pakai).
-  3. Buka https://kas-kelas-smansa.web.app/ lalu muat ulang paksa (Ctrl+Shift+R).
+  3. Buka https://kaskelas.web.app/ lalu muat ulang paksa (Ctrl+Shift+R).
 
 LANGKAH 3 - Perbarui Cloudflare Worker
   1. dash.cloudflare.com > Workers & Pages > pilih worker Anda > "Edit code".
@@ -258,7 +258,7 @@ LANGKAH 21 - ASISTEN AI (menu "Asisten AI" di aplikasi)
      Cloudflare > Workers & Pages > icy-truth-bbad > Settings > Bindings > Add > Workers AI > Variable name: AI > Deploy.
   B. Ganti model (opsional): tambah variabel AI_MODEL, mis. @cf/zai-org/glm-4.7-flash (model lama llama-3.1-8b sudah dipensiunkan Cloudflare; Worker otomatis mencoba model cadangan).
   C. Isi pengetahuan asisten ada di konstanta AI_SYSTEM di telegram-worker.js; perbarui bila ada fitur baru agar jawabannya akurat.
-  D. Pembatasan topik (anti-penyalahgunaan): asisten hanya menjawab seputar aplikasi Kas Kelas. Dua lapis: (1) penjaga kata kunci di Worker
+  D. Pembatasan topik (anti-penyalahgunaan): untuk Admin / Admin Kelas / Anggota asisten TERKUNCI ke panduan aplikasi Kas Kelas. Developer punya asisten sendiri yang BEBAS topik (tombol 🤖 di Konsol Developer, aplikasi & website); server memverifikasi akun developer lewat ID token Firebase, jadi tidak bisa dipakai orang lain. Untuk membebaskan semua pengguna juga (evaluasi), tambah variabel Cloudflare AI_TOPIC_LOCK = off. Cara kerja kunci: Dua lapis: (1) penjaga kata kunci di Worker
      menolak pertanyaan tanpa kaitan aplikasi SEBELUM memanggil AI (tidak memakai kuota); (2) prompt sistem menyuruh AI menjawab [LUAR_TOPIK]
      untuk hal di luar topik atau upaya "abaikan instruksi", lalu Worker menggantinya dengan pesan penolakan. Daftar kata kunci = AI_TOPIC
      di telegram-worker.js; tambahkan kata bila ada pertanyaan sah yang ikut ditolak. Tidak 100% kebal (AI bisa dipancing), tapi batas harian
@@ -281,3 +281,13 @@ LANGKAH 22 - INTEGRASI APLIKASI CATATAN SEKOLAH (tugas + jadwal sinkron dengan w
   E. Bot: /tugas menampilkan tugas yang belum selesai (urut tenggat, tanda peringatan bila lewat).
   F. Catatan teknis: kode Kotlin hanya diverifikasi lewat build GitHub Actions; relay key tertanam di APK (sama seperti Kas Kelas).
 
+LANGKAH 23 - TOKEN KETIGA: ADMIN KELAS (ketua kelas, sekretaris, dll)  (WAJIB: publish ulang firestore.rules + ganti index.html website; Worker & APK otomatis saat push)
+  Setiap ruang kini bisa punya 3 token: Admin (editor), Anggota (viewer), dan Admin Kelas (staff). Token Admin Kelas HANYA dibuat developer.
+  A. Cara membuat: Konsol Developer > buka ruang > "+ Token Admin Kelas (acak)"; atau saat membuat token ruang baru isi kolom Token Admin Kelas (boleh kosong).
+  B. Boleh: pengumuman (termasuk personal), jadwal, tugas, galeri/album, kontak, melihat daftar tunggakan, lapor ke developer, komentar, melihat keuangan.
+     Tidak boleh / disembunyikan: tambah-edit keuangan, edit data siswa, Kelola Anggota, Token Aktif, Perbarui Token, Log Kunjungan, Recount Tunggakan, Tema Warna, laporan masuk.
+     Token Admin Kelas tidak tampil di daftar token milik Admin (hanya developer yang melihatnya). Aplikasi Kas Kelas: data keuangan/siswa hanya lihat (label "Admin Kelas").
+     Aplikasi Tugas: boleh mengubah tugas & jadwal seperti Admin. Bot Telegram: tidak berubah.
+  C. Wajib publish ulang firestore.rules (fungsi isStaffOf: album galeri boleh ditulis Admin Kelas; sesi kind 'staff'). Tanpa itu galeri Admin Kelas ditolak server.
+  D. Keamanan: pembatasan ada di dua lapis: tampilan (menu disembunyikan) dan server (aturan Firestore untuk kas = hanya editor; Worker verifyAdmin = hanya editor, kecuali sinkron tugas/jadwal).
+     Catatan: dokumen website/{room} bisa ditulis semua pemegang token (sama seperti sebelumnya), jadi batas pengumuman/jadwal/tugas berlaku di antarmuka.

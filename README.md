@@ -74,7 +74,7 @@ Isi zip yang biasanya dikirim bersama:
 - **Tabel centang (aplikasi):** kolom No dan Nama bersifat sticky; sel sticky diberi `z-index:3` supaya kotak centang (centang digambar dengan `::after` posisi absolut) yang digeser ke kiri tersembunyi di bawah kolom nama.
 
 - **Menu aplikasi (hamburger):** "Pengingat Tagih Kas" dan "Kunci Aplikasi" kini berada di dalam "Pengaturan Aplikasi" (token User hanya melihat Kunci Aplikasi); "Cek Versi" ada di halaman Tentang;
-  item "Website" membuka alamat tetap `https://kas-kelas-smansa.web.app/` (kolom URL website dihapus; `state.websiteUrl` tidak dipakai lagi). Emoji di menu sengaja dihapus (gaya tanpa emoji).
+  item "Website" membuka alamat tetap `https://kaskelas.web.app/` (kolom URL website dihapus; `state.websiteUrl` tidak dipakai lagi). Emoji di menu sengaja dihapus (gaya tanpa emoji).
 - **Multi-kelas:** tiap kelas = satu ruang (`roomId`) dengan token Admin/User sendiri, dibuat developer lewat konsol developer. Data (`kas/{room}`, `website/{room}`), tema/mode kelas, dan tautan bot Telegram (per chat per token admin) terpisah per kelas.
   Yang bersifat global dan hanya dikendalikan developer: `config/app` (mode perbaikan, versi APK, kunci tema/mode semua kelas), hosting website, Firebase project/kuota, dan Cloudflare Worker.
 
@@ -169,3 +169,8 @@ Menu "Asisten AI" (aplikasi) menjawab pertanyaan cara pakai. Alur: aplikasi POST
 ## Integrasi Tugas (tugas + jadwal)
 Aplikasi Tugas (TaskReminder, v1.2.0) menyinkronkan tugas dan jadwal lewat endpoint relay `ns` di Worker: POST `{k, ns:{t:token, tasks, lessons, del:{tasks,lessons}}}` -> `{ok, role, tasks, lessons, del}`. `nsSync` memakai `fsUpdate` ke `website/{room}` (field `tugas`, `tugasDel`, `schedule`, `scheduleDel`); token editor menggabung (LWW per id dengan `u`, tombstone 60 hari), token user hanya membaca. Id jadwal lama tanpa id dibuat stabil dengan `nsHashId`. Website: kartu Tugas di Beranda, bagian Tugas di halaman Jadwal (admin: tambah/centang/hapus), jadwal punya kolom ruang dan hari Minggu. Bot: `/tugas`. Perbarui `AI_SYSTEM` bila fitur berubah.
 
+## Token ketiga: Admin Kelas (staff)
+`tokens/<TOKEN>.role` kini `'editor'|'viewer'|'staff'`. `staff` hanya dibuat developer (panel dv: `dvAddStaffToken`, kolom `#dvCSt`; editor tidak bisa membuatnya: rules token create hanya editor/viewer; `peers` tidak memuat staff; `ktRegisterPeer` menolak staff). Klien website: `isStaff()` (editor atau staff) untuk pengumuman, jadwal, tugas, galeri/album, kontak; `isAdmin()` tetap editor-only untuk keuangan, siswa, token, tema; elemen `.adm-only` disembunyikan bagi staff. APK: `isReadOnly()` = bukan editor, `roleLabel()` 'Admin Kelas'. Rules: `isStaffOf(room)` dipakai untuk `albums`; `sessions.kind` menerima 'staff'; `kas/*` tetap `isEditorOf`. Worker: `nsSync` mengizinkan staff menulis tugas/jadwal; `verifyAdmin` tetap editor-only. Aplikasi Tugas: role `staff` diperlakukan seperti editor (`Sync.readOnly`).
+
+## Asisten AI developer (bebas topik)
+Konsol Developer punya tombol 🤖 (`dvAiOpen/dvAiSend`) yang memanggil relay `ai:{dev:<Firebase ID token>, q, h, s}`. Worker `verifyDevIdToken` memeriksa token lewat `accounts:lookup` dan email `dev@kaskelas.dev`; bila valid memakai `AI_SYSTEM_DEV` (tanpa kunci topik, batas 1000/hari). Admin/Admin Kelas/Anggota tetap memakai `AI_SYSTEM` + penjaga topik; `AI_TOPIC_LOCK=off` membebaskan semuanya (bawaan sekarang terkunci).

@@ -50,6 +50,13 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/tokens/$(memberToken())).data.role == 'editor';
     }
 
+    // Admin Kelas (token role 'staff', dibuat developer): ketua/sekretaris. Boleh mengelola galeri/album, pengumuman, jadwal, tugas.
+    // TIDAK boleh menulis keuangan (kas), tidak bisa membuat/mengubah token.
+    function isStaffOf(room) {
+      return isMemberOf(room)
+        && get(/databases/$(database)/documents/tokens/$(memberToken())).data.role in ['editor', 'staff'];
+    }
+
     // Dokumen "pemilik developer": dibuat sekali oleh akun developer pertama, hanya bisa diubah oleh pemiliknya.
     match /config/dev {
       allow get: if isPasswordUser();
@@ -134,11 +141,11 @@ service cloud.firestore {
         allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
       }
 
-      // ALBUM GALERI: nama + sampul album. Hanya Editor/admin kelas yang boleh membuat, mengubah, dan menghapus.
+      // ALBUM GALERI: nama + sampul album. Hanya Editor/Admin Kelas yang boleh membuat, mengubah, dan menghapus.
       match /albums/{aid} {
         allow read, write: if isDev();
         allow get, list: if notBlocked();
-        allow create, update, delete: if notBlocked() && maintenanceOff() && isEditorOf(roomId);
+        allow create, update, delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
       }
 
       // KOMENTAR: satu dokumen per komentar. Siapa pun pemegang token kelas boleh MENULIS komentar baru
@@ -180,7 +187,7 @@ service cloud.firestore {
       allow create: if notBlocked()
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid','deviceId','platform','device','kind','roomId','who','appVersion','startedAt','lastSeen'])
-        && request.resource.data.kind in ['admin', 'user'];
+        && request.resource.data.kind in ['admin', 'staff', 'user'];
       allow update: if notBlocked()
         && resource.data.uid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen']);
