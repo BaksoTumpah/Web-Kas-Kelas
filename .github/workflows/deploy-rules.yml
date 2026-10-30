@@ -1,0 +1,22 @@
+name: Deploy Firestore Rules
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'firestore.rules'
+  workflow_dispatch:
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan kunci Firebase
+        env:
+          SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KAS_KELAS_SMANSA }}
+        run: |
+          printf '%s' "$SA_KEY" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+      - name: Deploy rules
+        run: npx --yes firebase-tools@latest deploy --only firestore:rules --project kas-kelas-smansa --non-interactive
