@@ -1,0 +1,283 @@
+KONFIGURASI SETELAH UPDATE (Riwayat Perubahan, Backup Otomatis, Kas Kegiatan)
+================================================================================
+Hal-hal lama (bot Telegram, bot developer, SHA-1, deploy sebelumnya) sudah selesai
+dan tidak perlu diulang. Kerjakan HANYA langkah di bawah, berurutan.
+
+LANGKAH 1 - Aturan Firestore (WAJIB, kerjakan paling awal)
+  1. Buka console.firebase.google.com > proyek kas-kelas-smansa.
+  2. Firestore Database > tab "Rules".
+  3. Hapus isi lama, tempel seluruh isi file firestore.rules dari zip ini.
+  4. Klik "Publish".
+  Tanpa langkah ini, perubahan dari website ke Riwayat Perubahan akan ditolak server.
+
+LANGKAH 2 - Ganti website
+  1. Ganti index.html di folder hosting dengan index.html dari zip ini.
+  2. Deploy: firebase deploy --only hosting (atau cara deploy yang biasa Anda pakai).
+  3. Buka https://kas-kelas-smansa.web.app/ lalu muat ulang paksa (Ctrl+Shift+R).
+
+LANGKAH 3 - Perbarui Cloudflare Worker
+  1. dash.cloudflare.com > Workers & Pages > pilih worker Anda > "Edit code".
+  2. Hapus semua isi, tempel seluruh isi telegram-worker.js dari zip ini.
+  3. Klik "Deploy".
+  Tidak ada secret baru, tidak ada KV baru, cron 07:00 WITA yang lama tetap dipakai.
+  Tidak perlu membuka /setup lagi.
+
+LANGKAH 4 - Pasang APK baru
+  1. Tunggu build di GitHub Actions selesai (repo kas-kelas-app-update), unduh APK.
+  2. Pasang di atas aplikasi lama (tanpa uninstall).
+
+LANGKAH 5 - Aktifkan Backup Otomatis di aplikasi (login sebagai Admin)
+  1. Menu > Backup (.xlsx / Drive) > centang "Backup Otomatis".
+  2. Pilih hari-hari backup, klik "Simpan Jadwal".
+  3. Backup berjalan pukul 07.00 WITA pada hari yang dipilih.
+  4. Hasil: Drive pemilik bot > "Backup Kas Kelas (nama kelas)" > "Backup Otomatis"
+     (hanya 1 file; file backup otomatis sebelumnya dihapus, backup manual tidak).
+
+SYARAT BACKUP OTOMATIS (cek sekali)
+  Worker harus punya 3 secret: G_CLIENT_ID, G_CLIENT_SECRET, G_REFRESH_TOKEN
+  (Workers > Settings > Variables and Secrets). Jika perintah /backup di bot admin
+  sudah menyimpan ke Drive, berarti secret ini sudah ada. Jika belum, bot developer
+  akan mengirim pesan "Backup otomatis GAGAL" berisi alasannya.
+
+LANGKAH 6 - Akun Google tiap kelas (backup otomatis & Telegram masuk ke akun yang login di APK)
+  1. Pastikan secret Worker G_CLIENT_ID dan G_CLIENT_SECRET adalah Web client yang SAMA dengan
+     serverClientId di capacitor.config.json (485912385352-gamvc8h85sd5t6piq42tf0sgb7pqgjsl.apps.googleusercontent.com).
+     Jika berbeda, ganti kedua secret itu dengan client tersebut, lalu Deploy.
+  2. Di Google Cloud Console > OAuth consent screen: tambahkan akun Google yang akan dipakai sebagai Test user
+     (selama aplikasi berstatus Testing).
+  3. Di aplikasi (Admin): Menu > Sinkron Akun Google Drive > "Sambungkan ke Server" > pilih akun Google.
+     Status harus berubah menjadi "Tersambung ke <email>".
+  4. Kelas lain: cukup login Admin di APK, lakukan langkah 3 dengan akun mereka. Tidak perlu secret baru.
+  G_REFRESH_TOKEN lama tetap dipakai hanya untuk kelas yang BELUM menyambungkan akun.
+  Catatan: kalau backup manual dan otomatis membuat dua folder "Backup Kas Kelas (...)", beri tahu saya
+  (artinya batas izin drive.file memisahkan folder buatan aplikasi dan server).
+
+LANGKAH 7 - Perintah baru bot (setelah Worker di-Deploy)
+  1. Buka sekali di browser: https://<alamat-worker-anda>/setup?key=<SECRET>
+     (memperbarui daftar menu perintah bot admin dan bot developer).
+  2. Di bot developer kirim /bantuan untuk melihat semua perintah, /ping untuk cek kesehatan, /uji untuk tes notifikasi.
+  3. OPSIONAL (notifikasi tertunda terkirim ulang lebih cepat): Cloudflare > Worker > Settings > Triggers > Cron Triggers >
+     tambah satu cron "*/5 * * * *" (tanpa menghapus cron lama). Tugas harian tetap hanya berjalan sekali per hari.
+  4. Aplikasi dan website lama tetap kompatibel; yang baru hanya mengirim jenis kabar tambahan agar /hidup /mati lebih akurat.
+
+LANGKAH 13 - Backup otomatis tidak jalan? + hapus data (versi 3.9.4)
+  1. Penyebab paling umum backup jam pilihan tidak jalan: Cron Trigger tiap jam belum terpasang. Pasang "0 * * * *" di
+     Cloudflare > Worker > Settings > Triggers > Cron Triggers.
+  2. Cek di bot developer kirim /jadwal: tertera "backup terakhir" tiap kelas dan "Pemeriksaan jadwal terakhir (cron / terpicu permintaan)".
+     Bila lebih dari 2 jam lalu, muncul peringatan cron belum terpasang.
+  3. Cadangan: Worker kini juga memeriksa jadwal tiap ada permintaan masuk (login/notifikasi/pesan bot), paling sering tiap 5 menit.
+     Itu hanya cadangan; cron tetap cara yang andal. Backup yang terlewat jamnya tetap dijalankan begitu pemeriksaan berikutnya terjadi di hari yang sama.
+  4. Riwayat Perubahan > "Bersihkan Riwayat" menghapus catatan yang sudah diproses (yang menunggu konfirmasi tidak dihapus).
+  5. Pengaturan Aplikasi > Zona berbahaya: "Hapus Semua Data Kecuali Siswa" (opsi "Tanpa Terkecuali" sudah dihapus; untuk
+     mengosongkan semuanya pakai "Reset Semua Data"). Meminta dua konfirmasi, lalu mengetik token Admin. Token, akun Google, dan galeri foto tidak ikut dihapus.
+     Sebelum menghapus, lakukan Backup (.xlsx / Drive) dulu.
+
+LANGKAH 12 - Pengingat tagih hanya di tanggal kolom (versi 3.9.1)
+  Ganti telegram-worker.js (Deploy) dan pasang APK baru. Pengingat tagih (notifikasi HP dan pesan bot pagi hari) kini hanya untuk
+  tanggal yang punya kolom centang. Contoh: kolom Senin-Jumat -> hari Sabtu tidak ada pengingat. Buat kolom bulan/minggu berikutnya
+  agar pengingatnya muncul. Libur yang ditandai tetap tidak diingatkan.
+
+LANGKAH 11 - Tarif kas berbeda dalam satu bulan (versi 3.9)
+  1. Ganti index.html website dan telegram-worker.js (Deploy) DAN pasang APK baru. Ketiganya perlu versi baru supaya hitungan tunggakan sama.
+     Aplikasi/website lama masih menghitung semua tanggal dengan satu nilai bulan, jadi jangan memakai tarif per tanggal sebelum semuanya diperbarui.
+  2. Di aplikasi: pilih bulan di beranda > menu Nilai & Jadwal Checklist > bagian "Tarif berbeda per tanggal" > + Tambah rentang.
+     Contoh November: rentang 1 = tgl 1-15, Rp5.000, tanpa pilih hari (tiap hari); rentang 2 = tgl 16-30, Rp2.000, centang Selasa & Kamis.
+     Klik "Terapkan rentang". Kolom tanggal otomatis dibuat dengan nominalnya masing-masing.
+     Kebalikannya (awal 2x seminggu Rp2.000, akhir tiap hari Rp5.000) dibuat dengan cara yang sama.
+  3. Opsi "Ganti jadwal bulan ini" menghapus tanggal di luar rentang, kecuali tanggal yang sudah ada centangnya.
+     Bila tanggal yang sudah tercentang berubah nominal, aplikasi meminta konfirmasi dulu.
+  4. Pemasukan, saldo, tunggakan (aplikasi, website, bot, backup) membaca nominal PER TANGGAL. Bulan lama tidak berubah.
+
+LANGKAH 10 - Konfirmasi lewat Telegram & ubah data manual (versi 3.8)
+  1. Deploy ulang Worker (telegram-worker.js), lalu buka /setup?key=<SECRET> sekali agar menu bot memuat /perubahan /yes /no.
+  2. Saat admin website menambah pemasukan/pengeluaran atau mengubah tunggakan, bot admin mengirim kabar. Balas:
+     /yes (konfirmasi) atau /no (tolak). Bila ada beberapa: /perubahan lalu /yes 2, /no 1, atau /yes semua.
+     Hasilnya sama dengan tombol Konfirmasi/Tolak di Riwayat Perubahan aplikasi (yang sudah diproses di salah satu tempat tidak diproses dua kali).
+  3. Ubah/hapus pemasukan manual & pengeluaran HANYA di aplikasi: tombol pensil di Pemasukan/Pengeluaran
+     (ubah keterangan, jumlah, tanggal & jam; tombol "Hapus data ini" di bagian bawah, dengan konfirmasi).
+     Website admin hanya bisa menambah, dan harus dikonfirmasi dulu (aplikasi atau Telegram).
+  4. Link "Coba Mode Demo" kini kecil di bawah "Request Token Custom".
+
+LANGKAH 9 - Jam backup otomatis, Mode Demo, dan Cron WAJIB (versi 3.7)
+  1. CRON WAJIB DITAMBAH: Cloudflare > Worker > Settings > Triggers > Cron Triggers > tambah "0 * * * *" (tiap jam).
+     Jadwal backup kini mengikuti jam pilihan kelas (bawaan 15:00 WITA), jadi Worker harus dibangunkan tiap jam.
+     Cron "0 23 * * *" (07:00 WITA) tetap dipakai untuk pengingat harian. Boleh ganti keduanya dengan "*/5 * * * *".
+     Tanpa cron tiap jam, backup otomatis TIDAK jalan pada jam pilihan.
+  2. Di aplikasi: Menu > Backup > Backup Otomatis > pilih Jam backup (WITA) dan hari > Simpan Jadwal (wajib simpan ulang sekali).
+  3. Mode Demo (untuk reviewer toko aplikasi): token DEMOADMN (admin) dan DEMOUSER (anggota), atau tombol "Coba Mode Demo".
+     Data contoh hanya di memori; tidak ke Firebase/Telegram dan tidak menimpa data asli. Tidak perlu membuat apa pun di Firebase.
+  4. Hapus pemasukan manual / pengeluaran satu per satu: tombol tempat sampah di Pemasukan dan Pengeluaran (ada konfirmasi).
+  5. Logo bawaan sekarang ikon celengan hijau; logo kelas yang diisi admin menggantikannya.
+  6. Akun Google Drive kini tetap tertaut sampai menekan "Keluar Akun Google" (Menu > Sinkron Akun Google Drive).
+
+LANGKAH 8 - Keamanan & perbaikan terbaru (versi 3.5)
+  1. Urutan wajib: (a) publish firestore.rules, (b) deploy index.html website, (c) paste telegram-worker.js lalu Deploy,
+     (d) /setup?key=<SECRET>, (e) install APK baru di semua HP admin.
+  2. Kunci relay baru: Worker kini memakai RELAY_KEY terpisah dari SECRET. Bawaan sudah cocok dengan APK/website baru.
+     Opsional lebih aman: buat secret RELAY_KEY sendiri di Cloudflare, lalu samakan TG_RELAY_KEY di index.html website
+     dan APK (kalau tidak diganti, pakai bawaan - tetap berfungsi).
+  3. Setelah SEMUA APK kelas sudah versi 3.5, tambahkan variabel RELAY_LEGACY = off di Worker agar SECRET lama tidak
+     lagi diterima di jalur relay.
+  4. Jadwal backup otomatis sekarang wajib membawa token admin. APK lama yang mendaftarkan jadwal akan ditolak;
+     buka menu Backup di APK baru dan simpan jadwal sekali lagi.
+  5. Backup otomatis memakai antrean dengan 3x percobaan ulang lalu pemberitahuan gagal ke developer.
+  6. Bot developer: /storage (atau /penyimpanan) menampilkan ukuran data tiap kelas dibanding batas 1 MB per dokumen.
+     Jika >80% aplikasi juga memberi peringatan; kurangi ukuran logo/foto atau pisahkan kelas.
+  7. Semua teks dari pengguna (nama, pengumuman, catatan) kini di-escape (anti-XSS). Backup .xlsx memuat sheet Kegiatan.
+  8. WAJIB oleh Anda: simpan cadangan keystore/ kunci tanda tangan APK di tempat aman (bukan hanya di GitHub).
+
+KETERBATASAN YANG TIDAK BISA DIPERBAIKI DENGAN KODE
+  - Data identitas (NISN/tanggal lahir) terbaca oleh pemegang token kelas: butuh desain ulang sisi server.
+  - Konfirmasi perubahan hanya ditegakkan di aplikasi (aturan Firestore tidak bisa membedakan editor web dan APK).
+  - Dua admin mengedit bersamaan: yang terakhir menyimpan menang (sudah dikurangi dengan simpan otomatis saat
+    aplikasi ditutup dan setelah Konfirmasi).
+  - App Check tidak bisa dipaksakan untuk APK yang dipasang manual (sideload).
+
+UJI SETELAH SEMUA SELESAI
+  a. Di website (login admin) klik "Lunas" pada satu tunggakan -> muncul popup di
+     aplikasi -> menu "Riwayat Perubahan" -> Konfirmasi -> siswa tercentang di tabel.
+  b. Cloudflare > Worker > Triggers > Cron > jalankan manual (atau tunggu 07:00 WITA)
+     pada hari yang dipilih, lalu cek folder "Backup Otomatis" di Drive.
+  d. Setelah langkah 6, kirim /backup ke bot admin: file harus muncul di Drive akun yang Anda sambungkan.
+  e. Di bot developer kirim /storage: tampil ukuran data tiap kelas.
+  c. Buat satu "Kas Kegiatan" di aplikasi; tombolnya muncul di website.
+
+
+LANGKAH 14 - BACKUP OTOMATIS LEBIH ANDAL, RESTORE, /datasiswa  (WAJIB: deploy ulang telegram-worker.js)
+  1. Cloudflare > Worker > Edit code > tempel isi telegram-worker.js yang baru > Deploy. Cron lama (*/30, */5, 0 *) boleh tetap.
+  2. Perbaikan backup otomatis: tiap pemeriksaan (cron/permintaan) kini langsung mengejar jadwal (tanpa penanda per jam),
+     percobaan dicatat SEBELUM berjalan (Worker yang mati di tengah jalan tetap terhitung & dilaporkan), tiga cron
+     bersamaan tidak lagi saling menghapus file, dan file lama hanya dihapus bila lebih lama dari file baru.
+  3. Bot developer: /cekbackup <kelas> (contoh /cekbackup XI.A2) menampilkan jadwal, hari/jam, antrean, hasil terakhir,
+     akun Drive, lalu MENJALANKAN backup saat itu juga dan menampilkan penyebab kesalahan yang sebenarnya.
+     Jika hasilnya "Drive belum dihubungkan": buka aplikasi > Sinkron Akun Google Drive > Sambungkan ke Server.
+     Jika "jadwal TIDAK ADA": buka aplikasi (versi terbaru) > Backup > Simpan Jadwal lagi.
+  4. Restore: aplikasi > Backup > "Pilih File Backup (.xlsx)". Semua file .xlsx backup (manual, otomatis, Drive, Telegram)
+     kini memuat sheet tersembunyi "_DATA" berisi salinan lengkap data, jadi TIDAK perlu file JSON. File backup LAMA
+     (sebelum versi ini) tidak punya sheet itu dan tidak bisa dipakai restore: buat backup baru dulu.
+     Restore meminta ketik token Admin; data website (pengumuman, jadwal, kontak) tidak ikut berubah. Jangan hapus sheet _DATA.
+  5. Folder Drive: backup otomatis tetap 1 file (diganti tiap kali); backup manual tidak dihapus.
+  6. Menu aplikasi untuk token User (lihat saja): Bot Telegram, Pengaturan Aplikasi (termasuk Kunci Aplikasi),
+     Riwayat Perubahan, dan grup Siswa disembunyikan; menu Website ditampilkan.
+  7. Bot admin: /datasiswa. Bot developer: /datasiswa <kelas>. Format: "35. 0101468700 Taufan Fadila Hariono 11 Juni".
+
+LANGKAH 15 - JAM:MENIT BACKUP & NOTIFIKASI TELEGRAM  (WAJIB: deploy ulang telegram-worker.js)
+  1. Aplikasi > Backup: "Jam & menit backup" kini bebas (mis. 09:30), bukan dropdown jam saja. Klik Simpan Jadwal.
+  2. Bot admin menerima: "Backup otomatis BERHASIL" (dengan jam), "gagal (percobaan 1/3 atau 2/3, dicoba lagi 10 menit)",
+     dan "GAGAL (sudah dicoba 3x)" / "Worker terhenti" bila tidak berhasil. Pemeriksaan jadwal tiap cron (*/5 -> maks. 5 menit setelah jam yang diset).
+
+LANGKAH 16 - FITUR BARU (laporan PDF, bukti struk, cari, WA, PWA, bot)
+  1. Worker: tempel ulang telegram-worker.js > Deploy, lalu buka sekali /setup?key=SECRET agar menu perintah bot ter-update.
+  2. Website (Firebase Hosting): ganti index.html DAN tambahkan 4 file baru di folder yang sama:
+     manifest.webmanifest, sw.js, icon-192.png, icon-512.png, lalu deploy ulang hosting.
+     Setelah itu website bisa dipasang seperti aplikasi (tombol "Pasang sebagai aplikasi" di halaman Data Kas atau menu browser).
+  3. Aplikasi (APK baru): Backup > "Laporan kas bulanan (PDF)" (unduh / bagikan ke WhatsApp), kolom Cari & filter di atas tabel
+     dashboard, tombol Bagikan WA di Daftar Tunggakan, "Nama saya" di Pengaturan Aplikasi (muncul di Riwayat Perubahan).
+  4. Bukti struk: kolom foto (opsional) di Tambah Pemasukan/Pengeluaran (aplikasi & website). Foto dikompres (~100 KB) lalu
+     diunggah Worker ke Google Drive kelas: "Backup Kas Kelas (nama)" / "Struk Bukti", nama file = tanggal & jam input.
+     Aplikasi/website hanya menyimpan & menampilkan tautan "Bukti". Syarat: Drive kelas sudah tersambung ke server
+     (aplikasi > Sinkron Akun Google Drive > Sambungkan ke Server) dan Worker versi terbaru.
+     Foto dari website baru tersimpan di data setelah perubahannya dikonfirmasi di aplikasi/Telegram.
+  5. Bot admin baru: /ulangtahun (pengingat otomatis H-1), /cari <nama>, /batassaldo <jumlah|off>
+     (peringatan saldo menipis tiap pagi dan saat /catat), /undo (batalkan /bayar /catat /pengumuman terakhir, 24 jam).
+     Pagi hari bot juga memberi tahu bila backup otomatis terakhir > 7 hari, dan pengingat backup tiap tanggal 1.
+  6. Log: tiap catatan berisi nama pengisi ("Nama saya") dan foto bukti dicatat di Riwayat Perubahan.
+  7. Popup login Google: admin (token Admin) yang belum menyambungkan akun Google ke server melihat peringatan saat masuk
+     aplikasi: backup otomatis, backup Telegram, dan foto struk akan masuk ke Drive developer sampai ia login.
+     Tombol "Nanti" menyembunyikannya 6 jam; hilang selamanya setelah akun tersambung.
+
+LANGKAH 17 - DEPLOY WORKER OTOMATIS LEWAT GITHUB (tanpa menempel kode di browser)
+  Repo kas-kelas-app-update berisi worker/telegram-worker.js dan .github/workflows/deploy-worker.yml.
+  Setiap file worker itu berubah (saat "push"), GitHub mengunggahnya ke Worker "icy-truth-bbad". KV, variabel, dan secret
+  yang sudah ada di Cloudflare tidak dihapus; Cron Trigger tidak berubah.
+  Persiapan sekali saja:
+  1. Cloudflare > My Profile > API Tokens > Create Token > template "Edit Cloudflare Workers" > Continue > Create.
+     Salin token-nya (hanya tampil sekali).
+  2. Account ID: Cloudflare > Workers & Pages > di sisi kanan halaman ada "Account ID" (salin).
+  3. GitHub repo > Settings > Secrets and variables > Actions > New repository secret, buat dua secret:
+       CLOUDFLARE_API_TOKEN  = token dari langkah 1
+       CLOUDFLARE_ACCOUNT_ID = Account ID dari langkah 2
+  4. GitHub > tab Actions > "Deploy Worker Telegram (Cloudflare)" > Run workflow. Hijau = Worker terbaru sudah aktif.
+  5. Buka sekali /setup?key=SECRET agar menu perintah bot ter-update, lalu kirim /jadwal ke bot developer untuk memeriksa.
+  Bila merah: buka log-nya; Worker lama tetap berjalan. Jangan bagikan token ke siapa pun; bila bocor, hapus di Cloudflare.
+
+LANGKAH 18 - TUTUP BUKU, KATEGORI PENGELUARAN, IMPOR SISWA  (APK baru + Worker otomatis + ganti index.html website)
+  1. Tutup Buku: dashboard > pilih bulan > tombol "Tutup Buku". Setelah ditutup, centang, tanggal, pemasukan, dan
+     pengeluaran bulan itu terkunci (aplikasi, website, dan bot menolak perubahan). Bulan tampil dengan ikon gembok.
+     Tombol berubah jadi "Buka Kunci" bila perlu mengubah lagi. Laporan PDF bulan ditutup diberi cap "BUKU DITUTUP".
+  2. Kategori pengeluaran: template ATK, Konsumsi, Kegiatan, Kebersihan, Transportasi, Lain-lain. Di form pengeluaran
+     ada pilihan Kategori + tombol Kelola / "+ Tambah kategori baru..." (maksimal 20, tiap nama maksimal 20 huruf).
+     Rekap per kategori tampil di halaman pengeluaran bulan dan di PDF. Website: pilih kategori saat menambah pengeluaran.
+     Bot: /catat 15rb fotokopi #atk  dan /kategori (rekap per kategori bulan ini).
+  3. Impor siswa: menu Siswa > "Impor Data Siswa (.xlsx)". Tekan "Unduh contoh file" untuk contoh (5 siswa + sheet Petunjuk).
+     Kolom: No, NISN, Nama Lengkap (wajib), Nama Panggilan, Tanggal Lahir, Kelas. Mode "Gabung" mencocokkan NISN lalu nama
+     lengkap (siswa baru ditambah di akhir, nomor absen lama aman). "Ganti seluruh daftar" hanya muncul bila belum ada centang iuran.
+  Worker otomatis ter-deploy lewat GitHub saat push; website: ganti index.html di Firebase Hosting lalu deploy.
+  4. Ekspor siswa: menu Siswa > "Ekspor Data Siswa (.xlsx)" menghasilkan file dengan kolom yang sama persis seperti
+     format impor (No, NISN, Nama Lengkap, Nama Panggilan, Tanggal Lahir, Kelas), jadi bisa diedit lalu diimpor lagi.
+  5. Opsi Login (developer): login developer > kartu "Opsi Login" > pilih NISN atau No. Absen > tombol "Matikan".
+     Di website, opsi yang dimatikan tampil semi transparan (kolom & tombol tidak bisa diisi/diklik) dan saat diketuk
+     muncul peringatan "sedang dinonaktifkan". Tombol berubah jadi "Hidupkan kembali". Berlaku untuk semua kelas;
+     login developer lewat ketuk judul 5x tidak terpengaruh. Pembatasan ini di tampilan website (aturan server tidak berubah).
+
+LANGKAH 19 - LAPOR KE DEVELOPER  (WAJIB: publish ulang firestore.rules + ganti index.html website; APK & Worker otomatis saat push)
+  1. Admin: aplikasi (menu > "Lapor ke Developer"), website (Menu Admin > "Lapor ke Developer"), atau bot admin:
+       /lapor tombol simpan tidak merespons sejak pagi
+     Batas 1 laporan per menit, isi 5-800 huruf.
+  2. Laporan masuk ke: (a) panel developer website > kartu "Laporan Admin" (tandai selesai / hapus, ada badge jumlah baru)
+     dan (b) Telegram developer. Di bot developer: /laporan (daftar) dan /selesailapor <no>.
+  3. firestore.rules BARU (ada koleksi adminReports): Firebase Console > Firestore Database > Rules > tempel isi
+     firestore.rules dari zip > Publish. Tanpa ini laporan tetap sampai ke Telegram developer, tetapi tidak tampil di panel.
+
+LANGKAH 20 - APK RILIS UNTUK UPTODOWN / TOKO APLIKASI (kunci tanda tangan asli)
+  APK biasa dari workflow "Build APK" bertanda tangan kunci debug, sehingga ditolak toko. Sekarang ada APK RILIS.
+  A. Buat kunci rilis (sekali saja)
+     1. GitHub > tab Actions > "Buat Keystore Rilis" > Run workflow (isi nama, mis. Kas Kelas).
+     2. Setelah hijau, buka run itu > bagian Artifacts > unduh "keystore-rilis" (zip). Isinya: kas-kelas-release.keystore,
+        RELEASE_KEYSTORE_BASE64.txt, ISI-4-SECRET.txt, SHA1.txt.
+     3. SIMPAN zip itu di tempat aman (mis. Google Drive pribadi). Kunci hilang = APK tidak bisa di-update di atas versi lama.
+     4. Repo > Settings > Secrets and variables > Actions > New repository secret, buat 4 secret sesuai ISI-4-SECRET.txt:
+        RELEASE_KEYSTORE_BASE64, RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD.
+     5. Hapus artifact "keystore-rilis" dari run tadi (otomatis hilang 3 hari juga). Jangan bagikan isinya ke siapa pun.
+  B. Bangun APK rilis
+     Actions > "Build APK" > Run workflow. Hasilnya artifact "kas-kelas-apk-release" (kas-kelas-release.apk) = APK untuk diunggah
+     ke Uptodown. Artifact "kas-kelas-apk" (debug) tetap ada untuk pemakaian pribadi.
+  C. PENTING
+     - Kunci rilis BERBEDA dari kunci debug: APK rilis tidak bisa dipasang di atas APK debug lama (harus uninstall dulu;
+       data kas aman karena tersimpan online per token).
+     - Login Google Drive: ambil SHA-1 APK rilis dari ringkasan run "Build APK" (bagian "SHA-1 APK RILIS"), lalu daftarkan di
+       Google Cloud > APIs & Services > Credentials > buat OAuth Client ID tipe Android (package com.kaskelas.app + SHA-1 itu).
+       Tanpa ini login Google di APK rilis gagal (kode 10). Bila nanti aplikasi dipublikasikan luas, atur juga layar persetujuan OAuth ke "In production".
+     - Selalu pakai kunci rilis yang SAMA untuk semua update berikutnya.
+
+
+LANGKAH 21 - ASISTEN AI (menu "Asisten AI" di aplikasi)
+  Memakai Cloudflare Workers AI (model @cf/meta/glm-4.7-flash, cadangan gemma-4 dan llama-3.3-70b), gratis dalam batas harian (+/- 100 pertanyaan/hari untuk semua kelas).
+  Tanpa kunci API baru. Worker membatasi 25 pertanyaan/hari per kelas (variabel opsional AI_DAILY_LIMIT) dan tidak menerima data siswa.
+  A. Binding AI: workflow "Deploy Worker" mencoba menambahkannya otomatis. Bila asisten menjawab "belum aktif di server":
+     Cloudflare > Workers & Pages > icy-truth-bbad > Settings > Bindings > Add > Workers AI > Variable name: AI > Deploy.
+  B. Ganti model (opsional): tambah variabel AI_MODEL, mis. @cf/zai-org/glm-4.7-flash (model lama llama-3.1-8b sudah dipensiunkan Cloudflare; Worker otomatis mencoba model cadangan).
+  C. Isi pengetahuan asisten ada di konstanta AI_SYSTEM di telegram-worker.js; perbarui bila ada fitur baru agar jawabannya akurat.
+  D. Pembatasan topik (anti-penyalahgunaan): asisten hanya menjawab seputar aplikasi Kas Kelas. Dua lapis: (1) penjaga kata kunci di Worker
+     menolak pertanyaan tanpa kaitan aplikasi SEBELUM memanggil AI (tidak memakai kuota); (2) prompt sistem menyuruh AI menjawab [LUAR_TOPIK]
+     untuk hal di luar topik atau upaya "abaikan instruksi", lalu Worker menggantinya dengan pesan penolakan. Daftar kata kunci = AI_TOPIC
+     di telegram-worker.js; tambahkan kata bila ada pertanyaan sah yang ikut ditolak. Tidak 100% kebal (AI bisa dipancing), tapi batas harian
+     per kelas (25) tetap membatasi dampaknya.
+  E. Batas pemakaian: jatah kelas 25 pertanyaan/hari (AI_DAILY_LIMIT) dan jatah per token 12/hari (AI_TOKEN_LIMIT) supaya satu orang tidak menghabiskan
+     jatah satu kelas; plus maksimal 12 pertanyaan per 10 menit per token. Pertanyaan yang ditolak penjaga topik tidak mengurangi jatah.
+
+LANGKAH 22 - INTEGRASI APLIKASI CATATAN SEKOLAH (tugas + jadwal sinkron dengan website)
+  Aplikasi terpisah "Tugas" (repo BaksoTumpah/TaskReminder, mulai v1.2.0) bisa disambungkan ke Kas Kelas memakai token Kas Kelas.
+  A. Yang perlu dilakukan: (1) Worker otomatis terdeploy lewat GitHub Actions (endpoint baru "ns" + perintah bot /tugas).
+     (2) Ganti index.html website di Firebase Hosting dengan yang baru (halaman Jadwal kini berisi Tugas; ada kartu Tugas di Beranda).
+     (3) Pasang APK Tugas v1.2.0 (build GitHub Actions), buka menu titik tiga > "Sambungkan Kas Kelas", masukkan token.
+     Firestore rules TIDAK berubah. Tidak ada kunci/secret baru (memakai RELAY_KEY yang sama).
+  B. Hak akses: token Admin (editor) boleh menambah/ubah/centang/hapus tugas dan jadwal dari aplikasi maupun website; token User hanya melihat
+     (aplikasi menampilkan data kelas, tombol tambah disembunyikan; data lokal HP diganti setelah konfirmasi). Semua anggota website bisa melihat tugas.
+  C. Cara kerja: data disimpan di dokumen website/{room} (field tugas, tugasDel, schedule, scheduleDel). Penggabungan per item: stempel waktu "u" terbaru
+     menang; hapus memakai tanda hapus (disimpan 60 hari) agar tidak muncul lagi. Aplikasi sinkron saat dibuka, setelah tiap perubahan, dan lewat menu Sambungkan.
+     Jadwal di website tanpa jam yang terbaca (format "07.00 - 08.30") hanya tampil di website, tidak masuk aplikasi.
+  D. Batas: 40 sinkron per 10 menit per token. Perubahan oleh dua orang pada item yang sama: yang terakhir menang.
+  E. Bot: /tugas menampilkan tugas yang belum selesai (urut tenggat, tanda peringatan bila lewat).
+  F. Catatan teknis: kode Kotlin hanya diverifikasi lewat build GitHub Actions; relay key tertanam di APK (sama seperti Kas Kelas).
+

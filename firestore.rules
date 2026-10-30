@@ -1,0 +1,245 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== DEVELOPER =====
+    // Akun developer = akun Firebase Auth (email/password) yang uid-nya tercatat di dokumen config/dev.
+    // Hanya akun itu yang boleh melihat DAFTAR semua token/kelas, menghapus data, dan memakai fitur developer.
+    function isPasswordUser() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+    function isDev() {
+      return isPasswordUser()
+        && exists(/databases/$(database)/documents/config/dev)
+        && get(/databases/$(database)/documents/config/dev).data.uid == request.auth.uid;
+    }
+
+    // ===== BLOKIR PERANGKAT =====
+    // Perangkat (UID anonim) yang diblokir developer ditolak di SEMUA aturan di bawah selama blokir berlaku.
+    // Blokir otomatis kedaluwarsa (field "until"). Server tidak mengenal IP, jadi yang diblokir adalah UID.
+    function notBlocked() {
+      return request.auth != null
+        && !(exists(/databases/$(database)/documents/blocks/$(request.auth.uid))
+             && get(/databases/$(database)/documents/blocks/$(request.auth.uid)).data.until > request.time);
+    }
+
+    // ===== MODE PERBAIKAN =====
+    // Saat aktif, perubahan data dari non-developer ditolak server (halaman perbaikan juga tampil di klien).
+    function maintenanceOff() {
+      return !(exists(/databases/$(database)/documents/config/app)
+               && get(/databases/$(database)/documents/config/app).data.get('maintenanceOn', false) == true);
+    }
+
+    // ===== PEMEGANG TOKEN (anggota ruang) =====
+    // Saat masuk, perangkat mendaftarkan "saya pemegang token X" ke dokumen PRIBADI members/{uid-nya}
+    // (hanya bisa dibaca perangkat itu sendiri). Hak menulis dinilai dari dokumen itu.
+    // Dengan begitu token TIDAK PERNAH disimpan di dokumen data kelas yang bisa dibaca semua anggota.
+    // Kalau token dicabut/diganti, dokumen pendaftaran otomatis tidak berlaku lagi.
+    function memberToken() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data.token;
+    }
+    function isMemberOf(room) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && exists(/databases/$(database)/documents/tokens/$(memberToken()))
+        && get(/databases/$(database)/documents/tokens/$(memberToken())).data.roomId == room;
+    }
+    function isEditorOf(room) {
+      return isMemberOf(room)
+        && get(/databases/$(database)/documents/tokens/$(memberToken())).data.role == 'editor';
+    }
+
+    // Dokumen "pemilik developer": dibuat sekali oleh akun developer pertama, hanya bisa diubah oleh pemiliknya.
+    match /config/dev {
+      allow get: if isPasswordUser();
+      allow create: if isPasswordUser()
+        && request.resource.data.uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/config/dev);
+      allow update: if isDev() && request.resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Pengaturan bersama (Mode Perbaikan, versi & link update APK): dibaca semua perangkat, diubah hanya developer.
+    match /config/app {
+      allow read, write: if isDev();
+      allow get: if notBlocked();
+    }
+
+    // PENDAFTARAN PEMEGANG TOKEN: tiap perangkat hanya bisa membaca/menulis dokumennya sendiri,
+    // dan hanya untuk token yang benar-benar ada.
+    match /members/{uid} {
+      allow read, write: if isDev();
+      allow get, delete: if notBlocked() && request.auth.uid == uid;
+      allow create, update: if notBlocked() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['token'])
+        && request.resource.data.token is string
+        && exists(/databases/$(database)/documents/tokens/$(request.resource.data.token));
+    }
+
+    // TOKEN: hanya bisa dibuka satu per satu jika tahu tokennya. Daftar semua token hanya untuk developer.
+    //  - Dokumen token Editor menyimpan "peers": daftar token lain milik ruang yang sama, supaya admin bisa
+    //    melihat token aktifnya. Dokumen itu hanya bisa dibuka oleh yang tahu token Editor-nya, jadi
+    //    anggota biasa tidak bisa melihatnya.
+    //  - Kelas baru: token boleh dibuat untuk ruang yang BELUM ada.
+    //  - Kelas yang sudah ada: hanya Editor kelas itu yang boleh membuat/mengganti/menghapus token ruangnya.
+    match /tokens/{token} {
+      allow read, write: if isDev();
+      allow get: if notBlocked();
+      allow create: if notBlocked() && maintenanceOff()
+        && request.resource.data.keys().hasOnly(['roomId', 'role', 'peers'])
+        && request.resource.data.role in ['editor', 'viewer']
+        && (!('peers' in request.resource.data) || request.resource.data.peers is map)
+        && !exists(/databases/$(database)/documents/kas/$(request.resource.data.roomId));
+      allow create: if notBlocked() && maintenanceOff()
+        && request.resource.data.keys().hasOnly(['roomId', 'role', 'peers'])
+        && request.resource.data.role in ['editor', 'viewer']
+        && (!('peers' in request.resource.data) || request.resource.data.peers is map)
+        && isEditorOf(request.resource.data.roomId);
+      allow update: if notBlocked() && maintenanceOff()
+        && isEditorOf(resource.data.roomId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['peers']);
+      allow delete: if notBlocked() && maintenanceOff()
+        && isEditorOf(resource.data.roomId);
+    }
+
+    // DATA KAS (dari aplikasi): dibaca semua yang login, ditulis hanya Editor kelas itu.
+    match /kas/{roomId} {
+      allow read, write: if isDev();
+      allow get: if notBlocked();
+      allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId);
+
+      // RIWAYAT PERUBAHAN KEUANGAN: perubahan dari website menunggu konfirmasi di aplikasi (status 'pending'),
+      // perubahan dari aplikasi/bot dicatat sebagai 'applied'. Anggota membaca, Editor menulis.
+      match /changes/{cid} {
+        allow read, write: if isDev();
+        allow get, list: if notBlocked() && isMemberOf(roomId);
+        allow create, update, delete: if notBlocked() && maintenanceOff() && isEditorOf(roomId);
+      }
+    }
+
+    // DATA WEBSITE (pengumuman, kontak, jadwal, laporan, rating, dll): ditulis pemegang token mana pun milik kelas itu.
+    match /website/{roomId} {
+      allow read, write: if isDev();
+      allow get: if notBlocked();
+      allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
+
+      // GALERI BERSAMA: tiap foto satu dokumen terpisah.
+      // Permintaan HAPUS biasa tidak membawa data, sehingga menghapus dilakukan dua langkah:
+      // (1) update menandai deleted=true + mengosongkan foto, (2) hapus dokumen sisa (hanya kalau sudah deleted).
+      match /gallery/{photoId} {
+        allow read, write: if isDev();
+        allow get, list: if notBlocked();
+        allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
+        allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
+      }
+
+      // ALBUM GALERI: nama + sampul album. Hanya Editor/admin kelas yang boleh membuat, mengubah, dan menghapus.
+      match /albums/{aid} {
+        allow read, write: if isDev();
+        allow get, list: if notBlocked();
+        allow create, update, delete: if notBlocked() && maintenanceOff() && isEditorOf(roomId);
+      }
+
+      // KOMENTAR: satu dokumen per komentar. Siapa pun pemegang token kelas boleh MENULIS komentar baru
+      // (tidak bisa diedit). Hapus: hanya perangkat yang menulisnya (uid sama) atau Editor/admin kelas itu.
+      // Penanda isAdmin=true hanya sah jika penulisnya memegang token Editor kelas ini.
+      match /comments/{cid} {
+        allow read, write: if isDev();
+        allow get, list: if notBlocked();
+        allow create: if notBlocked() && maintenanceOff() && isMemberOf(roomId)
+          && request.resource.data.keys().hasAll(['uid','absen','name','text','ts','isAdmin'])
+          && request.resource.data.keys().hasOnly(['uid','absen','name','text','ts','isAdmin','mentions','replyTo','replyAbsen','replyName','replyText'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.ts == request.time
+          && request.resource.data.absen is string
+          && request.resource.data.name is string && request.resource.data.name.size() <= 40
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+          && request.resource.data.isAdmin is bool
+          && (request.resource.data.isAdmin == false || isEditorOf(roomId))
+          && (!('mentions' in request.resource.data) || (request.resource.data.mentions is list && request.resource.data.mentions.size() <= 15))
+          && (!('replyText' in request.resource.data) || (request.resource.data.replyText is string && request.resource.data.replyText.size() <= 130));
+        allow delete: if notBlocked() && maintenanceOff()
+          && (resource.data.uid == request.auth.uid || isEditorOf(roomId));
+      }
+
+      // FOTO PROFIL per siswa: satu dokumen per absen, aturan hapus sama seperti galeri.
+      match /photos/{absen} {
+        allow read, write: if isDev();
+        allow get: if notBlocked();
+        allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
+        allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
+      }
+    }
+
+    // SESI / PERANGKAT: tiap perangkat mencatat sesinya sendiri; hanya developer yang bisa melihat semua.
+    // Perangkat hanya boleh memperbarui "lastSeen" (tidak bisa menghapus tanda "revoked" dari developer).
+    match /sessions/{sid} {
+      allow read, write: if isDev();
+      allow get: if notBlocked() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if notBlocked()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','deviceId','platform','device','kind','roomId','who','appVersion','startedAt','lastSeen'])
+        && request.resource.data.kind in ['admin', 'user'];
+      allow update: if notBlocked()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen']);
+      allow delete: if notBlocked() && resource.data.uid == request.auth.uid;
+    }
+
+    // LOG PERISTIWA: perangkat hanya boleh MENAMBAH log tentang dirinya (waktu diisi server); dibaca hanya developer.
+    // Request token custom dari layar login aplikasi: siapa pun (anonim) boleh MEMBUAT satu dokumen untuk dirinya,
+    // hanya developer yang boleh membaca / mengubah / menghapus.
+    match /tokenRequests/{rid} {
+      allow read, update, delete: if isDev();
+      allow create: if notBlocked()
+        && rid.matches(request.auth.uid + '_[0-9]+')
+        && request.resource.data.keys().hasOnly(['name','kelas','absen','sekolah','wa','status','createdAt','ver'])
+        && request.resource.data.name is string && request.resource.data.name.size() >= 3 && request.resource.data.name.size() <= 80
+        && request.resource.data.kelas is string && request.resource.data.kelas.size() >= 1 && request.resource.data.kelas.size() <= 40
+        && request.resource.data.absen is string && request.resource.data.absen.size() >= 1 && request.resource.data.absen.size() <= 6
+        && request.resource.data.sekolah is string && request.resource.data.sekolah.size() >= 2 && request.resource.data.sekolah.size() <= 80
+        && request.resource.data.wa is string && request.resource.data.wa.size() >= 8 && request.resource.data.wa.size() <= 20
+        && request.resource.data.status == 'baru'
+        && request.resource.data.createdAt is number;
+    }
+
+    // Laporan masalah dari admin (aplikasi / website / bot): perangkat boleh MEMBUAT satu dokumen untuk dirinya, hanya developer yang membaca/mengubah/menghapus.
+    match /adminReports/{rid} {
+      allow read, update, delete: if isDev();
+      allow create: if notBlocked() && maintenanceOff()
+        && rid.matches(request.auth.uid + '_[0-9]+')
+        && request.resource.data.keys().hasOnly(['msg','who','kelas','roomId','src','status','createdAt','ver'])
+        && request.resource.data.msg is string && request.resource.data.msg.size() >= 5 && request.resource.data.msg.size() <= 800
+        && request.resource.data.who is string && request.resource.data.who.size() <= 80
+        && request.resource.data.kelas is string && request.resource.data.kelas.size() <= 80
+        && request.resource.data.roomId is string && request.resource.data.roomId.size() <= 80
+        && request.resource.data.src in ['app','web','bot']
+        && request.resource.data.status == 'baru'
+        && request.resource.data.createdAt is number
+        && request.resource.data.ver is string && request.resource.data.ver.size() <= 20;
+    }
+
+    match /logs/{id} {
+      allow read, write: if isDev();
+      allow create: if notBlocked()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.ts == request.time
+        && request.resource.data.type in ['login_ok','login_fail','logout','data_view','data_export','token_rotate']
+        && request.resource.data.keys().hasOnly(['type','ts','expireAt','uid','deviceId','platform','device','role','roomId','who','what','ok','info','appVersion','tgt']);
+    }
+
+    // BLOKIR: hanya developer.
+    // (Backup TIDAK lagi disimpan di Firestore: berupa berkas .json di perangkat / Google Drive.
+    //  Koleksi "backups" hanya masih bisa dibaca developer untuk memindahkan backup lama.)
+    match /blocks/{uid} {
+      allow read, write: if isDev();
+    }
+    match /backups/{bid} {
+      allow read, write: if isDev();
+    }
+    match /backups/{bid}/{document=**} {
+      allow read, write: if isDev();
+    }
+  }
+}
