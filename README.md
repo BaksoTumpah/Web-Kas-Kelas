@@ -174,3 +174,12 @@ Aplikasi Tugas (TaskReminder, v1.2.0) menyinkronkan tugas dan jadwal lewat endpo
 
 ## Asisten AI developer (bebas topik)
 Konsol Developer punya tombol 🤖 (`dvAiOpen/dvAiSend`) yang memanggil relay `ai:{dev:<Firebase ID token>, q, h, s}`. Worker `verifyDevIdToken` memeriksa token lewat `accounts:lookup` dan email `dev@kaskelas.dev`; bila valid memakai `AI_SYSTEM_DEV` (tanpa kunci topik, batas 1000/hari). Admin/Admin Kelas/Anggota tetap memakai `AI_SYSTEM` + penjaga topik; `AI_TOPIC_LOCK=off` membebaskan semuanya (bawaan sekarang terkunci).
+
+## Animasi menu samping (APK, perombakan kelancaran)
+Penyebab patah sebelumnya: `box-shadow` besar ikut dianimasikan (repaint tiap frame), overlay memakai `display:none` + animasi, dan render tampilan/modal berat berjalan di frame yang sama dengan animasi tutup menu. Sekarang: hanya `transform`/`opacity` yang dianimasikan (lapisan GPU, `will-change`), bayangan tetap, menu/overlay disembunyikan lewat `visibility`, kurva iOS `cubic-bezier(.32,.72,0,1)`, item menu muncul bertahap (`menuIn`), geser ke kiri untuk menutup (mengikuti jari; IIFE setelah `toggleMenu`), dan `menuDefer()` menunda `openView`/`openModal` ±150 ms bila menu sedang terbuka. Bayangan `.bnav` dikecilkan (satu `drop-shadow` 14px).
+
+## Navigasi bawah (APK): bulatan pemilih bergeser
+Bulatan hijau tidak lagi "muncul" (animasi pop) di menu baru, tetapi bergeser halus dari menu lama ke menu terpilih. `slideTo()` (IIFE navigasi bawah) menganimasikan variabel CSS `--nx` lewat requestAnimationFrame (ease-out, 320-520 ms) sehingga bulatan dan lekukan bilah bergerak bersama; ikon di dalam bulatan memudar lalu berganti. Pertama kali tampil / `prefers-reduced-motion`: langsung di tempat.
+
+## Gerak ala iPhone (APK)
+`--ease` kini kurva iOS `cubic-bezier(.32,.72,0,1)`. Bulatan navbar memakai simulasi pegas (kekakuan 260, redaman 24). Jendela modal: muncul `popIn` .46s, tutup dengan animasi keluar (`closeModal` menambah kelas `closing` 210 ms, `openModal` membatalkannya). Halaman masuk `rise` .42s. Tekan tombol: skala .96 cepat lalu kembali. Menu samping: lempar ke kiri (kecepatan > .5 px/ms) menutup walau belum jauh.

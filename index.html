@@ -2733,6 +2733,13 @@ function loginOffApply(){
   if(inn){ if(off) inn.setAttribute('inert',''); else inn.removeAttribute('inert'); }
   document.querySelectorAll('#loginModeSeg div').forEach(d=>d.classList.toggle('lo',loginOffNow(d.dataset.mode)));
 }
+/* Tekan Enter di kolom login = klik tombol Login (laptop). */
+(function(){
+  ['loginId','loginBirthDay','loginBirthMonth','loginToken'].forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    el.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.keyCode===13) && !e.isComposing){ e.preventDefault(); doLogin(); } });
+  });
+})();
 async function doLogin(){
   let idVal = document.getElementById('loginId').value.trim();
   let token = document.getElementById('loginToken').value.trim();
