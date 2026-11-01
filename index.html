@@ -6,12 +6,12 @@
 <script>try{var __t=localStorage.getItem("kas_theme");if(__t&&/^[a-z-]+$/.test(__t))document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
 <script>try{var __d=document.documentElement,__m=localStorage.getItem("kas_mode");if(__m!=="light"&&__m!=="dark")__m="auto";__d.setAttribute("data-mode",__m);var __k=__m==="dark"||(__m==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);__d.setAttribute("data-scheme",__k?"dark":"light");}catch(e){}</script>
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#d5ebb8">
+<meta name="theme-color" content="#fbf4e2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Portal Kas Kelas</title>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -35,52 +35,55 @@
 :root{
   color-scheme:light dark;
 
-  /* permukaan */
-  --bg:#d5ebb8;            /* kanvas halaman */
-  --card:#f8fdee;          /* kartu, modal, bilah */
-  --card-2:#e5f3cf;        /* isian, tile, header tabel */
-  --line:#b6d98c;          /* garis halus */
-  --line-2:#9bc86a;        /* garis tegas / tepi isian */
+  /* permukaan: krem kertas buku tahunan */
+  --bg:#fbf4e2;            /* kanvas halaman */
+  --card:#fffdf6;          /* kartu, modal, bilah */
+  --card-2:#f7edd3;        /* isian, tile, header tabel */
+  --line:#eadcb7;          /* garis halus */
+  --line-2:#d8c38a;        /* garis tegas / tepi isian */
 
-  /* teks */
-  --text:#14201a;
-  --sub:#4a5d44;
+  /* teks: biru tinta */
+  --text:#1a2347;
+  --sub:#58628a;
 
-  /* merek: hijau Scienverse */
-  --brand:#8bd645;
-  --brand-2:#6cc02f;
-  --brand-ink:#11300a;     /* teks di atas warna merek */
-  --blue:#1a6420;          /* aksen untuk TEKS (nama lama dipertahankan agar kode lama tetap jalan) */
-  --tint-brand:#cfeaa5;
-  --brand-hi:#a2e655; --brand-lo:#72c235; --brand-rgb:139,214,69;     /* ujung gradien tombol/gelembung & warna bayangan merek */
-  --hero-1:#173f19; --hero-2:#235f1e; --hero-3:#3f8a24;               /* gradien kartu utama */
-  --hero-glow:rgba(190,240,120,.55); --hero-glow-2:rgba(120,90,255,.26);
-  --glow-1:rgba(139,214,69,.34); --glow-2:rgba(150,120,255,.17);      /* cahaya latar halaman login */
-  --ill-blob-a:#eaf8d4; --ill-blob-b:#cdeaa4; --ill-body-a:#2a6a1d; --ill-body-b:#143f17; --ill-flap-a:#5cb032; --ill-flap-b:#3a8a26; --ill-clasp:#8bd645;   /* ilustrasi dompet */
-  --meta-bg:#d5ebb8;                                                   /* warna bilah status peramban */
+  /* merek: emas sekolah + biru kerajaan */
+  --brand:#f5b82e;
+  --brand-2:#e0a01a;
+  --brand-ink:#3b2700;     /* teks di atas warna merek */
+  --blue:#2340a8;          /* aksen untuk TEKS (nama lama dipertahankan agar kode lama tetap jalan) */
+  --tint-brand:#fde7ac;
+  --brand-hi:#ffd466; --brand-lo:#ee9f12; --brand-rgb:245,184,46;     /* ujung gradien tombol/gelembung & warna bayangan merek */
+  --hero-1:#14205a; --hero-2:#233a98; --hero-3:#4a6be0;               /* gradien kartu utama */
+  --hero-glow:rgba(255,212,102,.55); --hero-glow-2:rgba(255,120,150,.30);
+  --glow-1:rgba(245,184,46,.34); --glow-2:rgba(255,120,150,.18);      /* cahaya latar */
+  --ill-blob-a:#fff1c9; --ill-blob-b:#ffd98a; --ill-body-a:#2a3f9c; --ill-body-b:#14205a; --ill-flap-a:#5b7be8; --ill-flap-b:#3a55c4; --ill-clasp:#f5b82e;   /* ilustrasi */
+  --meta-bg:#fbf4e2;                                                   /* warna bilah status peramban */
 
   /* tinta (tombol pil gelap ala onboarding) */
-  --ink:#14201a;
-  --on-ink:#ffffff;
+  --ink:#1a2347;
+  --on-ink:#fff6dc;
 
   /* status */
-  --red:#c42d33;  --tint-red:#fde4e5;
-  --amber:#e39a0b; --tint-amber:#fff0c7;
+  --red:#d1273d;  --tint-red:#ffe2e6;
+  --amber:#e8960b; --tint-amber:#fff0c7;
 
   /* pastel untuk ikon/tile */
-  --mint-bg:#dcf4e0;  --mint-fg:#157530;
-  --sky-bg:#dbeeff;   --sky-fg:#1b68b3;
-  --peach-bg:#ffe6d3; --peach-fg:#b4460f;
-  --lilac-bg:#ece5ff; --lilac-fg:#5a3fcf;
+  --mint-bg:#d6f5e3;  --mint-fg:#117a45;
+  --sky-bg:#d9eaff;   --sky-fg:#1b5fb8;
+  --peach-bg:#ffe1d0; --peach-fg:#b8470f;
+  --lilac-bg:#ebe3ff; --lilac-fg:#5a3fcf;
+  --rose-bg:#ffdfe8;  --rose-fg:#b3234f;
+  --sun-bg:#fff0bd;   --sun-fg:#8a5a00;
+  --coral:#ff7a6b; --mint:#2fc58a; --sky:#4aa8ff; --lilac:#9b7bff; --gold:#f5b82e;   /* warna pita & aksen ceria */
 
   /* bentuk & bayangan */
-  --r-sm:11px; --r-md:14px; --r-lg:20px; --r-xl:26px; --r-pill:999px;
-  --shadow-1:0 1px 2px rgba(20,32,26,.05),0 6px 18px rgba(20,32,26,.05);
-  --shadow-2:0 2px 4px rgba(20,32,26,.05),0 14px 32px rgba(20,32,26,.09);
-  --shadow-3:0 24px 60px -12px rgba(20,32,26,.28);
+  --r-sm:12px; --r-md:16px; --r-lg:22px; --r-xl:28px; --r-pill:999px;
+  --shadow-1:0 1px 0 rgba(255,255,255,.8) inset,0 8px 20px -12px rgba(70,48,0,.26);
+  --shadow-2:0 1px 0 rgba(255,255,255,.8) inset,0 18px 34px -16px rgba(70,48,0,.32);
+  --shadow-3:0 28px 64px -14px rgba(26,35,71,.38);
   --ring:0 0 0 4px rgba(var(--brand-rgb),.30);
-  --scrim:rgba(14,22,17,.46);
-  --glass:rgba(255,255,255,.82);
+  --scrim:rgba(18,24,56,.5);
+  --glass:rgba(255,251,240,.8);
 
   /* jarak (skala 4) */
   --s1:4px; --s2:8px; --s3:12px; --s4:14px; --s5:18px; --s6:20px; --s7:28px; --s8:44px;
@@ -90,25 +93,30 @@
   --spring:cubic-bezier(.34,1.45,.55,1);
 
   /* tipografi */
+  --font-display:'Fraunces','Iowan Old Style','Palatino Linotype',Georgia,serif;
   --font:'Plus Jakarta Sans','Plus Jakarta Sans Local',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
 :root[data-scheme="dark"]{
-    --bg:#0c140f; --card:#152019; --card-2:#1b2a21; --line:#243428; --line-2:#33493a;
-    --text:#ecf4e8; --sub:#93a698;
-    --brand:#8bd645; --brand-2:#6cc02f; --brand-ink:#0f2a09; --blue:#8bd645; --tint-brand:rgba(139,214,69,.14);
-    --ink:#8bd645; --on-ink:#0f2a09;
-    --red:#ff7075; --tint-red:rgba(255,112,117,.14);
-    --amber:#f4b73f; --tint-amber:rgba(244,183,63,.15);
-    --mint-bg:#173324; --mint-fg:#7fe39a; --sky-bg:#14293c; --sky-fg:#7cc0ff;
-    --peach-bg:#3a261a; --peach-fg:#ffab78; --lilac-bg:#251f3d; --lilac-fg:#b9a5ff;
-    --shadow-1:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.25);
-    --shadow-2:0 2px 4px rgba(0,0,0,.4),0 14px 32px rgba(0,0,0,.35);
-    --shadow-3:0 24px 60px -12px rgba(0,0,0,.7);
+    --bg:#0c1230; --card:#151d47; --card-2:#1d2858; --line:#27336a; --line-2:#394a94;
+    --text:#f6f1e1; --sub:#a6afd4;
+    --brand:#ffc94d; --brand-2:#f5b82e; --brand-ink:#2b1d00; --blue:#a9bcff; --tint-brand:rgba(255,201,77,.14);
+    --brand-hi:#ffdc83; --brand-lo:#f5b82e; --brand-rgb:255,201,77;
+    --hero-1:#1a2a78; --hero-2:#2a45b8; --hero-3:#5272ec;
+    --glow-1:rgba(255,201,77,.16); --glow-2:rgba(255,120,150,.10);
+    --ill-blob-a:#26346f; --ill-blob-b:#1a2552; --ill-body-a:#3a55c4; --ill-body-b:#1d2c80; --ill-flap-a:#6c88f0; --ill-flap-b:#4560d0; --ill-clasp:#ffc94d;
+    --ink:#ffc94d; --on-ink:#2b1d00;
+    --red:#ff7285; --tint-red:rgba(255,114,133,.15);
+    --amber:#f7bb45; --tint-amber:rgba(247,187,69,.15);
+    --mint-bg:#10352a; --mint-fg:#7fe3b0; --sky-bg:#14305a; --sky-fg:#9ccbff; --peach-bg:#3b2619; --peach-fg:#ffb48a; --lilac-bg:#2a2352; --lilac-fg:#c0acff;
+    --rose-bg:#40202f; --rose-fg:#ff9db9; --sun-bg:#3d3114; --sun-fg:#ffd77a;
+    --shadow-1:0 1px 0 rgba(255,255,255,.04) inset,0 10px 24px -14px rgba(0,0,0,.6);
+    --shadow-2:0 1px 0 rgba(255,255,255,.05) inset,0 20px 36px -16px rgba(0,0,0,.7);
+    --shadow-3:0 28px 64px -14px rgba(0,0,0,.75);
     --ring:0 0 0 4px rgba(var(--brand-rgb),.28);
-    --glow-1:rgba(139,214,69,.2); --glow-2:rgba(150,120,255,.1); --ill-blob-a:#1e3a22; --ill-blob-b:#142619; --meta-bg:#0c140f;
-    --scrim:rgba(0,0,0,.6);
-    --glass:rgba(21,32,25,.82);
+    --meta-bg:#0c1230;
+    --scrim:rgba(4,8,24,.62);
+    --glass:rgba(21,29,71,.78);
   }
 
 
@@ -271,7 +279,7 @@ button:active,.stat:active,.circle:active,.mitem:active,.bnav-item:active{transf
 
 /* ==========================================================================
    TEMA WARNA — enam palet, masing-masing punya varian terang & gelap (mengikuti sistem).
-   Dipilih lewat atribut <html data-theme="...">. "hijau-gelap" = bawaan (token :root).
+   Dipilih lewat atribut <html data-theme="...">. "hijau-gelap" = bawaan (token :root), kini bertema Klasik Sekolah (krem, biru tinta, emas).
    Semua pasangan teks/latar sudah diuji kontrasnya ≥ 4,5:1 (teks) dan ≥ 3:1 (angka besar).
    ========================================================================== */
 :root[data-theme="hijau-terang"]{
@@ -543,6 +551,128 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 .album-head .btn{padding:7px 12px;min-height:0;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;}
 .gphoto .gbtns a.btn{padding:5px 9px;font-size:13px;border-radius:var(--r-sm);min-height:0;text-decoration:none;display:inline-flex;}
 .cover-prev{width:88px;height:88px;border-radius:14px;object-fit:cover;background:var(--card-2);border:1px solid var(--line);display:block;margin-top:6px;}
+
+/* ==========================================================================
+   REDESAIN "BUKU TAHUNAN MODERN" — krem kertas, biru tinta, emas, pita warna-warni, judul serif.
+   Lapisan ini hanya mengubah tampilan (semua warna tetap dari token :root / tema warna).
+   ========================================================================== */
+html{background:var(--bg);}
+body{background:transparent;position:relative;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(560px 380px at 100% -4%,var(--glow-1),transparent 70%),
+    radial-gradient(520px 380px at -6% 104%,var(--glow-2),transparent 70%),
+    radial-gradient(color-mix(in srgb,var(--text) 10%,transparent) 1px,transparent 1.5px) 0 0/22px 22px;}
+h1,h2,h3,.gate-title,.topbar .greet,.title,.profile-info b,.menu-head b,.kt-box h2,.dv-box h3{font-family:var(--font-display);font-optical-sizing:auto;}
+
+/* judul bagian: bookmark berwarna */
+h2.h{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;letter-spacing:-.015em;margin:14px 0 var(--s4);}
+h2.h::before{content:"";flex:0 0 8px;height:24px;border-radius:4px 4px 8px 8px;background:linear-gradient(180deg,var(--coral),var(--gold) 55%,var(--mint));box-shadow:0 4px 10px -3px rgba(var(--brand-rgb),.7);}
+.card>.small:first-child,.card>.small[style*="margin-bottom"]{font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);}
+
+/* bilah atas: kaca krem + pita warna di bawahnya */
+.topbar{background:color-mix(in srgb,var(--card) 80%,transparent);border-bottom:none;box-shadow:0 10px 24px -18px rgba(70,48,0,.5);}
+.topbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;
+  background:linear-gradient(90deg,var(--coral) 0 20%,var(--gold) 20% 40%,var(--mint) 40% 60%,var(--sky) 60% 80%,var(--lilac) 80% 100%);opacity:.95;}
+:root[data-scheme="light"] .topbar{background:color-mix(in srgb,var(--card) 82%,transparent);}
+.topbar .greet,.title{font-size:18px;font-weight:700;letter-spacing:-.015em;}
+.iconbtn{background:var(--card);border:1.5px solid var(--line);}
+.iconbtn.pill{font-weight:700;}
+
+/* kartu */
+.card{border-radius:var(--r-lg);border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow-1);position:relative;}
+:root[data-scheme="light"] .card,:root[data-scheme="light"] .tblwrap{border-color:var(--line);}
+@media (hover:hover) and (pointer:fine){ .card:not(.profile):hover{box-shadow:var(--shadow-2);} }
+
+/* kartu profil: kartu pelajar */
+.card.profile{color:#fff;border:none;overflow:hidden;padding:20px var(--s5) 20px;
+  background:radial-gradient(240px 170px at 108% -8%,var(--hero-glow),transparent 66%),radial-gradient(200px 160px at -6% 120%,var(--hero-glow-2),transparent 70%),linear-gradient(135deg,var(--hero-1),var(--hero-2) 58%,var(--hero-3));
+  box-shadow:0 22px 40px -18px rgba(20,32,90,.7),inset 0 1px 0 rgba(255,255,255,.18);}
+.card.profile::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,var(--coral),var(--gold),var(--mint),var(--sky),var(--lilac));}
+.card.profile::after{content:"★";position:absolute;right:16px;bottom:8px;font-size:54px;line-height:1;color:rgba(255,255,255,.1);transform:rotate(14deg);pointer-events:none;}
+.card.profile .small,.card.profile .profile-info .small{color:rgba(255,255,255,.82);}
+.card.profile .profile-info b{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.01em;}
+.avatar{width:72px;height:72px;border-radius:24px;border:3px solid var(--gold);background:var(--card);box-shadow:0 10px 22px -8px rgba(0,0,0,.5),0 0 0 4px rgba(255,255,255,.18);}
+
+/* tombol */
+button.btn{border-radius:var(--r-md);font-weight:700;border:1.5px solid var(--line-2);background:var(--card);}
+.primary,button.btn.primary{background:linear-gradient(145deg,var(--brand-hi),var(--brand-lo));border-color:transparent;color:var(--brand-ink);
+  box-shadow:0 12px 22px -10px rgba(var(--brand-rgb),.9),inset 0 1px 0 rgba(255,255,255,.6);}
+button.btn.primary.gate-btn{background:linear-gradient(135deg,var(--hero-1),var(--hero-2));color:#fff6dc;border:none;
+  box-shadow:0 18px 30px -12px rgba(20,32,90,.65),inset 0 1px 0 rgba(255,255,255,.18);}
+button.btn.primary.gate-btn::after{color:var(--brand-hi);font-weight:800;}
+:root[data-scheme="dark"] button.btn.primary.gate-btn{background:linear-gradient(145deg,var(--brand-hi),var(--brand-lo));color:var(--brand-ink);}
+:root[data-scheme="dark"] button.btn.primary.gate-btn::after{color:var(--brand-ink);}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea{background:var(--card);border:1.5px solid var(--line-2);border-radius:var(--r-md);}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]):focus,select:focus,textarea:focus{border-color:var(--brand-2);background:var(--card);}
+.seg{background:var(--card-2);border:1.5px solid var(--line);}
+.seg div.sel{background:var(--ink);color:var(--on-ink);box-shadow:0 8px 16px -8px rgba(20,32,90,.7);}
+input[type=checkbox]:checked{background:var(--gold);border-color:var(--brand-2);}
+
+/* gerbang login */
+.gate{background:
+  radial-gradient(900px 520px at 90% -10%,var(--glow-1),transparent 62%),
+  radial-gradient(760px 520px at -14% 108%,var(--glow-2),transparent 62%),
+  radial-gradient(color-mix(in srgb,var(--text) 10%,transparent) 1px,transparent 1.5px) 0 0/22px 22px,var(--bg);}
+.gate-card{border-radius:34px;border:1px solid var(--line);padding:24px 24px 24px;box-shadow:var(--shadow-3);position:relative;overflow:hidden;}
+.gate-card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,var(--coral) 0 20%,var(--gold) 20% 40%,var(--mint) 40% 60%,var(--sky) 60% 80%,var(--lilac) 80% 100%);}
+.gate-brand{font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin-top:6px;}
+.gate-title{font-size:31px;font-weight:800;letter-spacing:-.02em;line-height:1.1;}
+.gate-sub{font-size:13.5px;}
+:root[data-scheme="light"] .gate-card{border:1px solid var(--line);}
+
+/* navigasi bawah */
+.bnav-bar{border-radius:28px;border:1px solid var(--line);}
+:root[data-scheme="light"] .bnav-bar{border:1px solid var(--line);}
+.bnav-item{font-weight:700;}
+.bnav-item.on{color:var(--blue);}
+:root[data-scheme="dark"] .bnav-item.on{color:var(--brand-hi);}
+.bnav-bubble{background:linear-gradient(145deg,var(--brand-hi),var(--brand-lo));box-shadow:0 14px 24px -8px rgba(var(--brand-rgb),.8),0 0 0 4px var(--bg),inset 0 1px 0 rgba(255,255,255,.65);}
+
+/* menu & modal */
+.menu{border-radius:0 var(--r-xl) var(--r-xl) 0;}
+.menu .mitem.top{background:linear-gradient(135deg,var(--tint-brand),transparent);}
+.modal{border-radius:30px;border:1px solid var(--line);position:relative;overflow:hidden;}
+.modal::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--coral),var(--gold),var(--mint),var(--sky),var(--lilac));}
+
+/* pengumuman: kartu dengan pita warna bergantian */
+#announceList .card,#cmtHomeList .cmt:not(.cmt-admin){border-left:6px solid var(--gold);}
+#announceList .card:nth-child(5n+1){border-left-color:var(--coral);}
+#announceList .card:nth-child(5n+2){border-left-color:var(--gold);}
+#announceList .card:nth-child(5n+3){border-left-color:var(--mint);}
+#announceList .card:nth-child(5n+4){border-left-color:var(--sky);}
+#announceList .card:nth-child(5n+5){border-left-color:var(--lilac);}
+#announceList .card b{font-family:var(--font-display);font-size:16.5px;font-weight:700;letter-spacing:-.01em;}
+
+/* tugas: kartu dengan penanda warna */
+.tugas-row{border-left:6px solid var(--sky);}
+.tugas-row:nth-child(3n+2){border-left-color:var(--coral);} .tugas-row:nth-child(3n+3){border-left-color:var(--mint);}
+
+/* tabel kas */
+th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;font-weight:800;}
+.tblwrap{border-radius:var(--r-lg);border:1px solid var(--line);}
+
+/* galeri: foto ala polaroid */
+.gallery-grid{gap:14px;}
+.gphoto{padding:7px 7px 7px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-1);transition:transform .45s var(--ease),box-shadow .3s ease;}
+.gphoto img{border-radius:14px;}
+.gphoto:nth-child(odd){transform:rotate(-1.2deg);} .gphoto:nth-child(even){transform:rotate(1.2deg);}
+@media (hover:hover) and (pointer:fine){ .gphoto:hover{transform:rotate(0) translateY(-4px);box-shadow:var(--shadow-2);} }
+.album-card{border-radius:24px;border:1.5px solid var(--line);box-shadow:var(--shadow-1);}
+
+/* komentar & bintang */
+.cmt{border-radius:var(--r-lg);}
+.cmt.cmt-admin{border-width:2px;}
+.stars button.on{color:var(--gold);filter:drop-shadow(0 4px 6px rgba(var(--brand-rgb),.6));}
+
+.badge,.roleLabel{font-family:var(--font);}
+/* Warna aksen ikut TEMA WARNA: tema selain bawaan memakai turunan warna temanya (pita, avatar, bintang, ilustrasi). */
+:root[data-theme="hijau-terang"],:root[data-theme="oranye"],:root[data-theme="biru-langit"],:root[data-theme="baby-pink"],:root[data-theme="ungu-muda"]{
+  --coral:var(--brand-hi); --gold:var(--brand); --mint:var(--brand-lo); --sky:var(--hero-3); --lilac:var(--hero-2);
+  --ill-body-a:var(--hero-2); --ill-body-b:var(--hero-1); --ill-blob-a:var(--tint-brand); --ill-blob-b:var(--line);
+}
+/* footer */
+.sitefooter{border-top:2px dashed var(--line-2);}
 </style>
 </head>
 <body>
@@ -550,7 +680,7 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 <div class="gate" id="loginGate">
   <div class="gate-card">
     <div class="gate-brand"><img class="brand-logo" id="gateLogo" alt="" src="data:image/png;base64,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"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" style="fill:var(--brand)"/><circle cx="16" cy="16" r="9" fill="none" style="stroke:var(--brand-ink)" stroke-width="2.2"/><path d="M13 11.5v9M13 16l5.2-4.5M13 16l5.2 4.5" fill="none" style="stroke:var(--brand-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Portal Kas Kelas</span></div>
-    <div class="gate-art compact"><svg viewBox="0 0 320 196" aria-hidden="true"><defs><linearGradient id="gaBlob" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-blob-a)"/><stop offset="1" style="stop-color:var(--ill-blob-b)"/></linearGradient><linearGradient id="gaBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-body-a)"/><stop offset="1" style="stop-color:var(--ill-body-b)"/></linearGradient><linearGradient id="gaFlap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ill-flap-a)"/><stop offset="1" style="stop-color:var(--ill-flap-b)"/></linearGradient><linearGradient id="gaCoin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe58d"/><stop offset="1" stop-color="#f3a21f"/></linearGradient></defs><path d="M52 108c-12-46 24-86 78-92 48-5 100 8 124 44 24 33 10 80-34 100-46 21-134 20-154-16-6-11-12-22-14-36z" fill="url(#gaBlob)"/><circle cx="42" cy="50" r="8" fill="#ece5ff"/><circle cx="286" cy="158" r="11" fill="#ffe1ea"/><circle cx="272" cy="38" r="5" fill="#dbeeff"/><ellipse cx="170" cy="178" rx="92" ry="9" fill="#14201a" opacity=".1"/><rect x="54" y="150" width="60" height="13" fill="#e8981a"/><ellipse cx="84" cy="150" rx="30" ry="10" fill="#d98a14"/><ellipse cx="84" cy="143" rx="30" ry="10" fill="url(#gaCoin)"/><ellipse cx="84" cy="143" rx="20" ry="6.5" fill="none" stroke="#c9820f" stroke-opacity=".45" stroke-width="1.5"/><rect x="54" y="137" width="60" height="13" fill="#e8981a"/><ellipse cx="84" cy="137" rx="30" ry="10" fill="#d98a14"/><ellipse cx="84" cy="130" rx="30" ry="10" fill="url(#gaCoin)"/><ellipse cx="84" cy="130" rx="20" ry="6.5" fill="none" stroke="#c9820f" stroke-opacity=".45" stroke-width="1.5"/><rect x="54" y="124" width="60" height="13" fill="#e8981a"/><ellipse cx="84" cy="124" rx="30" ry="10" fill="#d98a14"/><ellipse cx="84" cy="117" rx="30" ry="10" fill="url(#gaCoin)"/><ellipse cx="84" cy="117" rx="20" ry="6.5" fill="none" stroke="#c9820f" stroke-opacity=".45" stroke-width="1.5"/><rect x="104" y="80" width="156" height="94" rx="26" fill="url(#gaBody)"/><rect x="104" y="80" width="156" height="36" rx="26" fill="url(#gaFlap)"/><rect x="104" y="98" width="156" height="18" fill="url(#gaFlap)"/><path d="M118 132h60" stroke="#fff" stroke-opacity=".14" stroke-width="4" stroke-linecap="round"/><path d="M118 146h38" stroke="#fff" stroke-opacity=".1" stroke-width="4" stroke-linecap="round"/><rect x="216" y="116" width="56" height="38" rx="19" style="fill:var(--ill-clasp)"/><circle cx="238" cy="135" r="7.5" fill="#fff"/><circle cx="238" cy="135" r="3" style="fill:var(--ill-clasp)"/><circle cx="216" cy="56" r="24" fill="url(#gaCoin)"/><circle cx="216" cy="56" r="16.5" fill="none" stroke="#c9820f" stroke-opacity=".5" stroke-width="1.6"/><text x="216" y="62" text-anchor="middle" font-size="16" font-weight="800" fill="#a4620a" font-family="inherit">Rp</text><path d="M70 60Q70 70 80 70Q70 70 70 80Q70 70 60 70Q70 70 70 60Z" fill="#b9a5ff"/><path d="M262 88Q262 96 270 96Q262 96 262 104Q262 96 254 96Q262 96 262 88Z" fill="#ff9bb9"/><path d="M150 37Q150 44 157 44Q150 44 150 51Q150 44 143 44Q150 44 150 37Z" fill="#7fe39a"/><path d="M300 95Q300 100 305 100Q300 100 300 105Q300 100 295 100Q300 100 300 95Z" fill="#b9a5ff"/></svg></div>
+    <div class="gate-art compact"><svg viewBox="0 0 320 196" aria-hidden="true"><defs><linearGradient id="gaBlob" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-blob-a)"/><stop offset="1" style="stop-color:var(--ill-blob-b)"/></linearGradient><linearGradient id="gaCover" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--ill-body-a)"/><stop offset="1" style="stop-color:var(--ill-body-b)"/></linearGradient><linearGradient id="gaCoin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe58d"/><stop offset="1" stop-color="#f3a21f"/></linearGradient></defs><path d="M52 112c-12-46 24-84 78-90 48-5 100 8 124 44 24 33 10 80-34 100-46 21-134 20-154-16-6-11-12-22-14-38z" fill="url(#gaBlob)"/><path d="M8 16Q160 54 312 16" fill="none" stroke="#c9b98a" stroke-width="1.6"/><path d="M30 22l20 3-9 20z" style="fill:var(--coral)"/><path d="M75 29l20 2-8 20z" style="fill:var(--gold)"/><path d="M120 33l20 1-7 20z" style="fill:var(--mint)"/><path d="M165 34l20-1-6 20z" style="fill:var(--sky)"/><path d="M210 31l20-2-5 20z" style="fill:var(--lilac)"/><path d="M255 26l20-3-4 20z" style="fill:var(--coral)"/><ellipse cx="160" cy="184" rx="108" ry="8" fill="#1a2347" opacity=".12"/><path d="M52 112L160 90L268 112V176L160 158L52 176Z" fill="url(#gaCover)"/><path d="M64 120L160 102V152L64 168Z" style="fill:var(--card)"/><path d="M256 120L160 102V152L256 168Z" style="fill:var(--card-2)"/><path d="M160 102V152" stroke="#d8c38a" stroke-width="2"/><path d="M78 130l70-13M78 142l70-13M78 154l50-9" stroke="#d8c38a" stroke-width="3" stroke-linecap="round"/><path d="M172 117l70 13M172 129l70 13M172 141l50 9" stroke="#e5d4a3" stroke-width="3" stroke-linecap="round"/><path d="M212 58L262 74L212 90L162 74Z" fill="#1a2347"/><path d="M188 84v13q24 12 48 0V84L212 91Z" fill="#26398f"/><path d="M212 74L262 74" style="stroke:var(--gold)" stroke-width="0"/><path d="M256 76v26" style="stroke:var(--gold)" stroke-width="3" stroke-linecap="round"/><circle cx="256" cy="104" r="5" style="fill:var(--gold)"/><g transform="rotate(-32 62 78)"><rect x="24" y="68" width="74" height="13" rx="3" style="fill:var(--brand-hi)"/><rect x="24" y="68" width="16" height="13" rx="3" style="fill:var(--coral)"/><path d="M98 68l16 6.5L98 81z" fill="#f4d9a8"/><path d="M108 72l6 2.5l-6 2.5z" fill="#1a2347"/></g><path d="M278 56Q278 66 288 66Q278 66 278 76Q278 66 268 66Q278 66 278 56Z" style="fill:var(--gold)"/><path d="M40 110Q40 117 47 117Q40 117 40 124Q40 117 33 117Q40 117 40 110Z" style="fill:var(--lilac)"/><path d="M288 130Q288 136 294 136Q288 136 288 142Q288 136 282 136Q288 136 288 130Z" style="fill:var(--coral)"/><circle cx="108" cy="64" r="5" style="fill:var(--sky)"/></svg></div>
     <h1 class="gate-title" onclick="devTap()">Portal Kas Kelas</h1>
     <p class="gate-sub">Masuk pakai identitas yang terdaftar di aplikasi kas.</p>
     <label>Masuk pakai</label>
@@ -4041,7 +4171,7 @@ if(fbInit()) ktWatchConfig();
 
 <script>
 /* ===== TEMA WARNA: penimpa developer → tema kelas → cadangan lokal (hanya saat belum masuk kelas) ===== */
-var KT_THEMES={"hijau-gelap": {"name": "Hijau Gelap", "c1": "#173f19", "c2": "#8bd645"}, "hijau-terang": {"name": "Hijau Terang", "c1": "#22c55e", "c2": "#86efac"}, "oranye": {"name": "Oranye Flipper", "c1": "#e56f00", "c2": "#ffa233"}, "biru-langit": {"name": "Biru Langit", "c1": "#0ea5e9", "c2": "#7dd3fc"}, "baby-pink": {"name": "Baby Pink", "c1": "#ec7fb4", "c2": "#fbc4e0"}, "ungu-muda": {"name": "Ungu Muda", "c1": "#a78bfa", "c2": "#d8ccff"}}, KT_THEME_DEFAULT='hijau-gelap';
+var KT_THEMES={"hijau-gelap": {"name": "Klasik Sekolah", "c1": "#14205a", "c2": "#f5b82e"}, "hijau-terang": {"name": "Hijau Terang", "c1": "#22c55e", "c2": "#86efac"}, "oranye": {"name": "Oranye Flipper", "c1": "#e56f00", "c2": "#ffa233"}, "biru-langit": {"name": "Biru Langit", "c1": "#0ea5e9", "c2": "#7dd3fc"}, "baby-pink": {"name": "Baby Pink", "c1": "#ec7fb4", "c2": "#fbc4e0"}, "ungu-muda": {"name": "Ungu Muda", "c1": "#a78bfa", "c2": "#d8ccff"}}, KT_THEME_DEFAULT='hijau-gelap';
 function ktThemeValid(t){ return !!t && Object.prototype.hasOwnProperty.call(KT_THEMES,t); }
 function ktResolveTheme(){
   var g=(typeof ktCfg!=='undefined' && ktCfg) ? ktCfg.themeAll : '';
