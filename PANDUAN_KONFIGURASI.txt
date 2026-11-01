@@ -215,7 +215,7 @@ LANGKAH 18 - TUTUP BUKU, KATEGORI PENGELUARAN, IMPOR SISWA  (APK baru + Worker o
   Worker otomatis ter-deploy lewat GitHub saat push; website: ganti index.html di Firebase Hosting lalu deploy.
   4. Ekspor siswa: menu Siswa > "Ekspor Data Siswa (.xlsx)" menghasilkan file dengan kolom yang sama persis seperti
      format impor (No, NISN, Nama Lengkap, Nama Panggilan, Tanggal Lahir, Kelas), jadi bisa diedit lalu diimpor lagi.
-  5. Opsi Login (developer): login developer > kartu "Opsi Login" > pilih NISN atau No. Absen > tombol "Matikan".
+  5. Opsi Login (developer): login developer (website ATAU aplikasi) > kartu "Opsi Login" > pilih NISN atau No. Absen > tombol "Matikan".
      Di website, opsi yang dimatikan tampil semi transparan (kolom & tombol tidak bisa diisi/diklik) dan saat diketuk
      muncul peringatan "sedang dinonaktifkan". Tombol berubah jadi "Hidupkan kembali". Berlaku untuk semua kelas;
      login developer lewat ketuk judul 5x tidak terpengaruh. Pembatasan ini di tampilan website (aturan server tidak berubah).

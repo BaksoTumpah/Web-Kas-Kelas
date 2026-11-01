@@ -184,5 +184,10 @@ Bulatan hijau tidak lagi "muncul" (animasi pop) di menu baru, tetapi bergeser ha
 ## Gerak ala iPhone (APK)
 `--ease` kini kurva iOS `cubic-bezier(.32,.72,0,1)`. Bulatan navbar memakai simulasi pegas (kekakuan 260, redaman 24). Jendela modal: muncul `popIn` .46s, tutup dengan animasi keluar (`closeModal` menambah kelas `closing` 210 ms, `openModal` membatalkannya). Halaman masuk `rise` .42s. Tekan tombol: skala .96 cepat lalu kembali. Menu samping: lempar ke kiri (kecepatan > .5 px/ms) menutup walau belum jauh.
 
+## Redesain APK + opsi login di dev APK
+- Semua emoji dihapus dari APK dan website (teks, judul, tombol, pesan, komentar kode). Ikon yang dulu emoji kini SVG garis lewat `<i class="ic" data-ic="nama">` (`KT_IC`). Bot Telegram (`telegram-worker.js`) tidak diubah.
+- APK memakai redesain yang sama dengan website (token warna, font Fraunces, pita warna, ilustrasi sekolah). Daftar tema warna identik di dev, APK, dan website (`KT_THEMES`; bawaan "Klasik Sekolah"). Warna aksen ikut tema dan mode terang/gelap.
+- Mode developer APK: kartu baru "Opsi Login" (🚪) untuk mematikan/menghidupkan login NISN atau No. Absen website; menulis `config/app.loginOff` yang sama dengan mode dev website.
+
 ## Redesain website "Buku Tahunan Modern"
 Tema bawaan (`hijau-gelap`, tampil sebagai "Klasik Sekolah"): krem kertas + biru tinta + emas, pita warna (coral/emas/mint/langit/lilac) di bilah atas, kartu profil gaya kartu pelajar, judul serif Fraunces (`--font-display`), foto galeri ala polaroid, pengumuman/tugas berpita warna, ilustrasi login buku + toga. Token baru: `--rose-*`, `--sun-*`, `--coral`, `--mint`, `--sky`, `--lilac`, `--gold`. Lapisan gaya ada di blok "REDESAIN" di akhir `<style>` pertama; tema warna lain (hijau terang, oranye, dst.) tetap berlaku dan ikut memakai bentuk baru. Mode gelap = biru malam + emas. Lokasi font: Google Fonts (Fraunces) dengan cadangan Georgia.

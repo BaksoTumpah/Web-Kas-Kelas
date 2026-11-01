@@ -379,7 +379,7 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 @media (hover:hover) and (pointer:fine){ .gate-link:hover{letter-spacing:.01em;} }
 .gate-footer{text-align:center;font-size:11.5px;line-height:1.6;color:var(--sub);margin:var(--s6) 0 0;}
 #loginForm.off .lf-in{opacity:.4;filter:grayscale(.5);}
-.seg div.lo::after{content:" ⛔";font-size:11px;}
+.seg div.lo::after{content:" nonaktif";font-size:11px;}
 .seg{display:flex;background:var(--card-2);border-radius:var(--r-pill);padding:4px;margin-top:4px;border:1px solid var(--line);}
 .seg div{flex:1;text-align:center;padding:9px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--sub);border-radius:var(--r-pill);}
 .seg div.sel{background:var(--card);color:var(--text);font-weight:800;box-shadow:var(--shadow-1);}
@@ -673,6 +673,12 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 }
 /* footer */
 .sitefooter{border-top:2px dashed var(--line-2);}
+
+/* ikon garis (pengganti emoji) */
+.ic{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;line-height:0;flex:none;}
+.ic svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+div.avatar{display:grid;place-items:center;} .avatar .ic{width:55%;height:55%;opacity:.55;}
+.kl-ic .ic{width:34px;height:34px;}
 </style>
 </head>
 <body>
@@ -717,7 +723,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 
 <div class="topbar">
   <img class="top-logo" id="topLogo" alt="" src="data:image/png;base64,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"><div class="greet" id="greetText">Halo, ...</div>
-  <button class="iconbtn" id="btnDevRole" onclick="toggleDevRole()" style="display:none;font-size:11px;white-space:nowrap;border:1px dashed var(--line);border-radius:6px;padding:3px 6px;" title="Ganti peran (khusus developer)">🧪 Dev</button>
+  <button class="iconbtn" id="btnDevRole" onclick="toggleDevRole()" style="display:none;font-size:11px;white-space:nowrap;border:1px dashed var(--line);border-radius:6px;padding:3px 6px;" title="Ganti peran (khusus developer)">Dev</button>
   <button class="iconbtn" id="btnAdminMenu" onclick="toggleAdminMenu(true)" style="display:none;" title="Menu Admin" aria-label="Menu Admin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.1"/><circle cx="9" cy="17" r="2.1"/></svg></button>
   <button class="iconbtn pill" onclick="doLogout()" title="Keluar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v8"/><path d="M7 6.6a7.5 7.5 0 1 0 10 0"/></svg> <span>Keluar</span></button>
 </div>
@@ -727,7 +733,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 
 <div class="view active" id="view-home">
   <div class="card profile">
-    <div class="avatar" id="avatarBox">👤</div>
+    <div class="avatar" id="avatarBox"><i class="ic" data-ic="person"></i></div>
     <div class="profile-info" style="flex:1;">
       <div><b id="profName">-</b></div>
       <div class="small">NISN: <span id="profNisn">-</span></div>
@@ -736,7 +742,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
   </div>
   <div class="mrow" style="margin-top:-6px;margin-bottom:12px;">
     <input type="file" accept="image/*" id="avatarInput" style="display:none;" onchange="uploadAvatar()">
-    <button class="btn" style="width:100%;" onclick="document.getElementById('avatarInput').click()">📷 Ubah Foto Profil</button>
+    <button class="btn" style="width:100%;" onclick="document.getElementById('avatarInput').click()">Ubah Foto Profil</button>
   </div>
 
   <div class="card">
@@ -745,19 +751,19 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
   </div>
 
   <div class="card" id="tugasHomeCard" style="display:none;">
-    <div class="small" style="margin-bottom:6px;">📝 TUGAS TERDEKAT <a href="#" onclick="navGo('jadwal');return false;" style="float:right;font-weight:700;">Lihat semua</a></div>
+    <div class="small" style="margin-bottom:6px;">TUGAS TERDEKAT <a href="#" onclick="navGo('jadwal');return false;" style="float:right;font-weight:700;">Lihat semua</a></div>
     <div id="tugasHome"></div>
   </div>
 
   <div class="circles">
-    <div class="circle" onclick="openView('datakas')"><div class="ico">💰</div><span>Data Kas</span></div>
-    <div class="circle" onclick="openView('kegiatan')"><div class="ico">🎯</div><span>Kas Kegiatan</span></div>
-    <div class="circle" onclick="openView('galeri')"><div class="ico">🖼️</div><span>Galeri</span></div>
-    <div class="circle" onclick="openView('jadwal')"><div class="ico">📅</div><span>Jadwal</span></div>
-    <div class="circle" onclick="openView('kontak')"><div class="ico">☎️</div><span>Kontak</span></div>
+    <div class="circle" onclick="openView('datakas')"><div class="ico"></div><span>Data Kas</span></div>
+    <div class="circle" onclick="openView('kegiatan')"><div class="ico"></div><span>Kas Kegiatan</span></div>
+    <div class="circle" onclick="openView('galeri')"><div class="ico"></div><span>Galeri</span></div>
+    <div class="circle" onclick="openView('jadwal')"><div class="ico"></div><span>Jadwal</span></div>
+    <div class="circle" onclick="openView('kontak')"><div class="ico"></div><span>Kontak</span></div>
   </div>
 
-  <button class="btn kgBtn" style="width:100%;margin-bottom:10px;display:none;" onclick="openView('kegiatan')">🎯 Kas Kegiatan (study tour, perpisahan, dll)</button>
+  <button class="btn kgBtn" style="width:100%;margin-bottom:10px;display:none;" onclick="openView('kegiatan')">Kas Kegiatan (study tour, perpisahan, dll)</button>
 
   <h2 class="h">Pengumuman</h2>
   <div id="announceList"></div>
@@ -768,7 +774,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
     <div class="stars" id="starRow"></div>
   </div>
 
-  <h2 class="h" style="margin-top:6px;">💬 Komentar</h2>
+  <h2 class="h" style="margin-top:6px;">Komentar</h2>
   <div class="card cmt-composer-card"><div id="cmtComposerHome"></div></div>
   <div id="cmtHomeList"></div>
   <button class="btn" id="cmtHomeMore" style="width:100%;margin-bottom:14px;" onclick="cmtOpenPage()">Lihat semua komentar</button>
@@ -783,7 +789,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 
 <div class="view" id="view-datakas">
   <h2 class="h">Data Kas</h2>
-  <button class="btn kgBtn" style="width:100%;margin-bottom:8px;display:none;" onclick="openView('kegiatan')">🎯 Lihat Kas Kegiatan</button>
+  <button class="btn kgBtn" style="width:100%;margin-bottom:8px;display:none;" onclick="openView('kegiatan')">Lihat Kas Kegiatan</button>
   <div class="mrow" style="margin-top:0;">
     <select id="kasMonthSel" onchange="renderKasTable()" style="flex:1;"></select>
     <button class="btn primary" id="btnAddKasEntry" style="display:none;flex:0;" onclick="openModal('addkasentry')">+</button>
@@ -806,7 +812,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
     <button class="btn" onclick="kasShareWA()">Bagikan ke WhatsApp</button>
     <button class="btn" onclick="kasPrint()">Cetak / Simpan PDF</button>
   </div>
-  <button class="btn" id="btnInstallPwa" style="display:none;width:100%;margin-top:8px;" onclick="pwaInstall()">📲 Pasang sebagai aplikasi</button>
+  <button class="btn" id="btnInstallPwa" style="display:none;width:100%;margin-top:8px;" onclick="pwaInstall()">Pasang sebagai aplikasi</button>
 
   <button class="btn" style="margin-top:14px;" onclick="openView('home')">← Kembali</button>
 </div>
@@ -841,7 +847,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 </div>
 
 <div class="view" id="view-komentar">
-  <h2 class="h">💬 Komentar</h2>
+  <h2 class="h">Komentar</h2>
   <p class="small" style="margin-top:-6px;margin-bottom:10px;">Ketik <b>@</b> untuk menyebut anggota. Yang disebut atau dibalas akan mendapat pemberitahuan.</p>
   <div class="card cmt-composer-card"><div id="cmtComposerPage"></div></div>
   <div id="cmtPageList"></div>
@@ -867,7 +873,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
   <label>Kelas</label><input type="text" id="esKelas">
   <label>Foto Profil</label>
   <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
-    <div class="avatar" id="esAvatar" style="width:54px;height:54px;">👤</div>
+    <div class="avatar" id="esAvatar" style="width:54px;height:54px;"><i class="ic" data-ic="person"></i></div>
     <input type="file" accept="image/*" id="esPhotoInput" style="display:none;" onchange="esUploadPhoto()">
     <button class="btn" onclick="document.getElementById('esPhotoInput').click()">Ganti Foto</button>
     <button class="btn" style="color:var(--red);" onclick="esRemovePhoto()">Hapus Foto</button>
@@ -907,7 +913,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 </div>
 </div>
 
-<button class="fab" onclick="openModal('lapor')" title="Lapor Admin">⚠️</button>
+<button class="fab" onclick="openModal('lapor')" title="Lapor Admin"><i class="ic" data-ic="alert"></i></button>
 
 <div class="modal-bg" id="modal-album"><div class="modal">
   <h2 class="h" id="albumModalTitle">Album Baru</h2>
@@ -940,20 +946,20 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 <div class="modal-bg" id="modal-adminmenu"><div class="modal">
   <h2 class="h">Menu Admin</h2>
   <div class="mrow" style="flex-direction:column;">
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openView('kelolaanggotaview')">👥 Kelola Anggota</button>
-    <button class="btn" onclick="closeModal('adminmenu');openModal('editpengumuman')">📢 Edit Pengumuman</button>
-    <button class="btn" onclick="closeModal('adminmenu');openView('galeri')">🖼️ Kelola Galeri</button>
-    <button class="btn" onclick="closeModal('adminmenu');openView('jadwal')">📅 Kelola Jadwal</button>
-    <button class="btn" onclick="closeModal('adminmenu');openView('kontak')">☎️ Kelola Kontak</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('lihatlaporan')">📋 Lihat Laporan Masuk</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('loginlog')">📜 Log Kunjungan</button>
-    <button class="btn" onclick="closeModal('adminmenu');openModal('personalannounce')">🎯 Pengumuman Personal</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('recount')">🔄 Recount Tunggakan</button>
-    <button class="btn" onclick="closeModal('adminmenu');openModal('arrears')">📋 Daftar Tunggakan (salin)</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('activetokens')">🔐 Token Aktif</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('rotate')">🔑 Perbarui Token</button>
-    <button class="btn" onclick="closeModal('adminmenu');openModal('report')">🐞 Lapor ke Developer</button>
-    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('themeclass')">🎨 Tema Warna</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openView('kelolaanggotaview')">Kelola Anggota</button>
+    <button class="btn" onclick="closeModal('adminmenu');openModal('editpengumuman')">Edit Pengumuman</button>
+    <button class="btn" onclick="closeModal('adminmenu');openView('galeri')">Kelola Galeri</button>
+    <button class="btn" onclick="closeModal('adminmenu');openView('jadwal')">Kelola Jadwal</button>
+    <button class="btn" onclick="closeModal('adminmenu');openView('kontak')">Kelola Kontak</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('lihatlaporan')">Lihat Laporan Masuk</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('loginlog')">Log Kunjungan</button>
+    <button class="btn" onclick="closeModal('adminmenu');openModal('personalannounce')">Pengumuman Personal</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('recount')">Recount Tunggakan</button>
+    <button class="btn" onclick="closeModal('adminmenu');openModal('arrears')">Daftar Tunggakan (salin)</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('activetokens')">Token Aktif</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('rotate')">Perbarui Token</button>
+    <button class="btn" onclick="closeModal('adminmenu');openModal('report')">Lapor ke Developer</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('themeclass')">Tema Warna</button>
   </div>
   <div class="mrow"><button class="btn" onclick="closeModal('adminmenu')">Tutup</button></div>
 </div></div>
@@ -1073,7 +1079,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 
 <div class="modal-bg" id="modal-activetokens"><div class="modal">
   <h2 class="h">Token Aktif</h2>
-  <p class="small">Token yang sedang berlaku untuk kelas ini. <b>Hanya admin yang bisa melihat ini.</b> Jangan bagikan Token Admin. Ketuk 👁 untuk menampilkan.</p>
+  <p class="small">Token yang sedang berlaku untuk kelas ini. <b>Hanya admin yang bisa melihat ini.</b> Jangan bagikan Token Admin. Ketuk ikon mata untuk menampilkan.</p>
   <div id="atBox">Memuat…</div>
   <div class="mrow"><button class="btn primary" onclick="closeActiveTokens()">Tutup</button></div>
 </div></div>
@@ -1134,10 +1140,10 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 <div id="devRoot" class="dv-root">
   <div class="dv-top">
     <button class="dv-btn" id="dvBackBtn" onclick="dvGoHome()" style="display:none;" title="Kembali">←</button>
-    <div class="dv-title" id="dvTitle">🛠️ Developer</div>
+    <div class="dv-title" id="dvTitle">Developer</div>
     <button class="dv-btn" onclick="dvRefresh()" title="Segarkan">↻</button>
-    <button class="dv-btn" onclick="dvAiOpen()" title="Asisten AI (bebas topik, khusus developer)">🤖</button>
-    <button class="dv-btn" onclick="dvGoSettings()" title="Pengaturan developer">⚙️</button>
+    <button class="dv-btn" onclick="dvAiOpen()" title="Asisten AI (bebas topik, khusus developer)">AI</button>
+    <button class="dv-btn" onclick="dvGoSettings()" title="Pengaturan developer"><i class="ic" data-ic="gear"></i></button>
     <button class="dv-btn" onclick="dvLogout()" title="Keluar dari mode developer">⏻</button>
   </div>
   <div class="dv-body" id="dvBody"></div>
@@ -1146,7 +1152,7 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 </div>
 
 <div id="dvAiModal" class="dv-modal"><div class="dv-box" style="max-width:520px;width:94%;">
-  <h3>🤖 Asisten AI (Developer)</h3>
+  <h3>Asisten AI (Developer)</h3>
   <div class="dv-sub">Mode bebas: tidak terkunci panduan aplikasi, bisa ditanya apa saja. Admin kelas tetap memakai asisten yang terkunci panduan.</div>
   <div id="dvAiLog" style="height:46vh;overflow:auto;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px;margin:8px 0;font-size:13px;"></div>
   <div style="display:flex;gap:6px;"><input class="dv-in" id="dvAiIn" placeholder="Tulis pertanyaan…" autocomplete="off" style="flex:1;" onkeydown="if(event.key==='Enter')dvAiSend()"><button class="dv-btn" id="dvAiBtn" onclick="dvAiSend()">Kirim</button></div>
@@ -1179,14 +1185,14 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 </div></div>
 
 <div id="maintOverlay" class="kt-maint"><div class="kt-box">
-  <div style="font-size:54px;" onclick="devTap()">🛠️</div>
+  <div style="font-size:54px;" onclick="devTap()"><i class="ic" data-ic="wrench" style="width:54px;height:54px;"></i></div>
   <h2 onclick="devTap()">Sedang Dalam Perbaikan</h2>
   <p id="maintMsg">Kami sedang melakukan perbaikan sistem. Silakan coba lagi beberapa saat lagi.</p>
   <button class="dv-btn dv-pri" onclick="ktRecheck()">Coba lagi</button>
 </div></div>
 
 <div id="updPop" class="dv-modal"><div class="dv-box">
-  <h3>🔔 Update aplikasi tersedia</h3>
+  <h3>Update aplikasi tersedia</h3>
   <div class="dv-sub" id="updBody" style="color:var(--text,#eef5e6);line-height:1.5;"></div>
   <div class="dv-sub" id="updNoUrl" style="display:none;margin-top:8px;">Link update belum diatur developer.</div>
   <div class="dv-mrow"><button class="dv-btn" onclick="ktCloseUpdate()">Tutup</button><button class="dv-btn dv-pri" id="updGo" onclick="ktDoUpdate()">Update APK</button></div>
@@ -1260,7 +1266,7 @@ async function ktBase(){
 /* ---------- log peristiwa ---------- */
 /* ---------- Pemberitahuan ke Telegram (lewat Cloudflare Worker; token bot TIDAK ada di sini) ---------- */
 const TG_RELAY_URL = 'https://icy-truth-bbad.fadilataufan14.workers.dev/', TG_RELAY_KEY = 'rk_9fQ3vLx7TnB2wYc8Ud5HsKe1MzA6JpRg';
-const TG_EVENTS = {login_ok:'✅ Login berhasil', login_fail:'⚠️ Login gagal', data_export:'📤 Ekspor data', backup:'💾 Backup', token_rotate:'🔑 Token diganti', block:'⛔ Perangkat diblokir', force_logout:'🚪 Paksa keluar', maintenance:'🛠️ Mode perbaikan', change:'📝 Perubahan dari website menunggu konfirmasi', backup_auto:'💾 Backup otomatis', backup_fail:'❌ Backup otomatis gagal'};
+const TG_EVENTS = {login_ok:'Login berhasil', login_fail:'Login gagal', data_export:'Ekspor data', backup:'Backup', token_rotate:'Token diganti', block:'Perangkat diblokir', force_logout:'Paksa keluar', maintenance:'Mode perbaikan', change:'Perubahan dari website menunggu konfirmasi', backup_auto:'Backup otomatis', backup_fail:'Backup otomatis gagal'};
 function tgNotify(type, d){
   try{
     if(!TG_RELAY_URL || !TG_EVENTS[type]) return;
@@ -1391,9 +1397,9 @@ async function ktCheckVersion(){
     if(!c.latestVersion){ out.innerHTML='Informasi versi terbaru belum tersedia.'; return; }
     const v=dvEsc(String(c.latestVersion).replace(/^[vV]/,''));
     if(ktVerCmp(KT_VERSION,c.latestVersion)<0){
-      out.innerHTML='⚠️ Aplikasi kamu <b>versi lama</b> (v'+dvEsc(KT_VERSION)+'). Versi terbaru: <b>v'+v+'</b>.'
+      out.innerHTML='Aplikasi kamu <b>versi lama</b> (v'+dvEsc(KT_VERSION)+'). Versi terbaru: <b>v'+v+'</b>.'
         +(/^https?:\/\//i.test(String(c.downloadUrl||''))?'<button class="btn primary" style="width:100%;margin-top:10px;" onclick="ktDoUpdate()">Update APK</button>':'<div class="small" style="margin-top:6px;">Link update belum diatur developer.</div>');
-    } else out.innerHTML='✅ Aplikasi sudah <b>versi terbaru</b> (v'+dvEsc(KT_VERSION)+').';
+    } else out.innerHTML='Aplikasi sudah <b>versi terbaru</b> (v'+dvEsc(KT_VERSION)+').';
   }catch(e){ out.textContent='Tidak bisa memeriksa versi. Periksa koneksi internet lalu coba lagi.'; }
 }
 
@@ -1473,7 +1479,7 @@ function ktATRender(boxId, ownTok, peers){
   const box=document.getElementById(boxId); if(!box) return;
   box.innerHTML=ktAT.map((x,i)=>'<div style="margin:10px 0;"><div style="font-size:13px;opacity:.8;">'+dvEsc(x.label)+'</div>'
     +'<div style="display:flex;gap:6px;align-items:center;margin-top:4px;"><div id="ktATv'+i+'" style="flex:1;font-family:monospace;font-size:17px;letter-spacing:2px;padding:9px 10px;border:1px solid var(--line,#30461f);border-radius:8px;">••••••••</div>'
-    +'<button class="btn" style="padding:8px 10px;" onclick="ktATToggle('+i+')" aria-label="Tampilkan atau sembunyikan">👁</button>'
+    +'<button class="btn" style="padding:8px 10px;" onclick="ktATToggle('+i+')" aria-label="Tampilkan atau sembunyikan"><i class="ic" data-ic="eye"></i></button>'
     +'<button class="btn" style="padding:8px 10px;" onclick="ktATCopy('+i+')">Salin</button></div></div>').join('')
     +(hasViewer?'':'<div style="margin-top:12px;padding:10px;border:1px dashed var(--line,#30461f);border-radius:8px;font-size:13px;line-height:1.5;">Token Lihat Saja belum tercatat. Kalau kamu masih ingat, catat di sini; atau minta developer menekan <b>Sinkronkan daftar token</b>.'
       +'<input type="text" id="ktATPeer" autocapitalize="characters" autocomplete="off" placeholder="Token Lihat Saja" style="margin-top:8px;"><button class="btn" style="margin-top:6px;width:100%;" onclick="ktATRegister()">Catat token ini</button></div>');
@@ -1484,7 +1490,7 @@ function ktATToggle(i){
 }
 async function ktATCopy(i){
   const say=(typeof showMsg==='function')?showMsg:alertBox;
-  try{ if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(ktAT[i].tok); say('Token disalin.'); }catch(e){ say('Tekan 👁 lalu salin manual.'); }
+  try{ if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(ktAT[i].tok); say('Token disalin.'); }catch(e){ say('Tekan ikon mata lalu salin manual.'); }
 }
 function ktATClear(){ ktAT=[]; }
 async function ktATRegister(){
@@ -1685,7 +1691,7 @@ function dvRender(){
   dvEl('dvHelpBtn').style.display = dvScreen==='home' ? 'none' : 'flex'; dvEl('dvHelpCard').style.display='none';
 }
 function dvRenderHome(){
-  dvEl('dvTitle').textContent='🛠️ Developer';
+  dvEl('dvTitle').textContent='Developer';
   const rooms=Object.values(dvData.rooms);
   const sorters={ updated:(a,b)=>dvUpdated(b)-dvUpdated(a), size:(a,b)=>dvTotalBytes(b)-dvTotalBytes(a), name:(a,b)=>dvTitleOf(a).localeCompare(dvTitleOf(b)) };
   rooms.sort(sorters[dvSort]||sorters.updated);
@@ -1741,7 +1747,7 @@ function dvRenderRoom(){
   h+='<div class="dv-h">Token</div><div class="dv-card">'
     +(r.tokens.length ? r.tokens.map(t=>'<div class="dv-row"><span><span class="dv-tag '+(t.role==='editor'?'ed':'')+'">'+dvRoleName(t.role)+'</span> <span class="dv-mono">'+dvEsc(t.token)+'</span></span>'
         +'<span><button class="dv-btn" style="padding:3px 8px;font-size:12px;" data-copy="'+dvEsc(t.token)+'" onclick="dvCopy(this.dataset.copy)">Salin</button> '
-        +'<button class="dv-btn" style="padding:3px 8px;font-size:12px;" data-token="'+dvEsc(t.token)+'" onclick="dvAskRotate(this.dataset.token)">🔄 Perbarui</button> '
+        +'<button class="dv-btn" style="padding:3px 8px;font-size:12px;" data-token="'+dvEsc(t.token)+'" onclick="dvAskRotate(this.dataset.token)">Perbarui</button> '
         +'<button class="dv-btn dv-danger" style="padding:3px 8px;font-size:12px;" data-token="'+dvEsc(t.token)+'" onclick="dvAskDeleteToken(this.dataset.token)">Hapus</button></span></div>').join('')
       : '<span class="dv-sub">Tidak ada token yang menunjuk ruang ini (data yatim).</span>')
     +'<div class="dv-mrow"><button class="dv-btn" data-room="'+dvEsc(r.id)+'" onclick="dvGoSettings(this.dataset.room)">+ Token custom untuk ruang ini</button> '
@@ -1758,7 +1764,7 @@ function dvRenderRoom(){
   fin.per.forEach(p=>{
     const m=p.m, dates=m.dates||[], man=(r.kas.manualIncome||{})[p.mk]||[], ex=(r.kas.expenses||{})[p.mk]||[];
     h+='<div class="dv-card dv-details"><details><summary><b>'+dvEsc(p.mk)+'</b> · '+dates.length+' tanggal · '+dvRp(m.value||2000)+'/kotak · masuk '+dvRp(p.income)+' · keluar '+dvRp(p.e)+'</summary>'
-      +'<div class="dv-scroll" style="margin-top:6px;"><table class="dv-table"><tr><th>No</th><th>Nama</th>'+dates.map(d=>'<th class="c">'+dvEsc(d)+((m.holiday&&m.holiday[d])?'🚫':'')+'</th>').join('')+'</tr>'
+      +'<div class="dv-scroll" style="margin-top:6px;"><table class="dv-table"><tr><th>No</th><th>Nama</th>'+dates.map(d=>'<th class="c">'+dvEsc(d)+((m.holiday&&m.holiday[d])?'✕':'')+'</th>').join('')+'</tr>'
       +st.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+dvEsc(s.short)+'</td>'+dates.map(d=>{ const c=m.checks&&m.checks[String(i)]&&m.checks[String(i)][d]; return '<td class="c">'+((c&&c.on)?'✓':'·')+'</td>'; }).join('')+'</tr>').join('')+'</table></div>'
       +'<div class="dv-sub" style="margin-top:6px;">Pemasukan centang: '+p.boxes+' kotak = '+dvRp(p.chk)+'</div>'
       +'<div class="dv-sub" style="margin-top:6px;"><b>Pemasukan manual</b></div>'+(man.length?man.map(e=>'<div class="dv-row"><span>'+dvEsc(e.date)+' · '+dvEsc(e.name||e.desc||'')+'</span><span>'+dvRp(e.amount)+'</span></div>').join(''):'<div class="dv-sub">—</div>')
@@ -1782,7 +1788,7 @@ function dvRenderRoom(){
   h+='<div class="dv-h">Log login website (20 terakhir)</div><div class="dv-card">'+(logs.length?logs.map(l=>'<div class="dv-row"><span>'+dvEsc(l.name||('Absen '+l.absen))+'</span><span class="dv-sub">'+dvEsc(l.date)+' '+dvEsc(l.time)+'</span></div>').join(''):'<span class="dv-sub">—</span>')+'</div>';
   // --- hapus
   h+='<div class="dv-h">Zona berbahaya</div><div class="dv-card"><div class="dv-sub" style="margin-bottom:8px;">Menghapus ruang ini akan menghapus <b>semua token</b>, data aplikasi, data website, galeri, dan foto profil miliknya. Tidak bisa dibatalkan.</div>'
-    +'<button class="dv-btn dv-danger dv-wide" data-room="'+dvEsc(r.id)+'" onclick="dvAskDeleteRoom(this.dataset.room)">🗑️ Hapus ruang &amp; semua datanya</button></div>';
+    +'<button class="dv-btn dv-danger dv-wide" data-room="'+dvEsc(r.id)+'" onclick="dvAskDeleteRoom(this.dataset.room)">Hapus ruang &amp; semua datanya</button></div>';
   dvEl('dvBody').innerHTML=h;
 }
 
@@ -1865,7 +1871,7 @@ async function dvDeleteRoom(roomId){
 
 /* ---------- pengaturan developer ---------- */
 function dvRenderSettings(){
-  dvEl('dvTitle').textContent='⚙️ Pengaturan Developer';
+  dvEl('dvTitle').textContent='Pengaturan Developer';
   const rooms=Object.values(dvData.rooms);
   let h='<div class="dv-card"><b>Ubah username &amp; token developer</b>'
     +'<div class="dv-sub" style="margin:4px 0 6px;">Username = yang diisi di kolom NISN/absen saat login. Token = password. Disarankan token panjang (≥10 karakter, campuran huruf &amp; angka). Pengaturan ini hanya ada di mode developer.'+(dvSecret?'<br>Username sesi ini: <b>'+dvEsc(dvSecret.u)+'</b>':'')+'</div>'
@@ -1875,7 +1881,7 @@ function dvRenderSettings(){
     +'<div class="dv-mrow"><button class="dv-btn dv-pri" onclick="dvSaveCreds()">Simpan</button></div></div>';
   h+='<div class="dv-card"><b>Buat token custom</b>'
     +'<div class="dv-sub" style="margin:4px 0 6px;">Agar mudah diingat &amp; dibagikan. Huruf besar, angka, tanda - atau _ (4–24 karakter). Kosongkan salah satu kalau hanya butuh satu jenis.</div>'
-    +'<label class="dv-lbl">Untuk ruang</label><select class="dv-in" id="dvCRoom" onchange="dvCRoomChange()"><option value="__new__">➕ Kelas baru (data kosong)</option>'
+    +'<label class="dv-lbl">Untuk ruang</label><select class="dv-in" id="dvCRoom" onchange="dvCRoomChange()"><option value="__new__">Kelas baru (data kosong)</option>'
     +rooms.map(r=>'<option value="'+dvEsc(r.id)+'"'+(dvRoomId===r.id?' selected':'')+'>'+dvEsc(dvTitleOf(r))+' · '+dvEsc(r.id.slice(0,8))+'</option>').join('')+'</select>'
     +'<div id="dvCNameBox"><label class="dv-lbl">Nama kelas (untuk kelas baru)</label><input class="dv-in" id="dvCName" placeholder="Contoh: XII IPA 1"></div>'
     +'<label class="dv-lbl">Token Admin (bisa mengedit)</label><input class="dv-in" id="dvCEd" autocomplete="off" autocapitalize="characters" placeholder="Contoh: IPA1-ADMIN">'
@@ -1941,7 +1947,7 @@ async function dvCreateTokens(){
 /* ===================================================================
    FITUR PANEL DEVELOPER
 =================================================================== */
-const DV_FEATURES=[['logs','📡','Log Real-time'],['backup','💾','Backup & Rollback'],['sessions','👥','Sesi & Perangkat'],['maint','🛠️','Mode Perbaikan'],['version','📦','Versi & Build'],['brute','🛡️','Brute Force'],['sensitive','🔍','Akses Data Sensitif'],['multi','🔀','Login Ganda'],['theme','🎨','Tema Warna'],['requests','✉️','Request Token'],['reports','📩','Laporan Admin'],['login','🚪','Opsi Login']];
+const DV_FEATURES=[['logs','','Log Real-time'],['backup','','Backup & Rollback'],['sessions','','Sesi & Perangkat'],['maint','','Mode Perbaikan'],['version','','Versi & Build'],['brute','','Brute Force'],['sensitive','','Akses Data Sensitif'],['multi','','Login Ganda'],['theme','','Tema Warna'],['requests','','Request Token'],['reports','','Laporan Admin'],['login','','Opsi Login']];
 const DV_HELP={
   home:{t:'Panel Developer',d:'Daftar semua token/kelas terdaftar dan pintasan ke fitur developer.'},
   room:{t:'Data Satu Token',d:'Melihat seluruh data yang tersimpan untuk satu token/kelas (siswa, keuangan, data website), mengelola token-nya, atau menghapus ruangnya. Halaman ini hanya untuk dilihat, bukan mengedit data kelas.'},
@@ -1997,13 +2003,13 @@ function dvTileBadge(k){
   if(k==='brute') return dvBruteAnalyze().flagged.length||'';
   if(k==='multi') return dvMultiNow().length||'';
   if(k==='logs') return dvLive.logs.length?'live':'';
-  if(k==='theme') return ktThemeValid(ktCfg.themeAll)?'🔒':'';
+  if(k==='theme') return ktThemeValid(ktCfg.themeAll)?'':'';
   if(k==='requests') return dvReqNewCount()||'';
   if(k==='reports') return dvRepNewCount()||'';
   return '';
 }
 function dvTilesHtml(){
-  return DV_FEATURES.map(f=>{ const b=dvTileBadge(f[0]); return '<div class="dv-card click dv-tile" data-k="'+f[0]+'" onclick="dvGoFeature(this.dataset.k)"><div style="font-size:22px;">'+f[1]+'</div><div style="font-size:12px;font-weight:700;">'+dvEsc(f[2])+'</div>'+(b!==''?'<span class="dv-tag '+((f[0]==='brute'||f[0]==='multi'||b==='ON')?'warn':'ed')+'" style="margin-top:4px;">'+dvEsc(b)+'</span>':'')+'</div>'; }).join('');
+  return DV_FEATURES.map(f=>{ const b=dvTileBadge(f[0]); return '<div class="dv-card click dv-tile" data-k="'+f[0]+'" onclick="dvGoFeature(this.dataset.k)">'+(f[1]?'<div style="font-size:22px;">'+f[1]+'</div>':'')+'<div style="font-size:12px;font-weight:700;">'+dvEsc(f[2])+'</div>'+(b!==''?'<span class="dv-tag '+((f[0]==='brute'||f[0]==='multi'||b==='ON')?'warn':'ed')+'" style="margin-top:4px;">'+dvEsc(b)+'</span>':'')+'</div>'; }).join('');
 }
 function dvPaintTiles(){ const e=dvEl('dvTiles'); if(e) e.innerHTML=dvTilesHtml(); }
 
@@ -2022,7 +2028,7 @@ function dvRepOnSnap(s){
   }else if(fresh.length){ dvToast('Laporan baru dari '+(fresh[0].who||'admin')+'.'); }
 }
 function dvRenderReports(){
-  dvEl('dvTitle').textContent='📩 Laporan Admin';
+  dvEl('dvTitle').textContent='Laporan Admin';
   dvEl('dvBody').innerHTML='<div id="dvRepBox"></div>';
   dvPaintReports();
 }
@@ -2064,7 +2070,7 @@ function dvReqOnSnap(s){
   }else if(fresh.length){ dvToast('Request token baru masuk dari '+(fresh[0].name||'pengguna')+'.'); }
 }
 function dvRenderRequests(){
-  dvEl('dvTitle').textContent='✉️ Request Token';
+  dvEl('dvTitle').textContent='Request Token';
   dvEl('dvBody').innerHTML='<div id="dvReqBox"></div>';
   dvPaintRequests();
 }
@@ -2094,16 +2100,16 @@ function dvReqAskDelete(id){
 
 /* ---------- 1. LOG REAL-TIME ---------- */
 function dvRenderLogs(){
-  dvEl('dvTitle').textContent='📡 Log Real-time';
+  dvEl('dvTitle').textContent='Log Real-time';
   const opts=[['all','Semua jenis']].concat(Object.keys(DV_TYPES).map(k=>[k,DV_TYPES[k][0]]));
-  dvEl('dvBody').innerHTML='<div class="dv-card"><div class="dv-row" style="border:none;"><span class="dv-sub" id="dvLogCount"></span><button class="dv-btn" id="dvLogPause" onclick="dvToggleLogPause()">'+(dvLogPaused?'▶ Lanjut':'⏸ Jeda')+'</button></div>'
+  dvEl('dvBody').innerHTML='<div class="dv-card"><div class="dv-row" style="border:none;"><span class="dv-sub" id="dvLogCount"></span><button class="dv-btn" id="dvLogPause" onclick="dvToggleLogPause()">'+(dvLogPaused?'Lanjut':'Jeda')+'</button></div>'
     +'<select class="dv-in" id="dvLogSel" onchange="dvLogFilter=this.value;dvPaintLogs()">'+opts.map(o=>'<option value="'+o[0]+'"'+(dvLogFilter===o[0]?' selected':'')+'>'+dvEsc(o[1])+'</option>').join('')+'</select>'
     +'<div class="dv-mrow"><button class="dv-btn" onclick="dvAskClearLogs(7)">Hapus log &gt; 7 hari</button><button class="dv-btn dv-danger" onclick="dvAskClearLogs(0)">Hapus semua log</button></div></div>'
     +(dvLive.err?'<div class="dv-card dv-sub" style="color:var(--red,#ef4444);">'+dvEsc(dvLive.err)+'</div>':'')
     +'<div class="dv-card" id="dvLiveArea"></div>';
   dvPaintLogs();
 }
-function dvToggleLogPause(){ dvLogPaused=!dvLogPaused; const b=dvEl('dvLogPause'); if(b) b.textContent=dvLogPaused?'▶ Lanjut':'⏸ Jeda'; if(!dvLogPaused) dvPaintLogs(); }
+function dvToggleLogPause(){ dvLogPaused=!dvLogPaused; const b=dvEl('dvLogPause'); if(b) b.textContent=dvLogPaused?'Lanjut':'Jeda'; if(!dvLogPaused) dvPaintLogs(); }
 function dvLogRow(l){
   const t=DV_TYPES[l.type]||[l.type,''];
   return '<div class="dv-row" style="align-items:flex-start;"><span><span class="dv-tag '+t[1]+'">'+dvEsc(t[0])+'</span> <b>'+dvEsc(l.who||l.role||'')+'</b> '+dvEsc(l.what||'')+(l.info?' <span class="dv-sub">'+dvEsc(l.info)+'</span>':'')
@@ -2147,7 +2153,7 @@ function dvSessRow(s){
       +(s.kind==='developer'?'':'<button class="dv-btn dv-danger" style="padding:3px 8px;font-size:12px;" data-sid="'+dvEsc(s.id)+'" onclick="dvForceLogout(this.dataset.sid,true)">+ blokir</button>')+'</span>')+'</div>';
 }
 function dvRenderSessions(){
-  dvEl('dvTitle').textContent='👥 Sesi & Perangkat';
+  dvEl('dvTitle').textContent='Sesi & Perangkat';
   dvEl('dvBody').innerHTML=(dvLive.err?'<div class="dv-card dv-sub" style="color:var(--red,#ef4444);">'+dvEsc(dvLive.err)+'</div>':'')+'<div id="dvLiveArea"></div>';
   dvPaintSessions();
 }
@@ -2186,7 +2192,7 @@ async function dvSetMaintenance(on,msg){
   ktLog('maintenance',{what:on?'AKTIF':'NONAKTIF', info:msg||''});
 }
 function dvRenderLoginOpt(){
-  dvEl('dvTitle').textContent='🚪 Opsi Login Website';
+  dvEl('dvTitle').textContent='Opsi Login Website';
   dvEl('dvBody').innerHTML='<div class="dv-card"><div id="dvLoginStatus" style="font-size:14px;line-height:1.7;"></div></div>'
     +'<div class="dv-card"><label class="dv-lbl">Pilih opsi login</label><select class="dv-in" id="dvLoginSel" onchange="dvPaintLoginOpt()"><option value="nisn">NISN</option><option value="absen">No. Absen</option></select>'
     +'<div class="dv-mrow"><button class="dv-btn dv-danger" id="dvLoginBtn" onclick="dvAskLoginOpt()">Matikan</button></div>'
@@ -2195,7 +2201,7 @@ function dvRenderLoginOpt(){
 }
 function dvPaintLoginOpt(){
   const st=dvEl('dvLoginStatus'); if(!st) return; const lo=ktCfg.loginOff||{}, sel=dvEl('dvLoginSel').value;
-  st.innerHTML=[['nisn','NISN'],['absen','No. Absen']].map(x=>(lo[x[0]]===true?'🔴':'🟢')+' <b>'+x[1]+'</b>: '+(lo[x[0]]===true?'dinonaktifkan':'aktif')).join('<br>');
+  st.innerHTML=[['nisn','NISN'],['absen','No. Absen']].map(x=>(lo[x[0]]===true?'<span style="color:#ef4444">●</span>':'<span style="color:#22c55e">●</span>')+' <b>'+x[1]+'</b>: '+(lo[x[0]]===true?'dinonaktifkan':'aktif')).join('<br>');
   const b=dvEl('dvLoginBtn'); if(b){ const off=lo[sel]===true; b.textContent=off?'Hidupkan kembali':'Matikan'; b.className='dv-btn '+(off?'dv-pri':'dv-danger'); }
 }
 function dvAskLoginOpt(){
@@ -2212,14 +2218,14 @@ async function dvDoLoginOpt(mode,off){
   }catch(e){ dvToast('Gagal mengubah opsi login: '+((e&&e.code)||(e&&e.message)||'')); }
 }
 function dvRenderMaint(){
-  dvEl('dvTitle').textContent='🛠️ Mode Perbaikan';
+  dvEl('dvTitle').textContent='Mode Perbaikan';
   dvEl('dvBody').innerHTML='<div class="dv-card"><div id="dvMaintStatus" style="font-size:15px;"></div></div>'
     +'<div class="dv-card"><label class="dv-lbl">Pesan untuk pengguna</label><textarea class="dv-in" id="dvMaintMsg" rows="3" placeholder="Contoh: Sedang pemeliharaan sistem, kembali pukul 20.00.">'+dvEsc(ktCfg.maintenanceMsg||'')+'</textarea>'
     +'<div class="dv-mrow"><button class="dv-btn dv-danger" onclick="dvAskMaint(true)">Aktifkan Mode Perbaikan</button><button class="dv-btn dv-pri" onclick="dvAskMaint(false)">Matikan</button></div>'
     +'<div class="dv-sub" style="margin-top:8px;">Saat aktif: pengguna & admin melihat halaman perbaikan, perubahan data dari mereka ditolak server. Developer tetap bisa masuk (ketuk judul halaman 5×).</div></div>';
   dvPaintMaintStatus();
 }
-function dvPaintMaintStatus(){ const e=dvEl('dvMaintStatus'); if(!e) return; e.innerHTML=ktCfg.maintenanceOn===true?'🔴 <b>AKTIF</b> sejak '+dvWhen(ktCfg.maintenanceSince):'🟢 <b>Nonaktif</b> — aplikasi & website berjalan normal'; }
+function dvPaintMaintStatus(){ const e=dvEl('dvMaintStatus'); if(!e) return; e.innerHTML=ktCfg.maintenanceOn===true?'<span style="color:#ef4444">●</span> <b>AKTIF</b> sejak '+dvWhen(ktCfg.maintenanceSince):'<span style="color:#22c55e">●</span> <b>Nonaktif</b> — aplikasi & website berjalan normal'; }
 function dvAskMaint(on){
   const msg=(dvEl('dvMaintMsg').value||'').trim().slice(0,200);
   if(!on){ dvDoMaint(false,msg); return; }
@@ -2229,7 +2235,7 @@ async function dvDoMaint(on,msg){ try{ await dvSetMaintenance(on,msg); dvToast(o
 
 /* ---------- 5. VERSI & BUILD ---------- */
 function dvRenderVersion(){
-  dvEl('dvTitle').textContent='📦 Versi & Build';
+  dvEl('dvTitle').textContent='Versi & Build';
   dvEl('dvBody').innerHTML='<div class="dv-card"><div class="dv-row">'+(KT_HOST==='app'?'<span>Versi aplikasi ini</span><b>v'+dvEsc(KT_VERSION)+'</b>':'<span>Konsol dibuka dari</span><b>Website (selalu terbaru)</b>')+'</div><div class="dv-row" id="dvVerStatus"></div></div>'
     +'<div class="dv-card"><b>Pengumuman update APK</b><div class="dv-sub" style="margin:4px 0 6px;">Pengguna APK versi lama akan melihat pemberitahuan dengan tombol Tutup dan Update.</div>'
     +'<label class="dv-lbl">Versi APK terbaru (contoh: 3.3.0)</label><input class="dv-in" id="dvVerLatest" value="'+dvEsc(ktCfg.latestVersion||'')+'" autocomplete="off">'
@@ -2291,7 +2297,7 @@ function dvChartSvg(b,th){
   return s+'<text x="'+p+'" y="'+(H-2)+'" font-size="8" style="fill:var(--sub)">30 menit lalu</text><text x="'+(W-p)+'" y="'+(H-2)+'" font-size="8" style="fill:var(--sub)" text-anchor="end">sekarang</text></svg>';
 }
 function dvRenderBrute(){
-  dvEl('dvTitle').textContent='🛡️ Brute Force';
+  dvEl('dvTitle').textContent='Brute Force';
   dvEl('dvBody').innerHTML=(dvLive.err?'<div class="dv-card dv-sub" style="color:var(--red,#ef4444);">'+dvEsc(dvLive.err)+'</div>':'')+'<div id="dvLiveArea"></div>'
     +'<label class="dv-card" style="display:flex;gap:8px;align-items:center;font-size:13px;"><input type="checkbox" id="dvAutoBlk" style="width:auto;" onchange="try{localStorage.setItem(\'dv_autoblock\',this.checked?\'1\':\'0\')}catch(e){}"'+((()=>{try{return localStorage.getItem('dv_autoblock')==='1';}catch(e){return false;}})()?' checked':'')+'> Blokir otomatis (60 menit) perangkat yang ditandai — hanya berjalan selama konsol ini terbuka</label>';
   dvPaintBrute();
@@ -2323,7 +2329,7 @@ function dvAutoBlockCheck(){
 
 /* ---------- 7. AKSES DATA SENSITIF ---------- */
 function dvRenderSensitive(){
-  dvEl('dvTitle').textContent='🔍 Akses Data Sensitif';
+  dvEl('dvTitle').textContent='Akses Data Sensitif';
   dvEl('dvBody').innerHTML=(dvLive.err?'<div class="dv-card dv-sub" style="color:var(--red,#ef4444);">'+dvEsc(dvLive.err)+'</div>':'')
     +'<div class="dv-card"><select class="dv-in" style="margin:0;" onchange="dvSensFilter=this.value;dvPaintSensitive()">'+[['all','Lihat & ekspor'],['data_view','Hanya dilihat'],['data_export','Hanya ekspor/unduh']].map(o=>'<option value="'+o[0]+'"'+(dvSensFilter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div><div id="dvLiveArea"></div>';
   dvPaintSensitive();
@@ -2345,7 +2351,7 @@ function dvMultiNow(){
   return Object.keys(g).map(k=>({key:k,list:g[k],devs:new Set(g[k].map(s=>s.deviceId))})).filter(x=>x.devs.size>=2);
 }
 function dvRenderMulti(){
-  dvEl('dvTitle').textContent='🔀 Login Ganda';
+  dvEl('dvTitle').textContent='Login Ganda';
   dvEl('dvBody').innerHTML=(dvLive.err?'<div class="dv-card dv-sub" style="color:var(--red,#ef4444);">'+dvEsc(dvLive.err)+'</div>':'')+'<div id="dvLiveArea"></div>';
   dvPaintMulti();
 }
@@ -2374,7 +2380,7 @@ const dvIsNative=()=>{ try{ return !!(window.Capacitor && Capacitor.isNativePlat
 const dvChk=(id,label,on)=>'<label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:4px 0;"><input type="checkbox" id="'+id+'" style="width:auto;"'+(on?' checked':'')+'> '+label+'</label>';
 const dvNoTok=d=>{ const c=JSON.parse(JSON.stringify(d)); delete c.authToken; return c; };   // token tidak boleh ikut tersimpan di berkas
 function dvRenderBackup(){
-  dvEl('dvTitle').textContent='💾 Backup & Rollback';
+  dvEl('dvTitle').textContent='Backup & Rollback';
   const drive=dvHasDrive(), native=dvIsNative();
   dvEl('dvBody').innerHTML=
     '<div class="dv-card"><b>Buat backup</b><div class="dv-sub" style="margin:4px 0 6px;">Berkas .json berisi semua token &amp; data kelas. <b>Tidak disimpan di Firebase</b>: simpan di perangkat dan/atau Google Drive.</div>'
@@ -2382,12 +2388,12 @@ function dvRenderBackup(){
     +dvChk('dvBkMedia','Sertakan galeri &amp; foto profil (lebih besar)',false)
     +dvChk('dvBkFreeze','Bekukan perubahan data selama backup (Mode Perbaikan otomatis)',false)
     +'<div class="dv-h" style="margin:10px 0 2px;">Simpan ke</div>'
-    +dvChk('dvBkDev',native?'📱 Perangkat (lembar berbagi: pilih Files / Drive / …)':'📱 Perangkat (unduh berkas .json)',!drive)
-    +(drive?dvChk('dvBkDrive','☁️ Google Drive (akun Google yang tersambung)',true):'<div class="dv-sub">☁️ Google Drive hanya tersedia di APK. Di website, simpan ke perangkat lalu unggah manual ke Drive bila mau.</div>')
+    +dvChk('dvBkDev',native?'Perangkat (lembar berbagi: pilih Files / Drive / …)':'Perangkat (unduh berkas .json)',!drive)
+    +(drive?dvChk('dvBkDrive','Google Drive (akun Google yang tersambung)',true):'<div class="dv-sub">Google Drive hanya tersedia di APK. Di website, simpan ke perangkat lalu unggah manual ke Drive bila mau.</div>')
     +'<div class="dv-mrow"><button class="dv-btn dv-pri" onclick="dvBackupCreate()">Buat Backup</button></div><div class="dv-sub" id="dvBkProg" style="margin-top:6px;"></div></div>'
     +'<div class="dv-card"><b>Pulihkan (rollback): pilih berkas</b><div class="dv-sub" style="margin:4px 0 6px;">Pilih berkas backup yang mau dipulihkan. Ringkasannya tampil dulu sebelum apa pun diubah.</div>'
-    +'<label class="dv-lbl">📁 Dari perangkat</label><input type="file" accept=".json,application/json" id="dvBkFile" class="dv-in" onchange="dvPickFile(this)">'
-    +(drive?'<div class="dv-mrow"><button class="dv-btn" onclick="dvDriveShow()">☁️ Pilih dari Google Drive</button></div><div id="dvDriveList"></div>':'')
+    +'<label class="dv-lbl">Dari perangkat</label><input type="file" accept=".json,application/json" id="dvBkFile" class="dv-in" onchange="dvPickFile(this)">'
+    +(drive?'<div class="dv-mrow"><button class="dv-btn" onclick="dvDriveShow()">Pilih dari Google Drive</button></div><div id="dvDriveList"></div>':'')
     +'<div id="dvRestoreBox"></div></div><div id="dvLegacyBox"></div>';
   dvLegacyLoad();
 }
@@ -2591,7 +2597,7 @@ function dvFixInfo(){
 }
 function dvFixBannerHtml(){
   const f=dvFixInfo(); if(!f.leak&&!f.peers) return '';
-  return '<div class="dv-card" style="border-color:var(--red,#ef4444);"><b>⚠️ Perbaikan keamanan tersedia</b><div class="dv-sub" style="margin:4px 0 8px;">'
+  return '<div class="dv-card" style="border-color:var(--red,#ef4444);"><b>Perbaikan keamanan tersedia</b><div class="dv-sub" style="margin:4px 0 8px;">'
     +(f.leak?f.leak+' ruang masih menyimpan token Editor di dokumen data yang bisa dibaca semua anggota. ':'')+(f.peers?f.peers+' ruang belum mencatat daftar token untuk admin (fitur "Token Aktif"). ':'')
     +'Tekan Perbaiki: token dihapus dari dokumen data dan daftar token admin disinkronkan. Data kelas tidak berubah.</div><button class="dv-btn dv-pri" onclick="dvRunFixes()">Perbaiki sekarang</button></div>';
 }
@@ -2649,20 +2655,20 @@ async function dvRotateToken(roomId, oldTok, custom){
 
 /* ---------- TEMA WARNA (developer): kunci tema untuk SEMUA kelas & halaman ---------- */
 function dvRenderTheme(){
-  dvEl('dvTitle').textContent='🎨 Tema Warna';
+  dvEl('dvTitle').textContent='Tema Warna';
   dvEl('dvBody').innerHTML='<div class="dv-card"><b>Tema untuk SEMUA kelas &amp; halaman</b><div class="dv-sub" style="margin:4px 0 8px;">Mengunci tampilan seluruh token (aplikasi &amp; website) ke satu tema, seketika, termasuk halaman login. Pilihan tema tiap kelas tidak dihapus: lepas kunci untuk mengembalikannya.</div>'
     +'<div id="dvThemeState" class="dv-sub" style="margin-bottom:6px;"></div><div id="dvThemeAll"></div>'
-    +'<div class="dv-mrow"><button class="dv-btn" onclick="dvSetThemeAll(\'\')">🔓 Lepas kunci (ikuti pilihan tiap kelas)</button></div></div>'
-    +'<div class="dv-card"><b>Mode Terang / Gelap untuk SEMUA kelas &amp; halaman</b><div class="dv-sub" style="margin:4px 0 8px;">Memaksa seluruh pengguna (admin &amp; user, aplikasi &amp; website) ke mode terang atau gelap, termasuk halaman login. Pilihan admin tiap kelas tidak dihapus: lepas kunci untuk mengembalikannya.</div><div id="dvModeState" class="dv-sub" style="margin-bottom:6px;"></div><div class="dv-mrow"><button class="dv-btn" onclick="dvSetModeAll(\'light\')">☀️ Paksa Terang</button><button class="dv-btn" onclick="dvSetModeAll(\'dark\')">🌙 Paksa Gelap</button></div><div class="dv-mrow"><button class="dv-btn" onclick="dvSetModeAll(\'\')">🔓 Lepas kunci (ikuti pilihan tiap kelas)</button></div></div>'
+    +'<div class="dv-mrow"><button class="dv-btn" onclick="dvSetThemeAll(\'\')">Lepas kunci (ikuti pilihan tiap kelas)</button></div></div>'
+    +'<div class="dv-card"><b>Mode Terang / Gelap untuk SEMUA kelas &amp; halaman</b><div class="dv-sub" style="margin:4px 0 8px;">Memaksa seluruh pengguna (admin &amp; user, aplikasi &amp; website) ke mode terang atau gelap, termasuk halaman login. Pilihan admin tiap kelas tidak dihapus: lepas kunci untuk mengembalikannya.</div><div id="dvModeState" class="dv-sub" style="margin-bottom:6px;"></div><div class="dv-mrow"><button class="dv-btn" onclick="dvSetModeAll(\'light\')">Paksa Terang</button><button class="dv-btn" onclick="dvSetModeAll(\'dark\')">Paksa Gelap</button></div><div class="dv-mrow"><button class="dv-btn" onclick="dvSetModeAll(\'\')">Lepas kunci (ikuti pilihan tiap kelas)</button></div></div>'
     +'<div class="dv-h">Tema tiap kelas (pilihan admin)</div><div class="dv-card" id="dvThemeRooms"></div>';
   dvPaintTheme();
 }
 function dvPaintTheme(){
   const cur=ktThemeValid(ktCfg.themeAll)?ktCfg.themeAll:'';
-  const st=dvEl('dvThemeState'); if(st) st.innerHTML=cur?'🔒 <b>Terkunci</b>: semua kelas memakai <b>'+KT_THEMES[cur].name+'</b>.':'🔓 <b>Tidak dikunci</b>: tiap kelas memakai tema pilihannya sendiri.';
+  const st=dvEl('dvThemeState'); if(st) st.innerHTML=cur?'<b>Terkunci</b>: semua kelas memakai <b>'+KT_THEMES[cur].name+'</b>.':'<b>Tidak dikunci</b>: tiap kelas memakai tema pilihannya sendiri.';
   const a=dvEl('dvThemeAll'); if(a) a.innerHTML=ktSwatchesHtml(cur,'dvSetThemeAll');
   const mc=(ktCfg.modeAll==='light'||ktCfg.modeAll==='dark')?ktCfg.modeAll:'';
-  const ms=dvEl('dvModeState'); if(ms) ms.innerHTML=mc?'🔒 <b>Terkunci</b>: semua pengguna memakai mode <b>'+KT_MODE_NAMES[mc]+'</b>.':'🔓 <b>Tidak dikunci</b>: tiap kelas memakai mode pilihan adminnya (bawaan: ikuti HP).';
+  const ms=dvEl('dvModeState'); if(ms) ms.innerHTML=mc?'<b>Terkunci</b>: semua pengguna memakai mode <b>'+KT_MODE_NAMES[mc]+'</b>.':'<b>Tidak dikunci</b>: tiap kelas memakai mode pilihan adminnya (bawaan: ikuti HP).';
   const r=dvEl('dvThemeRooms');
   if(r) r.innerHTML=Object.values(dvData.rooms).map(room=>{ const id=(room.kas&&room.kas.theme)||'', k=KT_THEMES[id]||KT_THEMES['hijau-gelap'];
     return '<div class="dv-row"><b>'+dvEsc(dvTitleOf(room))+'</b><span class="dv-sub"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:linear-gradient(135deg,'+k.c1+','+k.c2+');"></span>'+dvEsc(ktThemeValid(id)?k.name:'Hijau Gelap (bawaan)')+' · '+dvEsc(KT_MODE_ICONS[(room.kas&&ktModeValid(room.kas.mode))?room.kas.mode:'auto']+' '+KT_MODE_NAMES[(room.kas&&ktModeValid(room.kas.mode))?room.kas.mode:'auto'])+'</span></div>'; }).join('')||'<span class="dv-sub">Belum ada kelas.</span>';
@@ -2696,7 +2702,7 @@ function ktCtx(){
   return {role: session.role==='editor'?'admin':(session.role==='staff'?'staff':'user'), roomId:session.roomId, who:(st.short||'?')+' (absen '+session.absen+')'};
 }
 function ktOnForced(reason){
-  alertBox(reason==='blocked' ? '⚠️ Akses perangkat ini dihentikan oleh developer.' : '⚠️ Sesi kamu dihentikan oleh developer.');
+  alertBox(reason==='blocked' ? 'Akses perangkat ini dihentikan oleh developer.' : 'Sesi kamu dihentikan oleh developer.');
   doLogout();
 }
 function ktAfterLogin(first){
@@ -2706,7 +2712,7 @@ function ktAfterLogin(first){
   if(first) ktLog('login_ok',{what:'login website'});
 }
 /* ---- Perbarui token (admin): token baru menggantikan token lama, data kelas TIDAK dihapus ---- */
-function ktOnTokenGone(){ alertBox('⚠️ Token ini sudah diganti atau dihapus. Masuk lagi dengan token baru.'); doLogout(); }
+function ktOnTokenGone(){ alertBox('Token ini sudah diganti atau dihapus. Masuk lagi dengan token baru.'); doLogout(); }
 async function openActiveTokens(){
   const box=document.getElementById('atBox');
   if(!session || session.role!=='editor'){ box.textContent='Hanya admin yang bisa melihat token aktif.'; return; }
@@ -2775,7 +2781,7 @@ function arrearsRows(){
 function renderArrearsModal(){
   let rows=arrearsRows(), sum=rows.reduce((a,r)=>a+r.total,0);
   let ta=document.getElementById('arrText'); ta.value=rows.map(r=>r.name+' '+arrFmt(r.total)).join('\n'); ta.rows=Math.min(14,Math.max(3,rows.length+1));
-  document.getElementById('arrSummary').textContent = rows.length ? (rows.length+' siswa menunggak · total '+fmtRp(sum)) : 'Tidak ada tunggakan — semua siswa lunas 🎉';
+  document.getElementById('arrSummary').textContent = rows.length ? (rows.length+' siswa menunggak · total '+fmtRp(sum)) : 'Tidak ada tunggakan — semua siswa lunas';
 }
 async function copyArrears(){
   let ta=document.getElementById('arrText'), t=ta.value;
@@ -2788,7 +2794,7 @@ async function copyArrears(){
 
 
 /* MODE UJI-COBA LOKAL (dimatikan; TIDAK dipakai untuk login developer yang asli).
-   ⚠️ WAJIB ubah DEV_MODE menjadi false sebelum website dipublikasikan ke kelas! */
+   WAJIB ubah DEV_MODE menjadi false sebelum website dipublikasikan ke kelas! */
 const DEV_MODE = false;
 const DEV_TOKEN = '';
 
@@ -2855,7 +2861,7 @@ function setLoginMode(mode){
   loginOffApply();
 }
 function loginOffNow(mode){ return !!(ktCfg && ktCfg.loginOff && ktCfg.loginOff[mode||loginMode]===true); }
-function loginOffWarn(){ alertBox('⛔ Opsi login '+(loginMode==='absen'?'No. Absen':'NISN')+' sedang dinonaktifkan. Silakan pakai opsi login yang lain atau hubungi admin/bendahara.'); }
+function loginOffWarn(){ alertBox('Opsi login '+(loginMode==='absen'?'No. Absen':'NISN')+' sedang dinonaktifkan. Silakan pakai opsi login yang lain atau hubungi admin/bendahara.'); }
 function loginOffApply(){
   const f=document.getElementById('loginForm'); if(!f) return;
   const off=loginOffNow(), ov=document.getElementById('loginOffOverlay'), inn=f.querySelector('.lf-in');
@@ -2883,7 +2889,7 @@ async function doLogin(){
     birthMonth = parseInt(document.getElementById('loginBirthMonth').value);
     if(!birthDay || !birthMonth){ alertBox('Isi tanggal dan bulan lahir dulu (untuk verifikasi identitas).'); return; }
   }
-  if(!fbInit()){ alertBox('⚠️ Website belum terhubung ke server. Hubungi admin/bendahara.'); return; }
+  if(!fbInit()){ alertBox('Website belum terhubung ke server. Hubungi admin/bendahara.'); return; }
   try{
     await ensureAnonAuth();
     let tokKey = token.toUpperCase();   // semua token kelas tersimpan HURUF BESAR
@@ -2892,10 +2898,10 @@ async function doLogin(){
       // bukan token kelas -> mungkin login developer (kolom NISN/absen = username, kolom token = password)
       let dr = await dvLogin(idVal, token);
       if(dr.ok){ dvOpen(); return; }
-      if(dr.stage==='rules' || dr.stage==='owner'){ alertBox('⚠️ '+dvLoginMessage(dr)); return; }   // kredensial BENAR tapi server belum siap
+      if(dr.stage==='rules' || dr.stage==='owner'){ alertBox(''+dvLoginMessage(dr)); return; }   // kredensial BENAR tapi server belum siap
       console.warn('[login] bukan token kelas / developer:', dr.stage, dr.code||'');
       ktHash8(token).then(h=>ktFail('token salah / tidak dikenal','tok:'+h));
-      alertBox('⚠️ Token salah / tidak dikenali.'); return;
+      alertBox('Token salah / tidak dikenali.'); return;
     }
     let {roomId, role} = tokDoc.data();
     let kasDoc = await fbDb.collection('kas').doc(roomId).get();
@@ -2907,8 +2913,8 @@ async function doLogin(){
       if(idx>=0 && idx<students.length){
         let bd = students[idx].birthDate || '';
         let expected = String(birthDay).padStart(2,'0')+'-'+String(birthMonth).padStart(2,'0');
-        if(!bd){ alertBox('⚠️ Tanggal lahir untuk absen ini belum diisi admin. Hubungi admin/bendahara.'); return; }
-        if(bd !== expected){ ktFail('tanggal lahir salah', idVal, roomId); alertBox('⚠️ Tanggal/bulan lahir tidak cocok dengan absen ini.'); return; }
+        if(!bd){ alertBox('Tanggal lahir untuk absen ini belum diisi admin. Hubungi admin/bendahara.'); return; }
+        if(bd !== expected){ ktFail('tanggal lahir salah', idVal, roomId); alertBox('Tanggal/bulan lahir tidak cocok dengan absen ini.'); return; }
         absen=String(idx+1);
       }
     } else {
@@ -2917,14 +2923,14 @@ async function doLogin(){
     }
     if(!absen){
       ktFail('identitas tidak terdaftar', idVal, roomId);
-      alertBox('⚠️ '+(loginMode==='absen'?'No. Absen':'NISN')+' tidak terdaftar di data siswa aplikasi. Hubungi admin/bendahara.');
+      alertBox(''+(loginMode==='absen'?'No. Absen':'NISN')+' tidak terdaftar di data siswa aplikasi. Hubungi admin/bendahara.');
       return;
     }
     session = {roomId, absen, role, token: tokKey};
     await ktRegisterMember(tokKey);   // daftarkan 'saya pemegang token ini' agar boleh menulis (token tidak disimpan di dokumen data)
     saveSession(remember);
     enterSite(true);
-  }catch(e){ alertBox((e && e.code==='permission-denied') ? '⚠️ Akses ditolak server (perangkat diblokir sementara atau sedang Mode Perbaikan).' : 'Gagal login: '+e.message); }
+  }catch(e){ alertBox((e && e.code==='permission-denied') ? 'Akses ditolak server (perangkat diblokir sementara atau sedang Mode Perbaikan).' : 'Gagal login: '+e.message); }
 }
 function doLogout(){
   ktLog('logout',{what:'keluar website'}); ktSessionEnd(); ktStopTokenWatch();
@@ -3144,7 +3150,7 @@ function renderLoginLog(){
   let vis=webState.visitors||{};
   let people=Object.keys(vis).length;
   let visits=Object.values(vis).reduce((a,v)=>a+(Number(v.count)||0),0);
-  document.getElementById('visitorSummary').innerHTML = '👥 <b>'+people+'</b> orang · <b>'+visits+'</b> kali kunjungan tercatat.';
+  document.getElementById('visitorSummary').innerHTML = '<b>'+people+'</b> orang · <b>'+visits+'</b> kali kunjungan tercatat.';
   let logs=[...(webState.loginLogs||[])].reverse();
   document.getElementById('loginLogList').innerHTML = logs.length ? logs.map(l=>
     `<div class="listrow"><span>${esc(l.name)} (absen ${esc(l.absen)})</span><span class="small">${esc(l.date)} · ${esc(l.time)}</span></div>`
@@ -3199,9 +3205,9 @@ function setRating(n){
   webState.ratings=webState.ratings||{};
   webState.ratings[session.absen]=n;
   renderFooter();
-  if(session.dev){ alertBox('Terima kasih atas penilaianmu! ⭐'); return; }
+  if(session.dev){ alertBox('Terima kasih atas penilaianmu!'); return; }
   fbDb.collection('website').doc(session.roomId).set({ratings:{[session.absen]:n}},{merge:true})
-    .then(()=>alertBox('Terima kasih atas penilaianmu! ⭐'))
+    .then(()=>alertBox('Terima kasih atas penilaianmu!'))
     .catch(e=>alertBox('Gagal menyimpan penilaian: '+e.message));
 }
 function renderFooter(){
@@ -3209,7 +3215,7 @@ function renderFooter(){
   let vis=webState.visitors||{};
   let people=Object.keys(vis).length;
   let visits=Object.values(vis).reduce((a,v)=>a+(Number(v.count)||0),0);
-  document.getElementById('visitorText').innerHTML='👥 Dikunjungi oleh <b>'+people+'</b> orang'+(visits?' · '+visits+' kali kunjungan':'');
+  document.getElementById('visitorText').innerHTML='Dikunjungi oleh <b>'+people+'</b> orang'+(visits?' · '+visits+' kali kunjungan':'');
   let rt=webState.ratings||{};
   let vals=Object.values(rt).map(Number).filter(v=>v>=1&&v<=5);
   let avg=vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
@@ -3236,13 +3242,13 @@ function renderAll(){
   document.getElementById('profNisn').textContent = st.nisn||'-';
   document.getElementById('profKelas').textContent = pr.kelas||'-';
   document.getElementById('profAbsen').textContent = session.absen;
-  document.getElementById('avatarBox').innerHTML = '👤';
+  document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(session.absen).then(photo=>{
     if(photo) document.getElementById('avatarBox').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
   });
   document.getElementById('btnAdminMenu').style.display = isStaff() ? 'inline-block':'none';
   document.querySelectorAll('.adm-only').forEach(function(e){ e.style.display = isAdmin() ? '' : 'none'; });
-  let dv=document.getElementById('btnDevRole'); dv.style.display = session.dev ? 'inline-block':'none'; dv.textContent='🧪 '+(isAdmin()?'Admin':(isStaff()?'Admin Kelas':'Anggota'));
+  let dv=document.getElementById('btnDevRole'); dv.style.display = session.dev ? 'inline-block':'none'; dv.textContent=''+(isAdmin()?'Admin':(isStaff()?'Admin Kelas':'Anggota'));
   document.getElementById('galeriAdminBtn').style.display = isStaff() ? 'block':'none';
   document.getElementById('jadwalEditBtn').style.display = isStaff() ? 'block':'none';
   document.getElementById('tugasAddBtn').style.display = isStaff() ? 'block':'none';
@@ -3288,7 +3294,7 @@ function renderTunggakan(){
   let total = list.reduce((a,e)=>a+e.amount,0);
   let box=document.getElementById('tunggakanBox');
   if(!list.length){
-    box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan 🎉</div>`;
+    box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan</div>`;
   } else {
     box.innerHTML = `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div>
       <div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`;
@@ -3314,7 +3320,7 @@ function renderClearedChips(){
   let dates=Object.keys(ovs).filter(d=>ovs[d] && ovs[d].cleared).sort();
   let el=document.getElementById('clearedChips'); if(!el) return;
   el.innerHTML = dates.length
-    ? '<span class="small">Sudah dilunasi / dihapus (ketuk untuk mengembalikan):</span><div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;">'+dates.map(d=>`<button class="btn" style="padding:4px 8px;font-size:12px;" onclick="pickClearedDate('${d}')">📅 ${d}</button>`).join('')+'</div>'
+    ? '<span class="small">Sudah dilunasi / dihapus (ketuk untuk mengembalikan):</span><div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;">'+dates.map(d=>`<button class="btn" style="padding:4px 8px;font-size:12px;" onclick="pickClearedDate('${d}')">${d}</button>`).join('')+'</div>'
     : '';
 }
 function prefillAtAmount(){
@@ -3442,11 +3448,11 @@ function myPersonalAnnouncements(){
 function renderAnnounce(){
   let tmr=tomorrowName();
   let sch=webState.schedule[tmr]||[];
-  let html = `<div class="card"><b>📅 Jadwal Besok (${tmr})</b>` +
+  let html = `<div class="card"><b>Jadwal Besok (${tmr})</b>` +
     (sch.length ? sch.map(j=>`<div class="listrow"><span>${esc(j.jam)}</span><span>${esc(j.mapel)}</span></div>`).join('') : '<div class="small">Tidak ada jadwal tercatat.</div>') +
     `</div>`;
   let mine=[...myPersonalAnnouncements()].sort((a,b)=>b.date.localeCompare(a.date));
-  html += mine.map(a=>`<div class="card" style="border-color:var(--amber);"><span class="small" style="color:var(--amber);">🎯 KHUSUS UNTUKMU</span><br><b>${esc(a.title)}</b><div class="small" style="margin:4px 0;">${esc(a.date)}</div><div>${esc(a.body)}</div></div>`).join('');
+  html += mine.map(a=>`<div class="card" style="border-color:var(--amber);"><span class="small" style="color:var(--amber);">KHUSUS UNTUKMU</span><br><b>${esc(a.title)}</b><div class="small" style="margin:4px 0;">${esc(a.date)}</div><div>${esc(a.body)}</div></div>`).join('');
   let list=[...(webState.announcements||[])].sort((a,b)=>b.date.localeCompare(a.date));
   html += list.length ? list.map(a=>`<div class="card"><b>${esc(a.title)}</b><div class="small" style="margin:4px 0;">${esc(a.date)}</div><div>${esc(a.body)}</div></div>`).join('') : (mine.length ? '' : '<p class="small">Belum ada pengumuman lain.</p>');
   document.getElementById('announceList').innerHTML = html;
@@ -3462,16 +3468,16 @@ function showAnnouncePopup(only){
     let sch=webState.schedule[tmr]||[];
     if(isAdmin() && (webState.reports||[]).length>0){
       html += `<div class="card" style="background:rgba(239,68,68,.15);border-color:var(--red);margin-bottom:10px;">
-        ⚠️ Ada <b>${webState.reports.length}</b> laporan masuk yang belum ditangani.
+        Ada <b>${webState.reports.length}</b> laporan masuk yang belum ditangani.
         <div class="mrow" style="margin-top:8px;"><button class="btn" style="width:100%;" onclick="closeModal('announcepopup');openModal('lihatlaporan');">Lihat Laporan</button></div>
       </div>`;
     }
     html += cn;
-    html += `<div style="margin-bottom:10px;"><b>📅 Jadwal Besok (${tmr})</b>` +
+    html += `<div style="margin-bottom:10px;"><b>Jadwal Besok (${tmr})</b>` +
       (sch.length ? sch.map(j=>`<div class="listrow"><span>${esc(j.jam)}</span><span>${esc(j.mapel)}</span></div>`).join('') : '<div class="small">Tidak ada jadwal tercatat.</div>') + `</div>`;
     let myLatestPersonal=[...myPersonalAnnouncements()].sort((a,b)=>b.date.localeCompare(a.date))[0];
     if(myLatestPersonal){
-      html += `<div class="card" style="border-color:var(--amber);"><span class="small" style="color:var(--amber);">🎯 KHUSUS UNTUKMU</span><br><b>${esc(myLatestPersonal.title)}</b><p>${esc(myLatestPersonal.body)}</p></div>`;
+      html += `<div class="card" style="border-color:var(--amber);"><span class="small" style="color:var(--amber);">KHUSUS UNTUKMU</span><br><b>${esc(myLatestPersonal.title)}</b><p>${esc(myLatestPersonal.body)}</p></div>`;
     }
     if((webState.announcements||[]).length){
       let latest=[...webState.announcements].sort((a,b)=>b.date.localeCompare(a.date))[0];
@@ -3568,7 +3574,7 @@ function renderGaleri(){
     add.style.display='none';
     document.getElementById('galeriBackBtn').textContent='← Kembali';
     var cards=[];
-    function card(v,name,cover,n){ return '<button class="album-card" onclick="openAlbum(\''+v+'\')">'+(cover?'<img class="cv" loading="lazy" src="'+cover+'">':'<div class="cv ph">🖼️</div>')+'<div class="al"><b>'+galeriEsc(name)+'</b><small>'+(n==null?'Google Drive':n+' foto')+'</small></div></button>'; }
+    function card(v,name,cover,n){ return '<button class="album-card" onclick="openAlbum(\''+v+'\')">'+(cover?'<img class="cv" loading="lazy" src="'+cover+'">':'<div class="cv ph"><i class="ic" data-ic="image" style="width:34px;height:34px;"></i></div>')+'<div class="al"><b>'+galeriEsc(name)+'</b><small>'+(n==null?'Google Drive':n+' foto')+'</small></div></button>'; }
     var all=galleryList;
     if(all.length || !albumList.length) cards.push(card('all','Semua Foto',all.length?all[all.length-1].photo:'',all.length));
     albumList.forEach(function(a){
@@ -3586,28 +3592,28 @@ function renderGaleri(){
   document.getElementById('galeriBackBtn').textContent='← Semua album';
   if(cur && cur.driveFolderId){
     add.style.display='none';
-    bar.innerHTML='<div class="album-head"><a class="btn" target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/'+cur.driveFolderId+'">📂 Buka folder Drive</a>'
-      +(adm?'<button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">✏️ Ubah</button><button class="btn" onclick="reloadDriveAlbum()">🔄 Muat ulang</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button>':'')+'</div>'
-      +(adm?'<p class="small" style="margin:0 0 8px;">Tekan ⭐ pada foto untuk menjadikannya sampul album. Tombol ⬇ mengunduh file asli resolusi penuh dari Drive.</p>':'');
+    bar.innerHTML='<div class="album-head"><a class="btn" target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/'+cur.driveFolderId+'">Buka folder Drive</a>'
+      +(adm?'<button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">Ubah</button><button class="btn" onclick="reloadDriveAlbum()">Muat ulang</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button>':'')+'</div>'
+      +(adm?'<p class="small" style="margin:0 0 8px;">Tekan ★ pada foto untuk menjadikannya sampul album. Tombol mengunduh file asli resolusi penuh dari Drive.</p>':'');
     var c=driveCache[cur.driveFolderId];
     if(!c || c.loading){ grid.innerHTML='<p class="small">Memuat foto dari Google Drive…</p>'; driveList(cur.driveFolderId).then(function(cc){ syncAlbumName(cur,cc); if(galeriView===cur.id) renderGaleri(); }); return; }
     if(c.err){ grid.innerHTML='<p class="small">Gagal memuat folder Drive: '+galeriEsc(c.err)+'</p>'; return; }
     grid.innerHTML = c.files.length ? c.files.map(function(f){
       return '<div class="gphoto"><a href="'+driveThumb(f.id,1600)+'" target="_blank" rel="noopener"><img loading="lazy" src="'+driveThumb(f.id,500)+'" alt=""></a><div class="gbtns">'
-        +'<a class="btn" href="'+driveDl(f.id)+'" target="_blank" rel="noopener" title="Unduh asli">⬇</a>'
-        +(adm?'<button class="btn" onclick="setDriveCover(\''+f.id+'\')" title="Jadikan sampul">'+(cur.coverId===f.id?'⭐':'☆')+'</button>':'')
+        +'<a class="btn" href="'+driveDl(f.id)+'" target="_blank" rel="noopener" title="Unduh asli"><i class="ic" data-ic="download"></i></a>'
+        +(adm?'<button class="btn" onclick="setDriveCover(\''+f.id+'\')" title="Jadikan sampul">'+(cur.coverId===f.id?'★':'☆')+'</button>':'')
         +'</div></div>';
     }).join('') : '<p class="small">Folder ini belum berisi foto, atau belum dibagikan ke "Siapa saja yang memiliki link".</p>';
     return;
   }
-  bar.innerHTML = (adm && cur) ? '<div class="album-head"><button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">✏️ Nama &amp; sampul</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button></div>' : '';
+  bar.innerHTML = (adm && cur) ? '<div class="album-head"><button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">Nama &amp; sampul</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button></div>' : '';
   add.style.display = adm ? 'block' : 'none';
   document.getElementById('galeriAddBtn').textContent = (galeriView==='all'||galeriView==='none') ? '+ Tambah Foto' : '+ Tambah Foto ke album ini';
   var list=photosOf(galeriView);
   grid.innerHTML = list.length ? list.map(function(g){
     return '<div class="gphoto"><img src="'+g.photo+'"><div class="gbtns">'
-      +'<button class="btn" onclick="downloadPhoto(\''+g.id+'\')" title="Unduh">⬇</button>'
-      +(adm?'<button class="btn" onclick="openMovePhoto(\''+g.id+'\')" title="Pindah album">📁</button><button class="btn" style="color:var(--red);" onclick="removeGaleri(\''+g.id+'\')" title="Hapus">✕</button>':'')
+      +'<button class="btn" onclick="downloadPhoto(\''+g.id+'\')" title="Unduh"><i class="ic" data-ic="download"></i></button>'
+      +(adm?'<button class="btn" onclick="openMovePhoto(\''+g.id+'\')" title="Pindah album"><i class="ic" data-ic="folder"></i></button><button class="btn" style="color:var(--red);" onclick="removeGaleri(\''+g.id+'\')" title="Hapus">✕</button>':'')
       +'</div></div>';
   }).join('') : '<p class="small">Belum ada foto di sini.</p>';
 }
@@ -3622,7 +3628,7 @@ function openAlbumModal(id){
   document.getElementById('albumModalTitle').textContent=a?'Ubah Album':'Album Baru';
   document.getElementById('albumName').value=a?(a.name||''):'';
   document.getElementById('albumDrive').value=a&&a.driveFolderId?(a.driveUrl||('https://drive.google.com/drive/folders/'+a.driveFolderId)):'';
-  var isD=!!(a&&a.driveFolderId); document.getElementById('albumCoverBtns').style.display=isD?'none':''; document.getElementById('albumCoverHint').textContent=isD?'Sampul album Drive dipilih dari foto di dalam album (tekan ⭐ pada foto).':'Kosongkan untuk memakai foto pertama di album.';
+  var isD=!!(a&&a.driveFolderId); document.getElementById('albumCoverBtns').style.display=isD?'none':''; document.getElementById('albumCoverHint').textContent=isD?'Sampul album Drive dipilih dari foto di dalam album (tekan ★ pada foto).':'Kosongkan untuk memakai foto pertama di album.';
   var pv=document.getElementById('albumCoverPrev'); if(a&&a.cover){ pv.src=a.cover; pv.style.display='block'; } else { pv.style.display='none'; pv.removeAttribute('src'); }
   document.getElementById('modal-album').classList.add('open');
 }
@@ -3839,7 +3845,7 @@ function renderKontak(){
   document.getElementById('kontakList').innerHTML = webState.contacts.length ? webState.contacts.map(k=>{
     let wa=waLinkFromInfo(k.info);
     return `<div class="card"><b>${esc(k.name)}</b><div class="small">${esc(k.role)}</div><div>${esc(k.info)}</div>
-      ${wa?`<div class="mrow" style="margin-top:10px;"><a class="btn primary" style="width:100%;text-decoration:none;text-align:center;display:block;" href="${wa}" target="_blank">💬 Chat WhatsApp</a></div>`:''}
+      ${wa?`<div class="mrow" style="margin-top:10px;"><a class="btn primary" style="width:100%;text-decoration:none;text-align:center;display:block;" href="${wa}" target="_blank">Chat WhatsApp</a></div>`:''}
     </div>`;
   }).join('') : '<p class="small">Belum ada kontak.</p>';
 }
@@ -3866,7 +3872,7 @@ function kirimLaporan(){
   let st=currentStudent();
   webState.reports.push({id:Date.now(), from:st.short||session.absen, date:new Date().toISOString().slice(0,16).replace('T',' '), msg});
   pushWeb(); closeModal('lapor');
-  tgSend('📩 Laporan baru dari '+(st.short||('absen '+session.absen))+'\n'+msg.slice(0,350)+'\n'+tgWhen(), session.roomId);
+  tgSend('Laporan baru dari '+(st.short||('absen '+session.absen))+'\n'+msg.slice(0,350)+'\n'+tgWhen(), session.roomId);
   document.getElementById('laporMsg').value='';
   alertBox('Laporan terkirim ke admin. Terima kasih!');
 }
@@ -3906,7 +3912,7 @@ function openEditSiswa(absen){
   document.getElementById('esBirthDay').value = bd?parseInt(bd):'';
   document.getElementById('esBirthMonth').value = bm?parseInt(bm):'';
   document.getElementById('esKelas').value=st.kelas||'';
-  document.getElementById('esAvatar').innerHTML = '👤';
+  document.getElementById('esAvatar').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(absen).then(photo=>{
     if(photo) document.getElementById('esAvatar').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
   });
@@ -3939,7 +3945,7 @@ function esUploadPhoto(){
 }
 async function esRemovePhoto(){
   await removeAvatarFor(activeEditAbsen);
-  document.getElementById('esAvatar').innerHTML='👤';
+  document.getElementById('esAvatar').innerHTML='<i class="ic" data-ic="person"></i>';
 }
 async function esSaveBiodata(){
   let nisn = document.getElementById('esNisn').value.trim();
@@ -4073,18 +4079,18 @@ async function reportSend(){
     if(fbInit()){ await ensureAnonAuth(); var uid=firebase.auth().currentUser.uid;
       await fbDb.collection('adminReports').doc(uid+'_'+now).set({msg:msg, who:String(who).slice(0,80), kelas:kelas, roomId:room, src:'web', status:'baru', createdAt:now, ver:String(KT_VERSION)}); saved=true; }
   }catch(e){ console.warn('[lapor]',e); }
-  try{ if(typeof TG_RELAY_URL!=='undefined' && TG_RELAY_URL){ tgDev('📩 Laporan masalah dari admin\nDari: '+who+' ('+'web'+')\nKelas: '+kelas+'\n\n'+(msg.length>330?msg.slice(0,330)+'… (selengkapnya di panel developer)':msg), room); sent=true; } }catch(e){}
+  try{ if(typeof TG_RELAY_URL!=='undefined' && TG_RELAY_URL){ tgDev('Laporan masalah dari admin\nDari: '+who+' ('+'web'+')\nKelas: '+kelas+'\n\n'+(msg.length>330?msg.slice(0,330)+'… (selengkapnya di panel developer)':msg), room); sent=true; } }catch(e){}
   btn.disabled=false;
   if(saved||sent){ try{ localStorage.setItem('kas_rep_last',String(now)); }catch(e){} ta.value=''; closeModal('report'); alertBox('Laporan terkirim ke developer. Terima kasih!'); }
   else alertBox('Laporan gagal dikirim. Periksa koneksi lalu coba lagi.');
 }
-function proofA(e){ return (e && /^https:\/\/(drive|docs)\.google\.com\//.test(e.proof||'')) ? ' <a href="'+esc(e.proof)+'" target="_blank" rel="noopener" style="color:var(--blue);white-space:nowrap;">📎 Bukti</a>' : ''; }
+function proofA(e){ return (e && /^https:\/\/(drive|docs)\.google\.com\//.test(e.proof||'')) ? ' <a href="'+esc(e.proof)+'" target="_blank" rel="noopener" style="color:var(--blue);white-space:nowrap;">Bukti</a>' : ''; }
 function renderKasDetail(mk){
   let el=document.getElementById('dkDetail'); if(!el) return;
   if(!mk){ el.innerHTML='<p class="small">Belum ada data.</p>'; return; }
   let inc=(kasState.manualIncome[mk]||[]), exp=(kasState.expenses[mk]||[]);
   let row=(e,t)=>`<div class="listrow" style="display:flex;justify-content:space-between;gap:8px;"><span>${esc(e.date)} — ${esc(t)}${e.cat?' <small style="opacity:.7">['+esc(e.cat)+']</small>':''}${proofA(e)}</span><b>${fmtRp(e.amount)}</b></div>`;
-  el.innerHTML=(kasClosed(mk)?'<div class="card small">🔒 Buku bulan ini sudah ditutup oleh admin.</div>':'')+'<div class="card"><b>Pemasukan manual</b>'+(inc.length?inc.map(e=>row(e,e.name||'')).join(''):'<div class="small">(belum ada)</div>')+'</div>'
+  el.innerHTML=(kasClosed(mk)?'<div class="card small">Buku bulan ini sudah ditutup oleh admin.</div>':'')+'<div class="card"><b>Pemasukan manual</b>'+(inc.length?inc.map(e=>row(e,e.name||'')).join(''):'<div class="small">(belum ada)</div>')+'</div>'
     +'<div class="card"><b>Pengeluaran</b>'+(exp.length?exp.map(e=>row(e,e.desc||'')).join(''):'<div class="small">(belum ada)</div>')+'</div>';
 }
 function kasReportText(mk){
@@ -4210,18 +4216,38 @@ function ktSwatchesHtml(cur,fn){
 }
 function ktThemeLockHtml(){
   var g=(typeof ktCfg!=='undefined' && ktCfg) ? ktCfg.themeAll : '';
-  return ktThemeValid(g) ? '<div class="theme-lock">🔒 Developer sedang mengunci tema <b>'+KT_THEMES[g].name+'</b> untuk semua kelas. Pilihanmu tetap disimpan dan tampil lagi saat kunci dilepas.</div>' : '';
+  return ktThemeValid(g) ? '<div class="theme-lock">Developer sedang mengunci tema <b>'+KT_THEMES[g].name+'</b> untuk semua kelas. Pilihanmu tetap disimpan dan tampil lagi saat kunci dilepas.</div>' : '';
 }
 function ktThemeOfClass(){ return (typeof session!=='undefined' && session) ? ((typeof kasState!=='undefined' && kasState && kasState.theme)||'') : null; }
 function ktModeOfClass(){ return (typeof session!=='undefined' && session) ? ((typeof kasState!=='undefined' && kasState && kasState.mode)||'') : null; }
 var KT_MODE_NAMES={auto:'Ikuti HP', light:'Terang', dark:'Gelap'};
-var KT_MODE_ICONS={auto:'📱', light:'☀️', dark:'🌙'};
+
+/* ikon garis (pengganti emoji): <i class="ic" data-ic="nama"> diisi SVG otomatis */
+var KT_IC={
+ person:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>',
+ eye:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+ gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+ wrench:'<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 12.6 12.6 21a2.1 2.1 0 0 1-3-3L18 9.6 17 8.6a4 4 0 0 0-5-5l2.4 2.4z"/></svg>',
+ lock:'<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+ pencil:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+ alert:'<svg viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.5v.1"/></svg>',
+ image:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8 8"/></svg>',
+ download:'<svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>',
+ folder:'<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+ sun:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>',
+ moon:'<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
+ device:'<svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>'
+};
+function ktHydrateIcons(root){ try{ (root||document).querySelectorAll('i.ic[data-ic]:empty').forEach(function(e){ var s=KT_IC[e.getAttribute('data-ic')]; if(s) e.innerHTML=s; }); }catch(e){} }
+ktHydrateIcons();
+try{ new MutationObserver(function(){ ktHydrateIcons(); }).observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+var KT_MODE_ICONS={auto:'<i class="ic" data-ic="device"></i>', light:'<i class="ic" data-ic="sun"></i>', dark:'<i class="ic" data-ic="moon"></i>'};
 function ktModeBtnsHtml(cur,fn){
   return ['auto','light','dark'].map(function(id){ return '<div'+(cur===id?' class="sel"':'')+' onclick="'+fn+'(&quot;'+id+'&quot;)">'+KT_MODE_ICONS[id]+' '+KT_MODE_NAMES[id]+'</div>'; }).join('');
 }
 function ktModeLockHtml(){
   var g=(typeof ktCfg!=='undefined' && ktCfg) ? ktCfg.modeAll : '';
-  return (g==='light'||g==='dark') ? '<div class="theme-lock">🔒 Developer sedang mengunci mode <b>'+KT_MODE_NAMES[g]+'</b> untuk semua kelas. Pilihanmu tetap disimpan dan berlaku lagi saat kunci dilepas.</div>' : '';
+  return (g==='light'||g==='dark') ? '<div class="theme-lock">Developer sedang mengunci mode <b>'+KT_MODE_NAMES[g]+'</b> untuk semua kelas. Pilihanmu tetap disimpan dan berlaku lagi saat kunci dilepas.</div>' : '';
 }
 function renderModeSeg(){
   var box=document.getElementById('modeSeg'); if(!box) return;
@@ -4317,13 +4343,13 @@ function cmtNotifHtml(){
       +'<div class="small" style="margin-top:2px;">“'+cmtEsc(cmtSnip(c.text,90))+'”</div></div>';
   }).join('');
   var more=n.length>4 ? '<div class="small" style="margin-top:6px;">+'+(n.length-4)+' lainnya</div>' : '';
-  return '<div class="card" style="border-color:var(--brand-2);background:var(--tint-brand);margin-bottom:10px;"><b>💬 Untuk kamu ('+n.length+')</b>'+rows+more
+  return '<div class="card" style="border-color:var(--brand-2);background:var(--tint-brand);margin-bottom:10px;"><b>Untuk kamu ('+n.length+')</b>'+rows+more
     +'<div class="mrow" style="margin-top:8px;"><button class="btn primary" style="width:100%;" onclick="closeModal(\'announcepopup\');cmtOpenPage();">Lihat komentar</button></div></div>';
 }
 function cmtToast(c){
   var el=document.getElementById('cmtToast');
   if(!el){ el=document.createElement('div'); el.id='cmtToast'; document.body.appendChild(el); }
-  el.innerHTML='<div><b>💬 '+cmtEsc(c.name)+'</b> '+(cmtKind(c)==='reply'?'membalas komentarmu':'menyebut kamu')+'<div class="small">“'+cmtEsc(cmtSnip(c.text,70))+'”</div></div><button class="btn primary" style="min-width:70px;" onclick="cmtToastGo()">Lihat</button>';
+  el.innerHTML='<div><b>'+cmtEsc(c.name)+'</b> '+(cmtKind(c)==='reply'?'membalas komentarmu':'menyebut kamu')+'<div class="small">“'+cmtEsc(cmtSnip(c.text,70))+'”</div></div><button class="btn primary" style="min-width:70px;" onclick="cmtToastGo()">Lihat</button>';
   el.classList.add('open'); clearTimeout(cmtToastT); cmtToastT=setTimeout(function(){ el.classList.remove('open'); },8000);
 }
 function cmtToastGo(){ var el=document.getElementById('cmtToast'); if(el) el.classList.remove('open'); cmtOpenPage(); }
@@ -4377,17 +4403,17 @@ function cmtItemHtml(c){
   var mine=cmtUid() && c.uid===cmtUid();
   var canDel=mine||isAdmin();
   var forMe=cmtKind(c)?' for-me':'';
-  var del=canDel ? '<button class="cmt-act del'+(cmtDelPending===c.id?' sure':'')+'" onclick="cmtDelete(\''+c.id+'\')">'+(cmtDelPending===c.id?'Yakin hapus?':'🗑 Hapus')+'</button>' : '';
-  var rq=c.replyTo ? '<div class="cmt-rq">↪ membalas <b>'+cmtEsc(c.replyName||'')+'</b>: “'+cmtEsc(cmtSnip(c.replyText,80))+'”</div>' : '';
+  var del=canDel ? '<button class="cmt-act del'+(cmtDelPending===c.id?' sure':'')+'" onclick="cmtDelete(\''+c.id+'\')">'+(cmtDelPending===c.id?'Yakin hapus?':'Hapus')+'</button>' : '';
+  var rq=c.replyTo ? '<div class="cmt-rq">membalas <b>'+cmtEsc(c.replyName||'')+'</b>: “'+cmtEsc(cmtSnip(c.replyText,80))+'”</div>' : '';
   return '<div class="cmt'+(c.isAdmin?' cmt-admin':'')+forMe+'" id="cmt-'+c.id+'">'
     +'<div class="cmt-h"><span class="cmt-name">'+cmtEsc(c.name||'-')+'</span>'+(c.isAdmin?'<span class="cmt-badge">ADMIN</span>':'')+(c.absen===cmtMe()?'<span class="cmt-tag">Kamu</span>':'')+'<span class="cmt-date">'+cmtFmt(cmtMs(c))+'</span></div>'
     +rq+'<div class="cmt-b">'+cmtBody(c.text)+'</div>'
-    +'<div class="cmt-acts"><button class="cmt-act" onclick="cmtReplyTo(\''+c.id+'\')">↩ Balas</button>'+del+'</div></div>';
+    +'<div class="cmt-acts"><button class="cmt-act" onclick="cmtReplyTo(\''+c.id+'\')">Balas</button>'+del+'</div></div>';
 }
 function cmtListHtml(arr){
   if(cmtErr) return '<div class="cmt-empty">Komentar belum bisa dimuat ('+cmtEsc(cmtErr)+'). '+(isAdmin()?'Pastikan <b>firestore.rules</b> terbaru sudah dipublish.':'Coba lagi nanti.')+'</div>';
   if(!cmtLoaded) return '<div class="cmt-empty">Memuat komentar…</div>';
-  if(!arr.length) return '<div class="cmt-empty">Belum ada komentar. Jadilah yang pertama! 👋</div>';
+  if(!arr.length) return '<div class="cmt-empty">Belum ada komentar. Jadilah yang pertama!</div>';
   return arr.map(cmtItemHtml).join('');
 }
 function renderComments(){
@@ -4453,7 +4479,7 @@ function cmtRenderReplyBars(){
     var rb=document.getElementById('cmt-rb-'+p); if(!rb) return;
     if(!cmtReply){ rb.style.display='none'; rb.innerHTML=''; return; }
     rb.style.display='flex';
-    rb.innerHTML='<span class="rt">↩ Membalas <b>'+cmtEsc(cmtReply.name)+'</b>: “'+cmtEsc(cmtSnip(cmtReply.text,60))+'”</span><button type="button" aria-label="Batal membalas" onclick="cmtCancelReply()">✕</button>';
+    rb.innerHTML='<span class="rt">Membalas <b>'+cmtEsc(cmtReply.name)+'</b>: “'+cmtEsc(cmtSnip(cmtReply.text,60))+'”</span><button type="button" aria-label="Batal membalas" onclick="cmtCancelReply()">✕</button>';
   });
 }
 function cmtReplyTo(id){
@@ -4486,7 +4512,7 @@ async function cmtSend(p){
         var adm=(webState.adminAbsens||[]).map(String), toAdm=[];
         if(cmtReply){ var rc=cmtList.find(function(x){return x.id===cmtReply.id;}); if(rc?rc.isAdmin===true:adm.indexOf(String(cmtReply.absen))>=0) toAdm.push('membalas komentar admin'); }
         if((doc.mentions||[]).some(function(a){return adm.indexOf(String(a))>=0;})) toAdm.push('menyebut admin');
-        if(toAdm.length) tgSend('💬 '+doc.name+' '+toAdm.join(' dan ')+'\n"'+text.slice(0,300)+'"\n'+tgWhen(), session.roomId);
+        if(toAdm.length) tgSend(''+doc.name+' '+toAdm.join(' dan ')+'\n"'+text.slice(0,300)+'"\n'+tgWhen(), session.roomId);
       }
     }catch(e){}
     ta.value=''; cmtReply=null; cmtInput(p); cmtRenderReplyBars();
