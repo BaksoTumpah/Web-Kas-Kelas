@@ -196,7 +196,7 @@ tbody tr:last-child td{border-bottom:none;}
 /* ---------- 5. BILAH ATAS, MENU, BADGE ---------- */
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--s3);
   padding:calc(10px + env(safe-area-inset-top,0)) var(--s4) 10px;background:var(--glass);
-  -webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);}
+  border-bottom:1px solid var(--line);}
 .iconbtn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0;border-radius:var(--r-pill);
   background:var(--card);border:1px solid var(--line);color:var(--text);font-size:18px;line-height:1;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-1);}
 .iconbtn.pill{padding:0 14px;gap:6px;font-size:12.5px;font-weight:600;white-space:nowrap;}
@@ -206,7 +206,7 @@ tbody tr:last-child td{border-bottom:none;}
 .badge{background:var(--tint-brand);color:var(--blue);}
 .roleLabel{background:var(--card-2);color:var(--sub);border:1px solid var(--line);}
 
-.overlay{position:fixed;inset:0;background:var(--scrim);z-index:30;display:none;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+.overlay{position:fixed;inset:0;background:var(--scrim);z-index:30;display:none;}
 .overlay.open{display:block;animation:fadeIn .25s ease;}
 .menu{position:fixed;top:0;left:0;bottom:0;width:84%;max-width:330px;background:var(--card);z-index:40;transform:translateX(-105%);
   transition:transform .38s var(--ease),box-shadow .38s;padding:calc(20px + env(safe-area-inset-top,0)) var(--s4) calc(26px + env(safe-area-inset-bottom,0));
@@ -222,7 +222,7 @@ tbody tr:last-child td{border-bottom:none;}
 
 /* ---------- 6. MODAL ---------- */
 .modal-bg{position:fixed;inset:0;background:var(--scrim);z-index:50;display:none;align-items:center;justify-content:center;padding:var(--s6);overflow-y:auto;
-  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
+  }
 .modal-bg.open{display:flex;animation:fadeIn .22s ease;}
 .modal{background:var(--card);border-radius:var(--r-xl);padding:22px var(--s5);width:100%;max-width:380px;margin:auto;box-shadow:var(--shadow-3);animation:popIn .34s var(--ease);}
 .modal-bg.open .modal{animation:popIn .34s var(--ease);}
@@ -439,7 +439,7 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
    ========================================================================== */
 .dv-root{display:none;position:fixed;inset:0;z-index:900;background:var(--bg);color:var(--text);overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:inherit;}
 .dv-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:3px;padding:calc(12px + env(safe-area-inset-top,0px)) 10px 12px;
-  background:var(--glass);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);}
+  background:var(--glass);border-bottom:1px solid var(--line);}
 .dv-title{flex:1;min-width:0;font-weight:700;font-size:14.5px;letter-spacing:-.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dv-top .dv-btn{padding:6px 7px;min-width:34px;font-size:14px;border-radius:var(--r-sm);}
 .dv-btn{background:var(--card);border:1px solid var(--line);color:inherit;border-radius:var(--r-sm);padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
@@ -470,7 +470,7 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 .dv-table td,.dv-table th{border-bottom:1px solid var(--line);padding:8px 8px;text-align:left;white-space:nowrap;}
 .dv-table th{color:var(--sub);}
 .dv-table td.c,.dv-table th.c{text-align:center;}
-.dv-modal{display:none;position:fixed;inset:0;z-index:950;background:var(--scrim);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:var(--s6);overflow-y:auto;}
+.dv-modal{display:none;position:fixed;inset:0;z-index:950;background:var(--scrim);align-items:center;justify-content:center;padding:var(--s6);overflow-y:auto;}
 .dv-modal.open{display:flex;animation:fadeIn .22s ease;}
 .dv-box{background:var(--card);color:var(--text);border-radius:var(--r-xl);padding:26px var(--s6);width:100%;max-width:400px;margin:auto;box-shadow:var(--shadow-3);animation:popIn .34s var(--ease);}
 .dv-box h3{margin:0 0 var(--s2);font-size:18px;font-weight:800;letter-spacing:-.02em;}
@@ -679,6 +679,15 @@ th{background:var(--card-2);color:var(--blue);text-transform:uppercase;letter-sp
 .ic svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
 div.avatar{display:grid;place-items:center;} .avatar .ic{width:55%;height:55%;opacity:.55;}
 .kl-ic .ic{width:34px;height:34px;}
+
+/* PERFORMA SCROLL (tanpa mengubah animasi/fisika): tanpa blur latar langsung, render item daftar hanya saat terlihat, sentuhan cepat */
+.topbar{-webkit-backdrop-filter:none;backdrop-filter:none;background:color-mix(in srgb,var(--card) 94%,transparent);}
+.overlay,.dv-modal{-webkit-backdrop-filter:none;backdrop-filter:none;}
+html{-webkit-tap-highlight-color:transparent;}
+button,a,.mitem,.bnav-item,.seg div,.swatch,.dv-tile,.dv-btn,.iconbtn,summary,label,select{touch-action:manipulation;}
+#announceList .card,.cmt,.gphoto,.album-card,.tugas-row,.dv-row,.listrow,.datarow{content-visibility:auto;contain-intrinsic-size:auto 96px;}
+.tblwrap{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;}
+img{-webkit-user-drag:none;}
 </style>
 </head>
 <body>
@@ -1370,7 +1379,7 @@ function ktVerCmp(a,b){
 function ktOpenExternal(url){
   if(!/^https?:\/\//i.test(String(url||''))) return;
   try{ const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App; if(A&&A.openUrl){ A.openUrl({url}); return; } }catch(e){}
-  try{ window.open(url,'_blank'); }catch(e){ location.href=url; }
+  try{ window.open(url,'_blank','noopener,noreferrer'); }catch(e){ location.href=url; }
 }
 function ktIsOld(){ return !!ktCfg.latestVersion && ktVerCmp(KT_VERSION, ktCfg.latestVersion)<0; }
 function ktMaybeAnnounceUpdate(){
@@ -3574,7 +3583,7 @@ function renderGaleri(){
     add.style.display='none';
     document.getElementById('galeriBackBtn').textContent='← Kembali';
     var cards=[];
-    function card(v,name,cover,n){ return '<button class="album-card" onclick="openAlbum(\''+v+'\')">'+(cover?'<img class="cv" loading="lazy" src="'+cover+'">':'<div class="cv ph"><i class="ic" data-ic="image" style="width:34px;height:34px;"></i></div>')+'<div class="al"><b>'+galeriEsc(name)+'</b><small>'+(n==null?'Google Drive':n+' foto')+'</small></div></button>'; }
+    function card(v,name,cover,n){ return '<button class="album-card" onclick="openAlbum(\''+v+'\')">'+(cover?'<img class="cv" loading="lazy" decoding="async" src="'+cover+'">':'<div class="cv ph"><i class="ic" data-ic="image" style="width:34px;height:34px;"></i></div>')+'<div class="al"><b>'+galeriEsc(name)+'</b><small>'+(n==null?'Google Drive':n+' foto')+'</small></div></button>'; }
     var all=galleryList;
     if(all.length || !albumList.length) cards.push(card('all','Semua Foto',all.length?all[all.length-1].photo:'',all.length));
     albumList.forEach(function(a){
@@ -3599,7 +3608,7 @@ function renderGaleri(){
     if(!c || c.loading){ grid.innerHTML='<p class="small">Memuat foto dari Google Drive…</p>'; driveList(cur.driveFolderId).then(function(cc){ syncAlbumName(cur,cc); if(galeriView===cur.id) renderGaleri(); }); return; }
     if(c.err){ grid.innerHTML='<p class="small">Gagal memuat folder Drive: '+galeriEsc(c.err)+'</p>'; return; }
     grid.innerHTML = c.files.length ? c.files.map(function(f){
-      return '<div class="gphoto"><a href="'+driveThumb(f.id,1600)+'" target="_blank" rel="noopener"><img loading="lazy" src="'+driveThumb(f.id,500)+'" alt=""></a><div class="gbtns">'
+      return '<div class="gphoto"><a href="'+driveThumb(f.id,1600)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+driveThumb(f.id,500)+'" alt=""></a><div class="gbtns">'
         +'<a class="btn" href="'+driveDl(f.id)+'" target="_blank" rel="noopener" title="Unduh asli"><i class="ic" data-ic="download"></i></a>'
         +(adm?'<button class="btn" onclick="setDriveCover(\''+f.id+'\')" title="Jadikan sampul">'+(cur.coverId===f.id?'★':'☆')+'</button>':'')
         +'</div></div>';
@@ -3611,7 +3620,7 @@ function renderGaleri(){
   document.getElementById('galeriAddBtn').textContent = (galeriView==='all'||galeriView==='none') ? '+ Tambah Foto' : '+ Tambah Foto ke album ini';
   var list=photosOf(galeriView);
   grid.innerHTML = list.length ? list.map(function(g){
-    return '<div class="gphoto"><img src="'+g.photo+'"><div class="gbtns">'
+    return '<div class="gphoto"><img loading="lazy" decoding="async" src="'+g.photo+'"><div class="gbtns">'
       +'<button class="btn" onclick="downloadPhoto(\''+g.id+'\')" title="Unduh"><i class="ic" data-ic="download"></i></button>'
       +(adm?'<button class="btn" onclick="openMovePhoto(\''+g.id+'\')" title="Pindah album"><i class="ic" data-ic="folder"></i></button><button class="btn" style="color:var(--red);" onclick="removeGaleri(\''+g.id+'\')" title="Hapus">✕</button>':'')
       +'</div></div>';
@@ -3845,7 +3854,7 @@ function renderKontak(){
   document.getElementById('kontakList').innerHTML = webState.contacts.length ? webState.contacts.map(k=>{
     let wa=waLinkFromInfo(k.info);
     return `<div class="card"><b>${esc(k.name)}</b><div class="small">${esc(k.role)}</div><div>${esc(k.info)}</div>
-      ${wa?`<div class="mrow" style="margin-top:10px;"><a class="btn primary" style="width:100%;text-decoration:none;text-align:center;display:block;" href="${wa}" target="_blank">Chat WhatsApp</a></div>`:''}
+      ${wa?`<div class="mrow" style="margin-top:10px;"><a class="btn primary" style="width:100%;text-decoration:none;text-align:center;display:block;" href="${wa}" target="_blank" rel="noopener noreferrer">Chat WhatsApp</a></div>`:''}
     </div>`;
   }).join('') : '<p class="small">Belum ada kontak.</p>';
 }
@@ -4222,6 +4231,18 @@ function ktThemeOfClass(){ return (typeof session!=='undefined' && session) ? ((
 function ktModeOfClass(){ return (typeof session!=='undefined' && session) ? ((typeof kasState!=='undefined' && kasState && kasState.mode)||'') : null; }
 var KT_MODE_NAMES={auto:'Ikuti HP', light:'Terang', dark:'Gelap'};
 
+
+/* ===== PENGERASAN KEAMANAN SISI KLIEN ===== */
+(function(){
+  try{ // anti-clickjacking (website di Firebase Hosting; header frame-ancestors sudah menolak, ini lapis cadangan)
+    if(window.top!==window.self && /(^|\.)(web\.app|firebaseapp\.com)$/.test(location.hostname)){ try{ window.top.location=window.self.location.href; }catch(e){ document.documentElement.style.display='none'; } }
+  }catch(e){}
+  function fixLinks(root){ try{ (root||document).querySelectorAll('a[target="_blank"]').forEach(function(a){ var r=(a.getAttribute('rel')||''); if(r.indexOf('noopener')<0) a.setAttribute('rel',(r+' noopener noreferrer').trim()); }); }catch(e){} }
+  fixLinks();
+  try{ new MutationObserver(function(){ fixLinks(); }).observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+  // tolak skema berbahaya pada tautan yang dibuat dari data pengguna
+  document.addEventListener('click',function(e){ var a=e.target&&e.target.closest&&e.target.closest('a[href]'); if(!a) return; var h=(a.getAttribute('href')||'').trim().toLowerCase(); if(/^(javascript|vbscript|data):/.test(h)){ e.preventDefault(); e.stopPropagation(); } },true);
+})();
 /* ikon garis (pengganti emoji): <i class="ic" data-ic="nama"> diisi SVG otomatis */
 var KT_IC={
  person:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>',

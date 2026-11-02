@@ -291,3 +291,13 @@ LANGKAH 23 - TOKEN KETIGA: ADMIN KELAS (ketua kelas, sekretaris, dll)  (WAJIB: p
   C. Wajib publish ulang firestore.rules (fungsi isStaffOf: album galeri boleh ditulis Admin Kelas; sesi kind 'staff'). Tanpa itu galeri Admin Kelas ditolak server.
   D. Keamanan: pembatasan ada di dua lapis: tampilan (menu disembunyikan) dan server (aturan Firestore untuk kas = hanya editor; Worker verifyAdmin = hanya editor, kecuali sinkron tugas/jadwal).
      Catatan: dokumen website/{room} bisa ditulis semua pemegang token (sama seperti sebelumnya), jadi batas pengumuman/jadwal/tugas berlaku di antarmuka.
+
+
+KEAMANAN TAMBAHAN (disarankan, manual, sekali saja)
+  1. Google Cloud Console > APIs & Services > Credentials: batasi "Browser key" Firebase dan kunci Drive ke HTTP referrer
+     https://kaskelas.web.app/*, https://kaskelas.firebaseapp.com/* (+ API yang dipakai saja: Identity Toolkit, Firestore, Drive API).
+  2. Firebase Console > App Check: daftarkan website (reCAPTCHA Enterprise/v3) lalu aktifkan penegakan untuk Firestore bila sudah stabil.
+  3. Cloudflare > Security > WAF > Rate limiting: batasi worker icy-truth-bbad (mis. 100 permintaan/menit per IP) dan nyalakan Bot Fight Mode.
+  4. Cloudflare Worker (opsional): variabel ALLOWED_ORIGINS (pisah koma) bila memakai domain lain; RELAY_KEY untuk mengganti kunci relay
+     (setelah itu isi TG_RELAY_KEY di aplikasi & website sama, lalu set RELAY_LEGACY=off).
+  5. GitHub > Settings > Code security: aktifkan Secret scanning dan Push protection di kedua repo.

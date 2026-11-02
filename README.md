@@ -184,6 +184,15 @@ Bulatan hijau tidak lagi "muncul" (animasi pop) di menu baru, tetapi bergeser ha
 ## Gerak ala iPhone (APK)
 `--ease` kini kurva iOS `cubic-bezier(.32,.72,0,1)`. Bulatan navbar memakai simulasi pegas (kekakuan 260, redaman 24). Jendela modal: muncul `popIn` .46s, tutup dengan animasi keluar (`closeModal` menambah kelas `closing` 210 ms, `openModal` membatalkannya). Halaman masuk `rise` .42s. Tekan tombol: skala .96 cepat lalu kembali. Menu samping: lempar ke kiri (kecepatan > .5 px/ms) menutup walau belum jauh.
 
+## Keamanan & performa (v4.1.3)
+- Audit: tidak ada rahasia privat di kode maupun riwayat GitHub. Yang tampil di frontend hanya kunci publik (Firebase `apiKey`, kunci Drive, `TG_RELAY_KEY`, OAuth client ID); rahasia asli (BOT_TOKEN, SECRET, G_CLIENT_SECRET, G_REFRESH_TOKEN, DEV_BOT_TOKEN, kunci rilis APK) hanya di secret Cloudflare/GitHub.
+- Hosting (`firebase.json`): CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, COOP/CORP; `index.html`, `sw.js`, manifest `no-cache`, gambar cache 7 hari.
+- Worker: pemeriksaan Origin (daftar `ORIGINS`; tambahan lewat variabel `ALLOWED_ORIGINS`, `ORIGIN_CHECK=off` untuk mematikan), batas ukuran 6 MB, pembatas per-IP (600/10 mnt, `/setup` 20/10 mnt), perbandingan kunci waktu-tetap, header keamanan di semua balasan.
+- Firestore rules: batas panjang teks pada `sessions` dan `logs` (`okStr`).
+- Klien: anti-clickjacking, `rel="noopener noreferrer"` otomatis, tautan `javascript:`/`data:` diblokir.
+- APK: `allowBackup=false` dan `usesCleartextTraffic=false`.
+- Scroll lebih ringan: blur latar langsung dihapus, `content-visibility:auto` untuk daftar panjang, listener sentuh pasif, gambar galeri lazy. Animasi dan fisika tidak diubah.
+
 ## Redesain APK + opsi login di dev APK
 - Semua emoji dihapus dari APK dan website (teks, judul, tombol, pesan, komentar kode). Ikon yang dulu emoji kini SVG garis lewat `<i class="ic" data-ic="nama">` (`KT_IC`). Bot Telegram (`telegram-worker.js`) tidak diubah.
 - APK memakai redesain yang sama dengan website (token warna, font Fraunces, pita warna, ilustrasi sekolah). Daftar tema warna identik di dev, APK, dan website (`KT_THEMES`; bawaan "Klasik Sekolah"). Warna aksen ikut tema dan mode terang/gelap.

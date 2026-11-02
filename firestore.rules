@@ -15,6 +15,9 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/config/dev).data.uid == request.auth.uid;
     }
 
+    // Batas panjang teks opsional (mencegah dokumen raksasa dari klien tak dikenal / bot).
+    function okStr(d, k, n) { return !(k in d) || (d[k] is string && d[k].size() <= n); }
+
     // ===== BLOKIR PERANGKAT =====
     // Perangkat (UID anonim) yang diblokir developer ditolak di SEMUA aturan di bawah selama blokir berlaku.
     // Blokir otomatis kedaluwarsa (field "until"). Server tidak mengenal IP, jadi yang diblokir adalah UID.
@@ -187,7 +190,9 @@ service cloud.firestore {
       allow create: if notBlocked()
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid','deviceId','platform','device','kind','roomId','who','appVersion','startedAt','lastSeen'])
-        && request.resource.data.kind in ['admin', 'staff', 'user'];
+        && request.resource.data.kind in ['admin', 'staff', 'user']
+        && okStr(request.resource.data, 'deviceId', 100) && okStr(request.resource.data, 'platform', 40) && okStr(request.resource.data, 'device', 200)
+        && okStr(request.resource.data, 'roomId', 100) && okStr(request.resource.data, 'who', 200) && okStr(request.resource.data, 'appVersion', 30);
       allow update: if notBlocked()
         && resource.data.uid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen']);
@@ -233,7 +238,10 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.ts == request.time
         && request.resource.data.type in ['login_ok','login_fail','logout','data_view','data_export','token_rotate']
-        && request.resource.data.keys().hasOnly(['type','ts','expireAt','uid','deviceId','platform','device','role','roomId','who','what','ok','info','appVersion','tgt']);
+        && request.resource.data.keys().hasOnly(['type','ts','expireAt','uid','deviceId','platform','device','role','roomId','who','what','ok','info','appVersion','tgt'])
+        && okStr(request.resource.data, 'deviceId', 100) && okStr(request.resource.data, 'platform', 40) && okStr(request.resource.data, 'device', 200)
+        && okStr(request.resource.data, 'role', 40) && okStr(request.resource.data, 'roomId', 100) && okStr(request.resource.data, 'who', 200)
+        && okStr(request.resource.data, 'what', 1000) && okStr(request.resource.data, 'info', 1000) && okStr(request.resource.data, 'appVersion', 30);
     }
 
     // BLOKIR: hanya developer.
