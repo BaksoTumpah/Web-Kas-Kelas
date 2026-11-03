@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Portal Kas Kelas</title>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
@@ -1224,11 +1225,15 @@ const firebaseConfig = {
   messagingSenderId: "16151192786",
   appId: "1:16151192786:web:46b238bb4e88f268a6b90b"
 };
+/* Firebase App Check (reCAPTCHA Enterprise): isi site key (kunci PUBLIK dari Firebase Console > App Check) agar website mengirim bukti 'ini website asli'. Kosong = nonaktif. Lihat PANDUAN_KONFIGURASI.txt. */
+const APPCHECK_SITE_KEY = '6LdfDA4uAAAAAK1T_1u4aN80zjYJL8te5iYSDFvV';
 let fbReadyFlag=false, fbDb=null;
 function fbInit(){
   if(fbReadyFlag) return true;
   if(!firebaseConfig.apiKey || firebaseConfig.apiKey.indexOf('GANTI')===0) return false;
-  try{ firebase.initializeApp(firebaseConfig); fbDb=firebase.firestore(); fbReadyFlag=true; return true; }
+  try{ firebase.initializeApp(firebaseConfig);
+    try{ if(APPCHECK_SITE_KEY && firebase.appCheck){ var P=firebase.appCheck; firebase.appCheck().activate(P.ReCaptchaEnterpriseProvider ? new P.ReCaptchaEnterpriseProvider(APPCHECK_SITE_KEY) : APPCHECK_SITE_KEY, true); } }catch(e){}
+    fbDb=firebase.firestore(); fbReadyFlag=true; return true; }
   catch(e){ return false; }
 }
 async function ensureAnonAuth(){

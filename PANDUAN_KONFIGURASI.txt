@@ -301,3 +301,7 @@ KEAMANAN TAMBAHAN (disarankan, manual, sekali saja)
   4. Cloudflare Worker (opsional): variabel ALLOWED_ORIGINS (pisah koma) bila memakai domain lain; RELAY_KEY untuk mengganti kunci relay
      (setelah itu isi TG_RELAY_KEY di aplikasi & website sama, lalu set RELAY_LEGACY=off).
   5. GitHub > Settings > Code security: aktifkan Secret scanning dan Push protection di kedua repo.
+  6. App Check (website, mode PANTAU saja): reCAPTCHA Classic sudah usang, pakai reCAPTCHA Enterprise (gratis 10.000 penilaian/bulan tanpa billing).
+     Google Cloud Console > Security > reCAPTCHA (Fraud Defense) > Create key > Website, jenis Score-based, domain kaskelas.web.app & kaskelas.firebaseapp.com.
+     Firebase Console > App Check > Apps > website > reCAPTCHA Enterprise > tempel Site Key. Tempel SITE KEY yang sama ke konstanta APPCHECK_SITE_KEY di index.html.
+     JANGAN klik "Enforce": APK dan worker Cloudflare belum mengirim token App Check dan akan ditolak.
