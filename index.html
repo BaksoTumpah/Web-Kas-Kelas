@@ -2788,7 +2788,8 @@ function arrearsRows(){
   let rows=[];
   (kasState.students||[]).forEach((s,i)=>{
     let tot=calcTunggakanFor(String(i+1)).reduce((a,e)=>a+(Number(e.amount)||0),0);
-    if(tot>0) rows.push({no:i+1, name:s.short||s.long||('Absen '+(i+1)), total:tot});
+    let lama=oldOwedOf(String(i+1)); tot+=lama;
+    if(tot>0) rows.push({no:i+1, name:s.short||s.long||('Absen '+(i+1)), total:tot, lama});
   });
   return rows;
 }
@@ -3273,6 +3274,14 @@ function renderAll(){
 }
 
 /* ---- Tunggakan otomatis dari data kas aplikasi ---- */
+/* ---- Tunggakan lama (diatur di aplikasi): kasState.oldName, kasState.oldBoxes {indexSiswa:[{id,date,amount,paid?}]} ---- */
+var OLD_MON=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function oldName(){ return String((kasState&&kasState.oldName)||'').trim()||'Tunggakan Lama'; }
+function oldDateLbl(d){ let p=String(d).split('-'); return (+p[2])+' '+OLD_MON[(+p[1])-1]+' '+p[0]; }
+function oldBoxesOf(absen){ return (((kasState&&kasState.oldBoxes)||{})[parseInt(absen)-1]||[]).slice().sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0)); }
+function oldOpenOf(absen){ return oldBoxesOf(absen).filter(b=>!b.paid); }
+function oldOwedOf(absen){ return oldOpenOf(absen).reduce((a,b)=>a+(Number(b.amount)||0),0); }
+function oldPaidIncomeAll(){ let t=0; Object.keys((kasState&&kasState.oldBoxes)||{}).forEach(si=>(kasState.oldBoxes[si]||[]).forEach(b=>{ if(b.paid && !b.paid.pre) t+=Number(b.amount)||0; })); return t; }
 function calcTunggakanFor(absen){
   let list=[];
   let idx=parseInt(absen)-1;
@@ -3307,12 +3316,26 @@ function renderTunggakan(){
   let list = calcTunggakanFor(session.absen);
   let total = list.reduce((a,e)=>a+e.amount,0);
   let box=document.getElementById('tunggakanBox');
-  if(!list.length){
-    box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan</div>`;
-  } else {
-    box.innerHTML = `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div>
-      <div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`;
+  if(!oldOpenOf(session.absen).length){   // tunggakan lama lunas/tidak ada: ringkasan lama disembunyikan, tampilan seperti semula
+    if(!list.length){
+      box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan</div>`;
+    } else {
+      box.innerHTML = `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div>
+        <div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`;
+    }
+    return;
   }
+  let oOpen=oldOpenOf(session.absen), oTot=oldOwedOf(session.absen), grand=total+oTot;
+  const lab=t=>`<div class="small" style="font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px;">${t}</div>`;
+  let h = lab('Tunggakan bulan ini');
+  h += list.length
+    ? `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div><div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`
+    : `<div style="color:var(--blue);font-weight:700;">Lunas</div>`;
+  h += `<div style="border-top:1px dashed var(--line);margin:12px 0 10px;"></div>` + lab(esc(oldName()));
+  h += `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(oTot)}</div><div class="small">Menunggak <b>${oOpen.length}x</b> — tanggal: ${oOpen.map(b=>oldDateLbl(b.date)).join(', ')}</div>`;
+  h += `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:2px solid var(--line);margin-top:12px;padding-top:10px;"><b>Total tunggakan</b>`
+    + (grand>0 ? `<b style="color:var(--amber);font-size:20px;">${fmtRp(grand)}</b>` : `<b style="color:var(--blue);">Lunas</b>`) + `</div>`;
+  box.innerHTML=h;
 }
 function renderEsTunggakan(){
   let list=calcTunggakanFor(activeEditAbsen);
@@ -3327,6 +3350,12 @@ function renderEsTunggakan(){
       <button class="btn" style="padding:4px 8px;color:var(--red);" title="Hapus tunggakan ini saja (tidak mencentang di aplikasi)" onclick="dropTunggakan('${activeEditAbsen}','${esc(e.date)}')">✕</button>
     </div>`;
   }).join('') : '<p class="small">Tidak ada tunggakan — lunas semua.</p>';
+  if(oldOpenOf(activeEditAbsen).length){
+    let oo=oldOpenOf(activeEditAbsen);
+    document.getElementById('esTunggakanList').innerHTML += `<div style="border-top:1px dashed var(--line);margin:12px 0 8px;"></div><div class="small" style="font-weight:800;text-transform:uppercase;letter-spacing:.04em;">${esc(oldName())}</div>`
+      + (oo.length ? oo.map(b=>`<div class="listrow"><span>${esc(oldDateLbl(b.date))}</span><b>${fmtRp(b.amount)}</b></div>`).join('') : '<p class="small">Lunas semua.</p>')
+      + `<p class="small" style="margin-top:6px;">Diatur dari aplikasi (menu ${esc(oldName())}), tidak bisa diubah di sini.</p>`;
+  }
   renderClearedChips();
 }
 function renderClearedChips(){
@@ -3996,7 +4025,7 @@ function totalKasAll(){
   let inc=0, exp=0;
   let allMk=new Set([...Object.keys(kasState.months||{}), ...Object.keys(kasState.manualIncome||{}), ...Object.keys(kasState.expenses||{})]);
   allMk.forEach(mk=>{ inc+=incomeForKasMonth(mk); exp+=expenseForKasMonth(mk); });
-  return inc-exp;
+  return inc-exp+(Number(kasState.openingBalance)||0)+oldPaidIncomeAll();
 }
 function totalIncomeAll(){
   let allMk=new Set([...Object.keys(kasState.months||{}), ...Object.keys(kasState.manualIncome||{})]);
