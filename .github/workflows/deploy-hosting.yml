@@ -10,6 +10,8 @@ on:
       - 'manifest.webmanifest'
       - 'icon-*.png'
       - 'firebase.json'
+      - 'robots.txt'
+      - 'sitemap.xml'
   workflow_dispatch:
 
 jobs:
