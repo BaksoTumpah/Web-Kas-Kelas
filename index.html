@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Portal Kas Kelas</title>
-<meta name="description" content="Portal Kas Kelas: lihat kas, tunggakan, pengumuman, jadwal, galeri, dan tugas kelas. Masuk memakai nomor absen atau NISN dan token dari bendahara.">
+<meta name="description" content="Portal Kas Kelas: lihat kas, tunggakan, pengumuman, jadwal, galeri, dan tugas kelas. Masuk memakai nomor absen atau NISN/NIS dan token dari bendahara.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://kaskelas.web.app/">
 <meta property="og:type" content="website">
@@ -703,85 +703,6 @@ button,a,.mitem,.bnav-item,.seg div,.swatch,.dv-tile,.dv-btn,.iconbtn,summary,la
 .tblwrap{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;}
 img{-webkit-user-drag:none;}
 </style>
-
-<style id="responsive">
-/* ==========================================================================
-   RESPONSIF — menyesuaikan tampilan dengan perangkat
-     HP (<700px)         : satu kolom + navigasi bawah (tampilan asli)
-     Tablet (700-1023px) : kolom lebih lebar, kartu 2-3 kolom, galeri 3 kolom
-     Laptop/desktop (>=1024px): navigasi jadi sidebar kiri, beranda 2 kolom
-     Layar besar & TV (>=1600px): seluruh tampilan diperbesar bertahap, fokus remote jelas
-   ========================================================================== */
-.hm-grid,.hm-col{display:block;min-width:0;}
-.view.active .hm-col>*{animation:rise .5s var(--ease) both;}
-.dk-stats{display:block;}
-:focus-visible{outline:3px solid var(--brand-2);outline-offset:2px;}
-.bnav-item:focus-visible{outline-offset:-3px;border-radius:16px;}
-
-/* HP landscape (tinggi pendek): ruang bawah lebih hemat */
-@media (orientation:landscape) and (max-height:480px){
-  .wrap{padding-bottom:calc(92px + env(safe-area-inset-bottom,0));}
-  .bnav{height:56px;}
-}
-
-/* ---------- TABLET ---------- */
-@media (min-width:700px){
-  .wrap{max-width:800px;padding-left:28px;padding-right:28px;}
-  .sitefooter{max-width:800px;}
-  .topbar{padding-left:28px;padding-right:28px;}
-  .bnav{max-width:640px;}
-  .dk-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);margin-bottom:var(--s4);}
-  .dk-stats .card{margin-bottom:0;}
-  .dk-stats .card:first-child{grid-column:1/-1;}
-  #dkDetail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);align-items:start;}
-  #dkDetail>.card{margin-bottom:0;}
-  #dkDetail>.card.small{grid-column:1/-1;}
-  #jadwalBox,#kgWebList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4);align-items:start;}
-  #jadwalBox>.card,#kgWebList>.card{margin-bottom:0;}
-  .gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
-  .modal{max-width:460px;}
-}
-
-/* ---------- TABLET LANDSCAPE / LAPTOP KECIL: beranda dua kolom ---------- */
-@media (min-width:860px){
-  .wrap{max-width:1000px;}
-  .sitefooter{max-width:1000px;}
-  .hm-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:var(--s6);align-items:start;}
-  .gallery-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
-}
-
-/* ---------- DESKTOP: sidebar kiri ---------- */
-@media (min-width:1024px){
-  :root{--side:236px;--tbh:64px;}
-  .topbar{min-height:var(--tbh);box-sizing:border-box;padding-left:32px;padding-right:32px;}
-  .bnav{left:0;top:var(--tbh);bottom:0;transform:none;width:var(--side);max-width:none;height:auto;filter:none;
-    background:var(--card);border-right:1px solid var(--line);z-index:15;overflow-y:auto;}
-  .bnav-bar{position:static;display:flex;flex-direction:column;gap:6px;padding:20px 14px;background:none;border-radius:0;-webkit-mask:none;mask:none;}
-  html:root .bnav .bnav-bar{border:0;border-radius:0;min-height:100%;box-sizing:border-box;}
-  .bnav-bubble{display:none;}
-  .bnav-item{flex:none;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;font-size:14.5px;text-align:left;}
-  .bnav-item .bnav-lbl{max-width:none;}
-  .bnav-item.on{background:var(--tint-brand);color:var(--text);}
-  .bnav-item.on .bnav-ico{opacity:1;transform:none;}
-  .bnav-item:not(.on):hover{background:var(--card-2);}
-  .wrap{max-width:none;margin:0 0 0 var(--side);padding:32px 40px 56px;}
-  .wrap>.view{max-width:1120px;margin-left:auto;margin-right:auto;}
-  .sitefooter{max-width:none;margin:var(--s2) 0 0 var(--side);padding-bottom:40px;}
-  .fab{bottom:28px;right:28px;}
-  .hm-grid{gap:32px;}
-  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
-  .modal{max-width:500px;}
-  .dk-stats{grid-template-columns:repeat(5,minmax(0,1fr));}
-  .dk-stats .card:first-child{grid-column:auto;}
-  #jadwalBox{grid-template-columns:repeat(3,minmax(0,1fr));}
-}
-
-/* ---------- LAYAR BESAR & TV: tampilan diperbesar agar terbaca dari jauh ---------- */
-@media (min-width:1600px){ #appRoot,#loginGate{zoom:1.15;} .wrap>.view{max-width:1280px;} }
-@media (min-width:1920px){ #appRoot,#loginGate{zoom:1.3;} :focus-visible{outline-width:4px;outline-offset:3px;} }
-@media (min-width:2560px){ #appRoot,#loginGate{zoom:1.75;} }
-@media (min-width:3400px){ #appRoot,#loginGate{zoom:2.3;} }
-</style>
 </head>
 <body>
 
@@ -794,7 +715,7 @@ img{-webkit-user-drag:none;}
     <label>Masuk pakai</label>
     <div class="seg" id="loginModeSeg">
       <div class="sel" data-mode="absen" onclick="setLoginMode('absen')">No. Absen</div>
-      <div data-mode="nisn" onclick="setLoginMode('nisn')">NISN</div>
+      <div data-mode="nisn" onclick="setLoginMode('nisn')">NISN / NIS</div>
     </div>
     <div id="loginForm" style="position:relative;"><div class="lf-in">
     <label id="loginIdLabel">No. Absen</label>
@@ -817,7 +738,7 @@ img{-webkit-user-drag:none;}
     <div class="chkrow"><input type="checkbox" id="rememberMe"> <span>Ingat saya di perangkat ini</span></div>
     <button class="btn primary gate-btn" onclick="doLogin()">Login</button>
     </div><div id="loginOffOverlay" onclick="loginOffWarn()" style="display:none;position:absolute;inset:0;z-index:5;cursor:not-allowed;"></div></div>
-    <p class="gate-footer">Nama/absen/NISN harus sudah terdaftar oleh admin dan cocok dengan token yang dipakai.</p>
+    <p class="gate-footer">Nama/absen/NISN/NIS harus sudah terdaftar oleh admin dan cocok dengan token yang dipakai.</p>
   </div>
 </div>
 
@@ -834,12 +755,11 @@ img{-webkit-user-drag:none;}
 <div class="wrap">
 
 <div class="view active" id="view-home">
-<div class="hm-grid"><div class="hm-col">
   <div class="card profile">
     <div class="avatar" id="avatarBox"><i class="ic" data-ic="person"></i></div>
     <div class="profile-info" style="flex:1;">
       <div><b id="profName">-</b></div>
-      <div class="small">NISN: <span id="profNisn">-</span></div>
+      <div class="small">NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span></div>
       <div class="small">Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span></div>
     </div>
   </div>
@@ -868,7 +788,6 @@ img{-webkit-user-drag:none;}
 
   <button class="btn kgBtn" style="width:100%;margin-bottom:10px;display:none;" onclick="openView('kegiatan')">Kas Kegiatan (study tour, perpisahan, dll)</button>
 
-  </div><div class="hm-col">
   <h2 class="h">Pengumuman</h2>
   <div id="announceList"></div>
 
@@ -882,7 +801,6 @@ img{-webkit-user-drag:none;}
   <div class="card cmt-composer-card"><div id="cmtComposerHome"></div></div>
   <div id="cmtHomeList"></div>
   <button class="btn" id="cmtHomeMore" style="width:100%;margin-bottom:14px;" onclick="cmtOpenPage()">Lihat semua komentar</button>
-  </div></div>
 </div>
 
 <div class="view" id="view-kegiatan">
@@ -904,13 +822,11 @@ img{-webkit-user-drag:none;}
   <div class="tblwrap"><table><thead><tr id="kasTheadRow"></tr></thead><tbody id="kasTbody"></tbody></table></div>
 
   <h2 class="h" style="margin-top:16px;">Rekap</h2>
-  <div class="dk-stats">
   <div class="card"><div class="small">Total Kas Saat Ini</div><div style="font-size:20px;font-weight:700;" id="dkTotal">Rp0</div></div>
   <div class="card"><div class="small">Pemasukan Bulan Ini</div><div style="font-size:16px;font-weight:700;color:var(--blue);" id="dkIncMonth">Rp0</div></div>
   <div class="card"><div class="small">Total Pemasukan</div><div style="font-size:16px;font-weight:700;color:var(--blue);" id="dkIn">Rp0</div></div>
   <div class="card"><div class="small">Pengeluaran Bulan Ini</div><div style="font-size:16px;font-weight:700;color:var(--red);" id="dkOutMonth">Rp0</div></div>
   <div class="card"><div class="small">Total Pengeluaran</div><div style="font-size:16px;font-weight:700;color:var(--red);" id="dkOut">Rp0</div></div>
-  </div>
 
   <h2 class="h" style="margin-top:16px;">Rincian Bulan Ini</h2>
   <p class="small">Transparansi: semua pemasukan manual dan pengeluaran bulan yang dipilih. Tautan &quot;Bukti&quot; membuka foto struk di Google Drive.</p>
@@ -965,6 +881,7 @@ img{-webkit-user-drag:none;}
 <div class="view" id="view-editsiswa">
   <h2 class="h" id="editSiswaTitle">Edit Siswa</h2>
   <label>NISN</label><input type="text" id="esNisn">
+  <label>NIS</label><input type="text" id="esNis">
   <label>Tanggal &amp; Bulan Lahir</label>
   <div style="display:flex;gap:8px;">
     <input type="number" id="esBirthDay" min="1" max="31" placeholder="Tgl" style="flex:1;">
@@ -976,7 +893,7 @@ img{-webkit-user-drag:none;}
       <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
     </select>
   </div>
-  <p class="small">NISN &amp; tanggal lahir ini otomatis tersinkron dua arah dengan aplikasi Kas Kelas (dipakai untuk verifikasi login).</p>
+  <p class="small">NISN, NIS &amp; tanggal lahir ini otomatis tersinkron dua arah dengan aplikasi Kas Kelas (dipakai untuk verifikasi login).</p>
   <label>Kelas</label><input type="text" id="esKelas">
   <label>Foto Profil</label>
   <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
@@ -1864,8 +1781,8 @@ function dvRenderRoom(){
     +'<div class="dv-mrow"><button class="dv-btn" data-room="'+dvEsc(r.id)+'" onclick="dvGoSettings(this.dataset.room)">+ Token custom untuk ruang ini</button> '
     +(r.tokens.some(t=>t.role==='staff')?'':'<button class="dv-btn dv-pri" data-room="'+dvEsc(r.id)+'" onclick="dvAddStaffToken(this.dataset.room)">+ Token Admin Kelas (acak)</button>')+'</div></div>';
   // --- siswa
-  h+='<div class="dv-h">Data siswa ('+st.length+')</div><div class="dv-card dv-scroll"><table class="dv-table"><tr><th>No</th><th>Nama</th><th>Nama lengkap</th><th>NISN</th><th>Lahir</th><th>Kelas</th></tr>'
-    +(st.length ? st.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+dvEsc(s.short)+'</td><td>'+dvEsc(s.long)+'</td><td>'+dvEsc(s.nisn)+'</td><td>'+dvEsc(s.birthDate)+'</td><td>'+dvEsc(s.kelas)+'</td></tr>').join('') : '<tr><td colspan="6" class="dv-sub">Belum ada siswa.</td></tr>')+'</table></div>';
+  h+='<div class="dv-h">Data siswa ('+st.length+')</div><div class="dv-card dv-scroll"><table class="dv-table"><tr><th>No</th><th>Nama</th><th>Nama lengkap</th><th>NISN</th><th>NIS</th><th>Lahir</th><th>Kelas</th></tr>'
+    +(st.length ? st.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+dvEsc(s.short)+'</td><td>'+dvEsc(s.long)+'</td><td>'+dvEsc(s.nisn)+'</td><td>'+dvEsc(s.nis)+'</td><td>'+dvEsc(s.birthDate)+'</td><td>'+dvEsc(s.kelas)+'</td></tr>').join('') : '<tr><td colspan="6" class="dv-sub">Belum ada siswa.</td></tr>')+'</table></div>';
   // --- keuangan
   h+='<div class="dv-h">Keuangan</div><div class="dv-grid">'
     +'<div class="dv-card dv-stat"><span class="dv-sub">Total pemasukan</span><b>'+dvRp(fin.income)+'</b></div>'
@@ -1985,7 +1902,7 @@ function dvRenderSettings(){
   dvEl('dvTitle').textContent='Pengaturan Developer';
   const rooms=Object.values(dvData.rooms);
   let h='<div class="dv-card"><b>Ubah username &amp; token developer</b>'
-    +'<div class="dv-sub" style="margin:4px 0 6px;">Username = yang diisi di kolom NISN/absen saat login. Token = password. Disarankan token panjang (≥10 karakter, campuran huruf &amp; angka). Pengaturan ini hanya ada di mode developer.'+(dvSecret?'<br>Username sesi ini: <b>'+dvEsc(dvSecret.u)+'</b>':'')+'</div>'
+    +'<div class="dv-sub" style="margin:4px 0 6px;">Username = yang diisi di kolom NISN/NIS/absen saat login. Token = password. Disarankan token panjang (≥10 karakter, campuran huruf &amp; angka). Pengaturan ini hanya ada di mode developer.'+(dvSecret?'<br>Username sesi ini: <b>'+dvEsc(dvSecret.u)+'</b>':'')+'</div>'
     +'<label class="dv-lbl">Username baru</label><input class="dv-in" id="dvNewUser" autocomplete="off" autocapitalize="none">'
     +'<label class="dv-lbl">Token baru</label><input class="dv-in" id="dvNewTok" type="password" autocomplete="off">'
     +'<label class="dv-lbl">Ulangi token baru</label><input class="dv-in" id="dvNewTok2" type="password" autocomplete="off">'
@@ -2069,11 +1986,11 @@ const DV_HELP={
   maint:{t:'Mode Perbaikan',d:'Saat DIAKTIFKAN, semua pengguna umum dan admin langsung melihat halaman "sedang dalam perbaikan" dan server menolak perubahan data dari mereka. Developer tetap bisa masuk dan bekerja. Pakai saat memperbaiki sistem, backup, atau rollback.'},
   version:{t:'Versi & Build',d:'Memantau versi aplikasi (APK) yang sedang dipakai, dan mengatur pengumuman update: isi versi terbaru dan link download APK, lalu nyalakan toggle. Pengguna APK versi lama akan melihat pemberitahuan dengan tombol Tutup dan Update (membuka link di browser). Fitur ini hanya bekerja pada APK yang sudah memuat fitur ini.'},
   brute:{t:'Brute Force & Gagal Login',d:'Grafik kegagalan login per menit (30 menit terakhir). Perangkat/akun yang gagal login ≥10 kali dalam 1 menit ditandai sebagai indikasi serangan. Developer bisa memblokir sementara perangkat (UID) pelakunya; blokir berlaku di server dan kedaluwarsa otomatis. Server tidak mengenal IP, jadi IP tidak bisa diblokir. Penandaan berjalan saat konsol ini terbuka.'},
-  sensitive:{t:'Akses Data Sensitif',d:'Catatan siapa yang melihat atau mengekspor data keuangan dan data siswa (NISN, tanggal lahir): halaman keuangan, rekap, daftar siswa, unduhan .xlsx, backup Drive, serta akses developer sendiri. Dipakai untuk mendeteksi kebocoran data internal. Ekspor ditandai merah.'},
+  sensitive:{t:'Akses Data Sensitif',d:'Catatan siapa yang melihat atau mengekspor data keuangan dan data siswa (NISN, NIS, tanggal lahir): halaman keuangan, rekap, daftar siswa, unduhan .xlsx, backup Drive, serta akses developer sendiri. Dipakai untuk mendeteksi kebocoran data internal. Ekspor ditandai merah.'},
   reports:{t:'Laporan Admin',d:'Laporan masalah internal yang dikirim admin lewat menu "Lapor ke Developer" di aplikasi/website atau perintah /lapor di bot Telegram admin. Tandai selesai setelah ditangani, atau hapus. Developer juga menerima salinannya di Telegram.'},
   requests:{t:'Request Token',d:'Permintaan token custom yang dikirim pengguna dari layar login aplikasi (nama lengkap, kelas, absen, sekolah, dan nomor WA bila diisi). Muncul juga sebagai popup saat kamu login. Hubungi lewat WA, buat tokennya di Pengaturan Developer, lalu tandai selesai.'},
   theme:{t:'Tema Warna',d:'Mengunci tema warna SEMUA kelas/token dan semua halaman (aplikasi & website) ke satu pilihan, seketika. Pilihan tema tiap kelas (yang diatur admin) tidak dihapus: lepas kunci untuk mengembalikannya. Tema kelas diatur admin di Pengaturan Aplikasi (APK) atau Menu Admin → Tema Warna (website).'},
-  login:{t:'Opsi Login Website',d:'Mematikan salah satu cara login di website (No. Absen atau NISN). Opsi yang dimatikan tampil semi transparan di layar login dan tidak bisa dipakai; saat diketuk muncul peringatan bahwa opsi itu sedang dinonaktifkan. Berlaku untuk semua kelas, dan login developer tidak terpengaruh.'},
+  login:{t:'Opsi Login Website',d:'Mematikan salah satu cara login di website (No. Absen atau NISN/NIS). Opsi yang dimatikan tampil semi transparan di layar login dan tidak bisa dipakai; saat diketuk muncul peringatan bahwa opsi itu sedang dinonaktifkan. Berlaku untuk semua kelas, dan login developer tidak terpengaruh.'},
   multi:{t:'Login Ganda',d:'Menampilkan akun yang terdeteksi aktif di dua perangkat berbeda pada saat yang sama, serta akun yang dipakai dari beberapa perangkat dalam 24 jam terakhir. Berguna untuk mendeteksi token yang bocor atau dibagikan tanpa izin. Lokasi tidak dapat dibaca (tanpa IP), jadi pembedanya adalah perangkat.'}
 };
 const DV_TYPES={login_ok:['Login berhasil','ed'],login_fail:['Login gagal','bad'],logout:['Keluar',''],data_view:['Lihat data','warn'],data_export:['Ekspor data','bad'],force_logout:['Keluar paksa','warn'],block:['Blokir','bad'],unblock:['Cabut blokir',''],maintenance:['Mode perbaikan','warn'],version:['Versi/Update',''],backup:['Backup','ed'],rollback:['Rollback','bad'],token_rotate:['Ganti token','warn'],theme:['Tema','']};
@@ -2305,18 +2222,18 @@ async function dvSetMaintenance(on,msg){
 function dvRenderLoginOpt(){
   dvEl('dvTitle').textContent='Opsi Login Website';
   dvEl('dvBody').innerHTML='<div class="dv-card"><div id="dvLoginStatus" style="font-size:14px;line-height:1.7;"></div></div>'
-    +'<div class="dv-card"><label class="dv-lbl">Pilih opsi login</label><select class="dv-in" id="dvLoginSel" onchange="dvPaintLoginOpt()"><option value="nisn">NISN</option><option value="absen">No. Absen</option></select>'
+    +'<div class="dv-card"><label class="dv-lbl">Pilih opsi login</label><select class="dv-in" id="dvLoginSel" onchange="dvPaintLoginOpt()"><option value="nisn">NISN / NIS</option><option value="absen">No. Absen</option></select>'
     +'<div class="dv-mrow"><button class="dv-btn dv-danger" id="dvLoginBtn" onclick="dvAskLoginOpt()">Matikan</button></div>'
     +'<div class="dv-sub" style="margin-top:8px;">Opsi yang dimatikan tampil semi transparan di layar login website, tidak bisa diisi atau diklik, dan menampilkan peringatan saat diketuk. Pembatasan ini ada di tampilan website (bukan di aturan server).</div></div>';
   dvPaintLoginOpt();
 }
 function dvPaintLoginOpt(){
   const st=dvEl('dvLoginStatus'); if(!st) return; const lo=ktCfg.loginOff||{}, sel=dvEl('dvLoginSel').value;
-  st.innerHTML=[['nisn','NISN'],['absen','No. Absen']].map(x=>(lo[x[0]]===true?'<span style="color:#ef4444">●</span>':'<span style="color:#22c55e">●</span>')+' <b>'+x[1]+'</b>: '+(lo[x[0]]===true?'dinonaktifkan':'aktif')).join('<br>');
+  st.innerHTML=[['nisn','NISN / NIS'],['absen','No. Absen']].map(x=>(lo[x[0]]===true?'<span style="color:#ef4444">●</span>':'<span style="color:#22c55e">●</span>')+' <b>'+x[1]+'</b>: '+(lo[x[0]]===true?'dinonaktifkan':'aktif')).join('<br>');
   const b=dvEl('dvLoginBtn'); if(b){ const off=lo[sel]===true; b.textContent=off?'Hidupkan kembali':'Matikan'; b.className='dv-btn '+(off?'dv-pri':'dv-danger'); }
 }
 function dvAskLoginOpt(){
-  const mode=dvEl('dvLoginSel').value, off=!((ktCfg.loginOff||{})[mode]===true), nm=mode==='nisn'?'NISN':'No. Absen';
+  const mode=dvEl('dvLoginSel').value, off=!((ktCfg.loginOff||{})[mode]===true), nm=mode==='nisn'?'NISN / NIS':'No. Absen';
   if(!off){ dvDoLoginOpt(mode,false); return; }
   dvConfirm({title:'Matikan login '+nm+'?', html:'Pengguna website tidak bisa login memakai <b>'+nm+'</b> sampai kamu menghidupkannya lagi.', ok:'Ya, Matikan', cb:()=>dvDoLoginOpt(mode,true)});
 }
@@ -2324,8 +2241,8 @@ async function dvDoLoginOpt(mode,off){
   try{
     const lo=Object.assign({},ktCfg.loginOff||{}); lo[mode]=!!off;
     await fbDb.collection('config').doc('app').set({loginOff:lo, updatedAt:Date.now()},{merge:true}); ktCfg=Object.assign({},ktCfg,{loginOff:lo}); try{ loginOffApply(); }catch(e){}
-    ktLog('maintenance',{what:'Login '+(mode==='nisn'?'NISN':'No. Absen')+(off?' DINONAKTIFKAN':' diaktifkan lagi'), info:''});
-    dvToast('Login '+(mode==='nisn'?'NISN':'No. Absen')+(off?' dinonaktifkan.':' diaktifkan kembali.')); dvPaintLoginOpt();
+    ktLog('maintenance',{what:'Login '+(mode==='nisn'?'NISN / NIS':'No. Absen')+(off?' DINONAKTIFKAN':' diaktifkan lagi'), info:''});
+    dvToast('Login '+(mode==='nisn'?'NISN / NIS':'No. Absen')+(off?' dinonaktifkan.':' diaktifkan kembali.')); dvPaintLoginOpt();
   }catch(e){ dvToast('Gagal mengubah opsi login: '+((e&&e.code)||(e&&e.message)||'')); }
 }
 function dvRenderMaint(){
@@ -2885,8 +2802,7 @@ function arrearsRows(){
   let rows=[];
   (kasState.students||[]).forEach((s,i)=>{
     let tot=calcTunggakanFor(String(i+1)).reduce((a,e)=>a+(Number(e.amount)||0),0);
-    let lama=oldOwedOf(String(i+1)); tot+=lama;
-    if(tot>0) rows.push({no:i+1, name:s.short||s.long||('Absen '+(i+1)), total:tot, lama});
+    if(tot>0) rows.push({no:i+1, name:s.short||s.long||('Absen '+(i+1)), total:tot});
   });
   return rows;
 }
@@ -2967,13 +2883,13 @@ function alertBox(msg){
 function setLoginMode(mode){
   loginMode=mode;
   document.querySelectorAll('#loginModeSeg div').forEach(d=>d.classList.toggle('sel', d.dataset.mode===mode));
-  document.getElementById('loginIdLabel').textContent = mode==='absen' ? 'No. Absen' : 'NISN';
-  document.getElementById('loginId').placeholder = mode==='absen' ? 'Contoh: 5' : 'Contoh: 1234567890';
+  document.getElementById('loginIdLabel').textContent = mode==='absen' ? 'No. Absen' : 'NISN / NIS';
+  document.getElementById('loginId').placeholder = mode==='absen' ? 'Contoh: 5' : 'Contoh: NISN atau NIS';
   document.getElementById('loginBirthBox').style.display = mode==='absen' ? 'block' : 'none';
   loginOffApply();
 }
 function loginOffNow(mode){ return !!(ktCfg && ktCfg.loginOff && ktCfg.loginOff[mode||loginMode]===true); }
-function loginOffWarn(){ alertBox('Opsi login '+(loginMode==='absen'?'No. Absen':'NISN')+' sedang dinonaktifkan. Silakan pakai opsi login yang lain atau hubungi admin/bendahara.'); }
+function loginOffWarn(){ alertBox('Opsi login '+(loginMode==='absen'?'No. Absen':'NISN / NIS')+' sedang dinonaktifkan. Silakan pakai opsi login yang lain atau hubungi admin/bendahara.'); }
 function loginOffApply(){
   const f=document.getElementById('loginForm'); if(!f) return;
   const off=loginOffNow(), ov=document.getElementById('loginOffOverlay'), inn=f.querySelector('.lf-in');
@@ -3031,11 +2947,12 @@ async function doLogin(){
       }
     } else {
       let ni = students.findIndex(s=>s.nisn && s.nisn===idVal);
+      if(ni<0) ni = students.findIndex(s=>s.nis && s.nis===idVal);
       if(ni>=0) absen=String(ni+1);
     }
     if(!absen){
       ktFail('identitas tidak terdaftar', idVal, roomId);
-      alertBox(''+(loginMode==='absen'?'No. Absen':'NISN')+' tidak terdaftar di data siswa aplikasi. Hubungi admin/bendahara.');
+      alertBox(''+(loginMode==='absen'?'No. Absen':'NISN/NIS')+' tidak terdaftar di data siswa aplikasi. Hubungi admin/bendahara.');
       return;
     }
     session = {roomId, absen, role, token: tokKey};
@@ -3063,7 +2980,7 @@ function currentStudent(){
   let idx=parseInt(session.absen)-1;
   return (kasState.students && kasState.students[idx]) || {short:'-', long:'-'};
 }
-function currentProfile(){ let st=currentStudent(); return {nisn: st.nisn||'-', kelas: st.kelas||'-'}; }
+function currentProfile(){ let st=currentStudent(); return {nisn: st.nisn||'-', nis: st.nis||'-', kelas: st.kelas||'-'}; }
 
 function enterSite(firstLoginThisSession){
   let gate=document.getElementById('loginGate');
@@ -3192,7 +3109,7 @@ async function removeAvatarFor(absen){
 
 /* ---- Mode developer: data contoh lokal (tanpa Firebase) ---- */
 function makeDemoData(){
-  const S=(short,long,nisn,bd)=>({short,long,nisn,birthDate:bd});
+  let _nis=24000; const S=(short,long,nisn,bd)=>({short,long,nisn,nis:String(++_nis),birthDate:bd});
   const jd=(a,b)=>[{jam:'07:00-08:30',mapel:a},{jam:'08:30-10:00',mapel:b}];
   const kas={
     appTitle:'Kas Kelas (Demo)',
@@ -3231,7 +3148,7 @@ function startDevSession(idVal){
   let demo=makeDemoData(); kasState=demo.kas; webState=demo.web;
   let absen='1';
   if(loginMode==='absen'){ let n=parseInt(idVal); if(n>=1 && n<=kasState.students.length) absen=String(n); }
-  else { let i=kasState.students.findIndex(s=>s.nisn===idVal); if(i>=0) absen=String(i+1); }
+  else { let i=kasState.students.findIndex(s=>s.nisn===idVal||s.nis===idVal); if(i>=0) absen=String(i+1); }
   let v=webState.visitors[absen]||{count:0}; v.count=(Number(v.count)||0)+1; v.last=new Date().toISOString().slice(0,10); webState.visitors[absen]=v;
   session={roomId:'dev-demo', absen, role:'editor', token:DEV_TOKEN, dev:true};
   enterSite(true);
@@ -3352,6 +3269,7 @@ function renderAll(){
   document.getElementById('greetText').innerHTML = 'Halo, '+(st.short||'-')+' <span class="roleLabel">'+roleTxt+'</span>';
   document.getElementById('profName').textContent = st.long||st.short||'-';
   document.getElementById('profNisn').textContent = st.nisn||'-';
+  document.getElementById('profNis').textContent = st.nis||'-';
   document.getElementById('profKelas').textContent = pr.kelas||'-';
   document.getElementById('profAbsen').textContent = session.absen;
   document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
@@ -3371,14 +3289,6 @@ function renderAll(){
 }
 
 /* ---- Tunggakan otomatis dari data kas aplikasi ---- */
-/* ---- Tunggakan lama (diatur di aplikasi): kasState.oldName, kasState.oldBoxes {indexSiswa:[{id,date,amount,paid?}]} ---- */
-var OLD_MON=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-function oldName(){ return String((kasState&&kasState.oldName)||'').trim()||'Tunggakan Lama'; }
-function oldDateLbl(d){ let p=String(d).split('-'); return (+p[2])+' '+OLD_MON[(+p[1])-1]+' '+p[0]; }
-function oldBoxesOf(absen){ return (((kasState&&kasState.oldBoxes)||{})[parseInt(absen)-1]||[]).slice().sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0)); }
-function oldOpenOf(absen){ return oldBoxesOf(absen).filter(b=>!b.paid); }
-function oldOwedOf(absen){ return oldOpenOf(absen).reduce((a,b)=>a+(Number(b.amount)||0),0); }
-function oldPaidIncomeAll(){ let t=0; Object.keys((kasState&&kasState.oldBoxes)||{}).forEach(si=>(kasState.oldBoxes[si]||[]).forEach(b=>{ if(b.paid && !b.paid.pre) t+=Number(b.amount)||0; })); return t; }
 function calcTunggakanFor(absen){
   let list=[];
   let idx=parseInt(absen)-1;
@@ -3413,26 +3323,12 @@ function renderTunggakan(){
   let list = calcTunggakanFor(session.absen);
   let total = list.reduce((a,e)=>a+e.amount,0);
   let box=document.getElementById('tunggakanBox');
-  if(!oldOpenOf(session.absen).length){   // tunggakan lama lunas/tidak ada: ringkasan lama disembunyikan, tampilan seperti semula
-    if(!list.length){
-      box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan</div>`;
-    } else {
-      box.innerHTML = `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div>
-        <div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`;
-    }
-    return;
+  if(!list.length){
+    box.innerHTML = `<div style="color:var(--blue);font-weight:700;">Lunas — tidak ada tunggakan</div>`;
+  } else {
+    box.innerHTML = `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div>
+      <div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`;
   }
-  let oOpen=oldOpenOf(session.absen), oTot=oldOwedOf(session.absen), grand=total+oTot;
-  const lab=t=>`<div class="small" style="font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px;">${t}</div>`;
-  let h = lab('Tunggakan bulan ini');
-  h += list.length
-    ? `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(total)}</div><div class="small">Menunggak <b>${list.length}x</b> — tanggal: ${list.map(e=>e.date).join(', ')}</div>`
-    : `<div style="color:var(--blue);font-weight:700;">Lunas</div>`;
-  h += `<div style="border-top:1px dashed var(--line);margin:12px 0 10px;"></div>` + lab(esc(oldName()));
-  h += `<div style="color:var(--amber);font-weight:700;font-size:18px;">${fmtRp(oTot)}</div><div class="small">Menunggak <b>${oOpen.length}x</b> — tanggal: ${oOpen.map(b=>oldDateLbl(b.date)).join(', ')}</div>`;
-  h += `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:2px solid var(--line);margin-top:12px;padding-top:10px;"><b>Total tunggakan</b>`
-    + (grand>0 ? `<b style="color:var(--amber);font-size:20px;">${fmtRp(grand)}</b>` : `<b style="color:var(--blue);">Lunas</b>`) + `</div>`;
-  box.innerHTML=h;
 }
 function renderEsTunggakan(){
   let list=calcTunggakanFor(activeEditAbsen);
@@ -3447,12 +3343,6 @@ function renderEsTunggakan(){
       <button class="btn" style="padding:4px 8px;color:var(--red);" title="Hapus tunggakan ini saja (tidak mencentang di aplikasi)" onclick="dropTunggakan('${activeEditAbsen}','${esc(e.date)}')">✕</button>
     </div>`;
   }).join('') : '<p class="small">Tidak ada tunggakan — lunas semua.</p>';
-  if(oldOpenOf(activeEditAbsen).length){
-    let oo=oldOpenOf(activeEditAbsen);
-    document.getElementById('esTunggakanList').innerHTML += `<div style="border-top:1px dashed var(--line);margin:12px 0 8px;"></div><div class="small" style="font-weight:800;text-transform:uppercase;letter-spacing:.04em;">${esc(oldName())}</div>`
-      + (oo.length ? oo.map(b=>`<div class="listrow"><span>${esc(oldDateLbl(b.date))}</span><b>${fmtRp(b.amount)}</b></div>`).join('') : '<p class="small">Lunas semua.</p>')
-      + `<p class="small" style="margin-top:6px;">Diatur dari aplikasi (menu ${esc(oldName())}), tidak bisa diubah di sini.</p>`;
-  }
   renderClearedChips();
 }
 function renderClearedChips(){
@@ -4042,12 +3932,13 @@ function renderMemberEditList(){
   ).join('') || '<p class="small">Belum ada data siswa dari aplikasi.</p>';
 }
 function openEditSiswa(absen){
-  ktView('Data siswa & NISN');
+  ktView('Data siswa, NISN & NIS');
   activeEditAbsen=String(absen);
   let idx=absen-1;
-  let st=kasState.students[idx]||{short:'',nisn:'',birthDate:''};
+  let st=kasState.students[idx]||{short:'',nisn:'',nis:'',birthDate:''};
   document.getElementById('editSiswaTitle').textContent = 'Edit Siswa: '+(st.short||absen);
   document.getElementById('esNisn').value=st.nisn||'';
+  document.getElementById('esNis').value=st.nis||'';
   let [bd,bm]=(st.birthDate||'').split('-');
   document.getElementById('esBirthDay').value = bd?parseInt(bd):'';
   document.getElementById('esBirthMonth').value = bm?parseInt(bm):'';
@@ -4060,14 +3951,15 @@ function openEditSiswa(absen){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-editsiswa').classList.add('active');
 }
-async function pushKasStudentEdit(idx, nisn, birthDate, kelas){
+async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis){
   if(!isAdmin()){ alertBox('Hanya admin yang bisa mengubah data ini.'); return false; }
-  if(session.dev){ if(!kasState.students[idx]) return false; kasState.students[idx].nisn=nisn; kasState.students[idx].birthDate=birthDate; kasState.students[idx].kelas=kelas; renderAll(); return true; }
+  if(session.dev){ if(!kasState.students[idx]) return false; kasState.students[idx].nisn=nisn; kasState.students[idx].nis=nis||''; kasState.students[idx].birthDate=birthDate; kasState.students[idx].kelas=kelas; renderAll(); return true; }
   try{
     let fresh = await fbDb.collection('kas').doc(session.roomId).get();
     let st8 = (fresh.exists && fresh.data().state) ? fresh.data().state : kasState;
     if(!st8.students || !st8.students[idx]) return false;
     st8.students[idx].nisn = nisn;
+    st8.students[idx].nis = nis||'';
     st8.students[idx].birthDate = birthDate;
     st8.students[idx].kelas = kelas;
     await fbDb.collection('kas').doc(session.roomId).set({state: st8});
@@ -4089,11 +3981,12 @@ async function esRemovePhoto(){
 }
 async function esSaveBiodata(){
   let nisn = document.getElementById('esNisn').value.trim();
+  let nis = document.getElementById('esNis').value.trim();
   let kelas = document.getElementById('esKelas').value.trim();
   let d=parseInt(document.getElementById('esBirthDay').value), m=parseInt(document.getElementById('esBirthMonth').value);
   let birthDate = (d && m) ? String(d).padStart(2,'0')+'-'+String(m).padStart(2,'0') : '';
   let idx=parseInt(activeEditAbsen)-1;
-  let ok = await pushKasStudentEdit(idx, nisn, birthDate, kelas);
+  let ok = await pushKasStudentEdit(idx, nisn, birthDate, kelas, nis);
   alertBox(ok ? 'Biodata siswa tersimpan ke aplikasi.' : 'Gagal menyimpan biodata.');
 }
 
@@ -4122,7 +4015,7 @@ function totalKasAll(){
   let inc=0, exp=0;
   let allMk=new Set([...Object.keys(kasState.months||{}), ...Object.keys(kasState.manualIncome||{}), ...Object.keys(kasState.expenses||{})]);
   allMk.forEach(mk=>{ inc+=incomeForKasMonth(mk); exp+=expenseForKasMonth(mk); });
-  return inc-exp+(Number(kasState.openingBalance)||0)+oldPaidIncomeAll();
+  return inc-exp;
 }
 function totalIncomeAll(){
   let allMk=new Set([...Object.keys(kasState.months||{}), ...Object.keys(kasState.manualIncome||{})]);
@@ -4285,7 +4178,7 @@ function openView(id){
   if(id==='kontak') renderKontak();
   if(id==='kegiatan'){ renderKegiatanWeb(); ktView('Kas Kegiatan'); }
   if(id==='datakas'){ renderDataKas(); ktView('Data Kas (keuangan)'); }
-  if(id==='kelolaanggotaview'){ renderMemberEditList(); ktView('Daftar siswa (NISN & tanggal lahir)'); }
+  if(id==='kelolaanggotaview'){ renderMemberEditList(); ktView('Daftar siswa (NISN, NIS & tanggal lahir)'); }
   if(id==='komentar'){ try{ cmtOnOpenPage(); }catch(e){} }
   window.scrollTo(0,0);
 }

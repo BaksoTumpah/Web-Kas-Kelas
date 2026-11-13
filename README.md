@@ -184,6 +184,12 @@ Bulatan hijau tidak lagi "muncul" (animasi pop) di menu baru, tetapi bergeser ha
 ## Gerak ala iPhone (APK)
 `--ease` kini kurva iOS `cubic-bezier(.32,.72,0,1)`. Bulatan navbar memakai simulasi pegas (kekakuan 260, redaman 24). Jendela modal: muncul `popIn` .46s, tutup dengan animasi keluar (`closeModal` menambah kelas `closing` 210 ms, `openModal` membatalkannya). Halaman masuk `rise` .42s. Tekan tombol: skala .96 cepat lalu kembali. Menu samping: lempar ke kiri (kecepatan > .5 px/ms) menutup walau belum jauh.
 
+## Dropdown aplikasi & update otomatis dari GitHub Release (APK)
+- Semua kotak pilihan (`<select>`) di APK kini membuka lembar pilihan bergaya aplikasi, bukan daftar bawaan Android. Pilihan bulan berwarna merah bila masih ada yang menunggak, hijau bila lunas semua (dihitung dari centang di aplikasi, tanggal yang belum jatuh tempo tidak dihitung); kotak bulan di dashboard ikut berwarna.
+- Menu hamburger > "Cek Pembaruan Aplikasi": membaca GitHub Release `BaksoTumpah/kas-kelas-app-update`, menampilkan versi baru + catatan, lalu unduh dengan progres dan buka pemasang Android (plugin native `KasUpdate`, cek SHA-256, hanya mengunduh dari repo resmi). Tanda merah di ikon menu muncul bila ada versi baru (pengecekan senyap maks. sekali per 6 jam).
+- Workflow Build APK kini menerbitkan Release otomatis (`vX.Y.Z`, berkas `kas-kelas-vX.Y.Z-debug.apk` dan `-release.apk` bila kunci rilis diisi) mengikuti `KT_VERSION`. Tidak perlu upload APK manual. Aplikasi memilih berkas sesuai jenis pemasangan (debug/rilis) supaya tanda tangan cocok.
+- Versi pertama yang memuat fitur ini harus dipasang manual sekali; setelah itu pembaruan bisa dari dalam aplikasi.
+
 ## Keamanan & performa (v4.1.3)
 - Audit: tidak ada rahasia privat di kode maupun riwayat GitHub. Yang tampil di frontend hanya kunci publik (Firebase `apiKey`, kunci Drive, `TG_RELAY_KEY`, OAuth client ID); rahasia asli (BOT_TOKEN, SECRET, G_CLIENT_SECRET, G_REFRESH_TOKEN, DEV_BOT_TOKEN, kunci rilis APK) hanya di secret Cloudflare/GitHub.
 - Hosting (`firebase.json`): CSP, HSTS, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy, COOP/CORP; `index.html`, `sw.js`, manifest `no-cache`, gambar cache 7 hari.

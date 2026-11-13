@@ -98,18 +98,8 @@ function arrDetail(st, web, i) {   // rincian tunggakan satu siswa (sama dengan 
   ((web.manualTunggakan || {})[ab] || []).forEach(e => list.push({date: e.date, amount: Number(e.amount) || 0, note: e.note || 'manual'}));
   return list.sort((x, y) => x.date.localeCompare(y.date));
 }
-// ---- Saldo awal & tunggakan lama (diatur dari aplikasi): st.openingBalance, st.oldName, st.oldBoxes {indexSiswa:[{id,date,amount,paid?}]}
-//   tanpa paid = menunggak; paid.pre = lunas sebelum memakai aplikasi (tidak masuk kas); paid.at = dibayar lewat aplikasi/bot (pemasukan pada tanggal itu)
-const openingOf = st => Number(st && st.openingBalance) || 0;
-const oldName = st => String((st && st.oldName) || '').trim() || 'Tunggakan Lama';
-const oldBoxes = (st, i) => (((st && st.oldBoxes) || {})[i] || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
-const oldOpen = (st, i) => oldBoxes(st, i).filter(b => !b.paid);
-const oldOwed = (st, i) => oldOpen(st, i).reduce((a, b) => a + (Number(b.amount) || 0), 0);
-function oldPaidEach(st, fn) { Object.keys(st.oldBoxes || {}).forEach(si => (st.oldBoxes[si] || []).forEach(b => { if (b.paid && !b.paid.pre && b.paid.at) fn(b, String(b.paid.at), si); })); }
-function oldIncMonth(st, mk) { let t = 0; oldPaidEach(st, (b, at) => { if (at.slice(0, 7) === mk) t += Number(b.amount) || 0; }); return t; }
-function oldPayMonths(st) { const o = {}; oldPaidEach(st, (b, at) => { o[at.slice(0, 7)] = 1; }); return Object.keys(o); }
 function arrears(st, web) {
-  return (st.students || []).map((s, i) => { const lama = oldOwed(st, i); return {no: i + 1, name: s.short || s.long || ('Absen ' + (i + 1)), total: arrDetail(st, web, i).reduce((a, e) => a + e.amount, 0) + lama, lama}; });
+  return (st.students || []).map((s, i) => ({no: i + 1, name: s.short || s.long || ('Absen ' + (i + 1)), total: arrDetail(st, web, i).reduce((a, e) => a + e.amount, 0)}));
 }
 function isTagihDay(st, ds) {   // hari kas ditarik (sama dengan pengingat di aplikasi)
   const p = ds.split('-'), day = +p[2], wd = new Date(Date.UTC(+p[0], +p[1] - 1, day)).getUTCDay(), m = st.months && st.months[ds.slice(0, 7)];
@@ -125,7 +115,7 @@ async function listDocs(env, path, q) {
 function incMonth(st, mk) {
   const m = st.months && st.months[mk]; let t = 0;
   if (m) (m.dates || []).forEach(d => Object.keys(m.checks || {}).forEach(i => { const c = m.checks[i] && m.checks[i][d]; if (c && (c === true || c.on)) t += rateOf(m, d); }));
-  return t + oldIncMonth(st, mk) + ((st.manualIncome && st.manualIncome[mk]) || []).reduce((a, e) => a + (Number(e.amount) || 0), 0);
+  return t + ((st.manualIncome && st.manualIncome[mk]) || []).reduce((a, e) => a + (Number(e.amount) || 0), 0);
 }
 const expMonth = (st, mk) => ((st.expenses && st.expenses[mk]) || []).reduce((a, e) => a + (Number(e.amount) || 0), 0);
 function incToday(st, td) {
@@ -134,7 +124,6 @@ function incToday(st, td) {
     let n = 0; Object.keys((m.checks || {})[i] || {}).forEach(d => { const c = m.checks[i][d]; if (c && c.on && c.checkedAt === td) n += rateOf(m, d); });
     if (n) out.push((s.short || s.long) + ' ' + rp(n)); }); });
   Object.keys(st.manualIncome || {}).forEach(mk => (st.manualIncome[mk] || []).forEach(e => { if (e.date === td) out.push(e.name + ' (manual) ' + rp(e.amount)); }));
-  oldPaidEach(st, (b, at, si) => { if (at === td) out.push(((st.students[si] || {}).short || 'Absen ' + (+si + 1)) + ' (' + oldName(st).toLowerCase() + ') ' + rp(b.amount)); });
   return out;
 }
 // ================= BACKUP XLSX (sama dengan "Unduh backup" di aplikasi) =================
@@ -149,7 +138,7 @@ function XStyles(){
     o=o||{}; var key=JSON.stringify(o); if(cache[key]!==undefined) return cache[key];
     var f='<font>'+(o.b?'<b/>':'')+'<sz val="'+(o.sz||11)+'"/><color rgb="FF'+(o.color||'000000')+'"/><name val="Calibri"/></font>';
     var fi=idx(fonts,f), fl=0, bd=0;
-    var fc=o.fill||(o.border?'FFFFFF':''); if(fc) fl=idx(fills,'<fill><patternFill patternType="solid"><fgColor rgb="FF'+fc+'"/><bgColor indexed="64"/></patternFill></fill>');
+    if(o.fill) fl=idx(fills,'<fill><patternFill patternType="solid"><fgColor rgb="FF'+o.fill+'"/><bgColor indexed="64"/></patternFill></fill>');
     if(o.border) bd=idx(borders,BD);
     var nf=o.rp?164:0;
     var al='<alignment horizontal="'+(o.h||'left')+'" vertical="center"'+(o.wrap?' wrapText="1"':'')+'/>';
@@ -192,29 +181,26 @@ function kasXlsx(st, td) {   // -> Uint8Array berisi file .xlsx
   const MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   function ensureM(mk) { const m = st.months[mk] || (st.months[mk] = {dates: [], checks: {}, value: 2000, weekdays: [], holiday: {}}); m.dates = m.dates || []; m.checks = m.checks || {}; m.holiday = m.holiday || {}; if (!st.expenses[mk]) st.expenses[mk] = []; if (!st.manualIncome[mk]) st.manualIncome[mk] = []; return m; }
   function isChecked(m, i, d) { const c = m.checks[i] && m.checks[i][d]; return !!c && (c === true || c.on === true); }
-  function incomeForMonth(mk) { const m = st.months[mk]; let t = 0; if (m) m.dates.forEach(d => st.students.forEach((s, i) => { if (isChecked(m, i, d)) t += rateOf(m, d); })); return t + oldIncMonth(st, mk) + (st.manualIncome[mk] || []).reduce((a, e) => a + (Number(e.amount) || 0), 0); }
+  function incomeForMonth(mk) { const m = st.months[mk]; let t = 0; if (m) m.dates.forEach(d => st.students.forEach((s, i) => { if (isChecked(m, i, d)) t += rateOf(m, d); })); return t + (st.manualIncome[mk] || []).reduce((a, e) => a + (Number(e.amount) || 0), 0); }
   function expenseForMonth(mk) { return (st.expenses[mk] || []).reduce((a, e) => a + (Number(e.amount) || 0), 0); }
-  function totalKas() { let n = 0; new Set([...Object.keys(st.months), ...Object.keys(st.manualIncome), ...Object.keys(st.expenses), ...oldPayMonths(st)]).forEach(mk => { n += incomeForMonth(mk) - expenseForMonth(mk); }); return n + openingOf(st); }
+  function totalKas() { let n = 0; new Set([...Object.keys(st.months), ...Object.keys(st.manualIncome), ...Object.keys(st.expenses)]).forEach(mk => { n += incomeForMonth(mk) - expenseForMonth(mk); }); return n; }
   const MON_S = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
   function fmtDateShort(ds) { const p = String(ds || '').split('-'); return p.length < 3 ? (ds || '') : (+p[2]) + ' ' + MON_S[+p[1] - 1] + ' ' + p[0]; }
-  // ---- salinan logika buildWorkbook aplikasi (struktur sheet HARUS sama dengan file backup dari aplikasi) ----
-  var oaName = function(){ return oldName(st); }, oaBoxesOf = function(i){ return oldBoxes(st, i); };
-  var oaLbl = function(d){ var p = String(d).split('-'); return (+p[2]) + ' ' + MON_S[+p[1] - 1]; }, oaLblY = function(d){ return oaLbl(d) + ' ' + String(d).slice(0, 4); };
-  function oaPaidList(mk){ var out = []; oldPaidEach(st, function(b, at, si){ if (at.slice(0, 7) === mk) out.push({date: at, amount: b.amount, name: ((st.students[si] || {}).short || 'Absen ' + (+si + 1)) + ' (lama ' + oaLbl(b.date) + ')'}); }); return out.sort(function(x, y){ return x.date < y.date ? -1 : (x.date > y.date ? 1 : 0); }); }
+  // ---- salinan logika buildWorkbook aplikasi ----
   var X=new XStyles(), sheets=[], used={};
-  var monthKeys=new Set([...Object.keys(st.months), ...Object.keys(st.manualIncome), ...Object.keys(st.expenses), ...oldPayMonths(st)]);
+  var monthKeys=new Set([...Object.keys(st.months), ...Object.keys(st.manualIncome), ...Object.keys(st.expenses)]);
   monthKeys.add(td.slice(0,7));
   var S={
     hd:X.get({b:1,color:'FFFFFF',fill:'37474F',h:'center',border:1}), hdName:X.get({b:1,color:'FFFFFF',fill:'37474F',h:'center',border:1}),
-    hdDate:X.get({b:1,color:'FFFFFF',fill:'4A86E8',h:'center',border:1}), hdHol:X.get({b:1,color:'000000',fill:'FB6251',h:'center',border:1}),
-    no:X.get({h:'center',border:1}), name:X.get({border:1}), chk:X.get({b:1,color:'FFFFFF',fill:'263B59',h:'center',border:1}),
-    hol:X.get({b:1,sz:9,color:'000000',fill:'FB6251',h:'center',border:1}),
-    sec:X.get({b:1,color:'FFFFFF',fill:'3C78D8',border:1}), th:X.get({b:1,fill:'D9E2F3',h:'center',border:1}),
+    hdDate:X.get({b:1,color:'FFFFFF',fill:'4A86E8',h:'center',border:1}), hdHol:X.get({b:1,color:'FFFFFF',fill:'CC0000',h:'center',border:1}),
+    no:X.get({h:'center',border:1}), name:X.get({border:1}), chk:X.get({b:1,color:'1155CC',fill:'C9DAF8',h:'center',border:1}),
+    hol:X.get({b:1,sz:9,color:'CC0000',fill:'F4CCCC',h:'center',border:1}),
+    sec:X.get({b:1,color:'FFFFFF',fill:'6D9EEB',border:1}), th:X.get({b:1,fill:'D9E2F3',h:'center',border:1}),
     cell:X.get({border:1}), cellC:X.get({h:'center',border:1}), money:X.get({rp:1,h:'right',border:1}), empty:X.get({i:1,color:'757575',border:1}),
-    red:X.get({b:1,color:'000000',fill:'FB6251',border:1}), redV:X.get({b:1,color:'000000',fill:'FB6251',rp:1,h:'center',border:1})
+    red:X.get({b:1,color:'FFFFFF',fill:'E53935',border:1}), redV:X.get({b:1,color:'FFFFFF',fill:'E53935',rp:1,h:'center',border:1})
   };
   var maxName=0; (st.students||[]).forEach(function(st){ maxName=Math.max(maxName,String(st.long||st.short||'').length); });
-  var nameW=Math.min(60,Math.max(40,Math.round(maxName*1.15)+2));
+  var nameW=Math.min(60,Math.max(28,Math.round(maxName*1.15)+2));
   [...monthKeys].sort().forEach(function(mk){
     var m=ensureM(mk), ws=new XSheet(), nd=m.dates.length, last=2+Math.max(3,nd)-1;   // kolom terakhir (indeks); minimal 3 kolom tanggal agar nominal muat
     ws.cols=[6,nameW]; for(var i=0;i<Math.max(3,nd);i++) ws.cols.push(7);
@@ -235,7 +221,6 @@ function kasXlsx(st, td) {   // -> Uint8Array berisi file .xlsx
       list.forEach(function(e,k){ ws.set(r,0,k+1,S.no); ws.set(r,1,fmtDateShort(e.date)+' — '+fmt(e),S.name); ws.set(r,2,Number(e.amount)||0,S.money); for(var c=3;c<=last;c++) ws.set(r,c,'',S.money); ws.merge(r,2,r,last); r++; });
     }
     section('PEMASUKAN MANUAL',(st.manualIncome[mk]||[]),function(e){ return e.name||''; });
-    section('PEMBAYARAN '+oaName().toUpperCase(),oaPaidList(mk),function(e){ return e.name; });
     section('PENGELUARAN',(st.expenses[mk]||[]),function(e){ return e.desc||''; });
     r++;
     var inc=incomeForMonth(mk), exp=expenseForMonth(mk);
@@ -269,7 +254,6 @@ function kasXlsx(st, td) {   // -> Uint8Array berisi file .xlsx
     ws.cols=[6,24,18,18,18,22]; ws.heights[0]=24;
     ['No','Bulan','Uang Masuk','Pengeluaran','Saldo Bulan Ini','Saldo Kumulatif'].forEach(function(h,c){ ws.set(0,c,h,c===0||c===1?S.hdName:S.hdDate); });
     r=1;
-    if(Number(st.openingBalance)>0){ run=Number(st.openingBalance); ws.set(r,0,'',S.no); ws.set(r,1,'Saldo awal',S.name); ws.set(r,2,'',S.money); ws.set(r,3,'',S.money); ws.set(r,4,'',S.money); ws.set(r,5,run,S.money); r++; }
     keys.forEach(function(mk,i){
       var pt=mk.split('-'), inc=incomeForMonth(mk), exp=expenseForMonth(mk); run+=inc-exp; tin+=inc; tout+=exp;
       ws.set(r,0,i+1,S.no); ws.set(r,1,MONTH_NAMES[parseInt(pt[1])-1]+' '+pt[0],S.name);
@@ -282,37 +266,6 @@ function kasXlsx(st, td) {   // -> Uint8Array berisi file .xlsx
     });
     ws.freeze=[1,2];
     var nm='Rekap', n=2; while(used[nm]) nm='Rekap '+(n++);
-    used[nm]=1; sheets.push({name:nm, xml:ws.xml()});
-  })();
-  // ---- Sheet TUNGGAKAN LAMA: matriks nama x tanggal. Kolom = semua tanggal tunggakan (dari yang terlama).
-  //   biru kosong = bukan tanggal tunggakan siswa itu / sudah lunas sebelum pakai aplikasi; putih kosong = masih menunggak;
-  //   hijau berisi nominal = sudah dibayar lewat aplikasi ----
-  (function(){
-    var stus=[], dset={};
-    (st.students||[]).forEach(function(st,i){ var bx=oaBoxesOf(i); if(!bx.length) return; stus.push({i:i,st:st,bx:bx}); bx.forEach(function(b){ dset[b.date]=1; }); });
-    if(!stus.length) return;
-    var dates=Object.keys(dset).sort(), nc=dates.length, lastC=2+nc, yrs={}; dates.forEach(function(d){ yrs[d.slice(0,4)]=1; }); var multi=Object.keys(yrs).length>1;
-    var BL=X.get({fill:'263B59',h:'center',border:1}), GR=X.get({b:1,color:'FFFFFF',fill:'265933',rp:1,h:'right',border:1});
-    var ws=new XSheet(); ws.cols=[6,nameW]; dates.forEach(function(){ ws.cols.push(11); }); ws.cols.push(16); ws.heights[0]=24;
-    ws.set(0,0,'No',S.hd); ws.set(0,1,'Nama Siswa',S.hdName);
-    dates.forEach(function(d,j){ ws.set(0,2+j,multi?oaLblY(d):oaLbl(d),S.hdDate); }); ws.set(0,lastC,'Total Diterima',S.hd);
-    var r=1, grand=0, colTot=dates.map(function(){ return 0; });
-    stus.forEach(function(x){
-      ws.set(r,0,x.i+1,S.no); ws.set(r,1,x.st.long||x.st.short||'',S.name); var sum=0;
-      dates.forEach(function(d,j){
-        var bs=x.bx.filter(function(b){ return b.date===d; });
-        if(!bs.length){ ws.set(r,2+j,'',BL); return; }                       // bukan tanggal tunggakan siswa ini
-        var got=0, owe=0; bs.forEach(function(b){ var a=Number(b.amount)||0; if(!b.paid) owe+=a; else if(!b.paid.pre) got+=a; });
-        if(got>0){ ws.set(r,2+j,got,GR); sum+=got; colTot[j]+=got; }          // diterima lewat aplikasi: isi nominal
-        else if(owe>0) ws.set(r,2+j,'',S.cellC);                              // masih menunggak: putih kosong
-        else ws.set(r,2+j,'',BL);                                             // lunas sebelum pakai aplikasi: biru kosong
-      });
-      ws.set(r,lastC,sum,S.money); grand+=sum; r++;
-    });
-    ws.set(r,0,'TOTAL DITERIMA',S.red); ws.set(r,1,'',S.red); ws.merge(r,0,r,1);
-    dates.forEach(function(d,j){ ws.set(r,2+j,colTot[j],S.redV); }); ws.set(r,lastC,grand,S.redV); ws.heights[r]=22;
-    ws.freeze=[1,2];
-    var base=oaName().replace(/[\[\]\:\*\?\/\\]/g,' ').slice(0,28), nm=base, n=2; while(used[nm]) nm=base+' '+(n++);
     used[nm]=1; sheets.push({name:nm, xml:ws.xml()});
   })();
   // ---- Sheet _DATA (tersembunyi): salinan lengkap data untuk fitur "Restore dari file backup" di aplikasi ----
@@ -880,7 +833,7 @@ function findStudents(st, q) {
   return /^\d+$/.test(q) ? (S[+q - 1] ? [+q - 1] : []) : S.map((s, i) => i).filter(i => ((S[i].short || '') + ' ' + (S[i].long || '')).toLowerCase().includes(q));
 }
 function saldoOf(st) {
-  let n = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {}), ...oldPayMonths(st)]).forEach(x => { n += incMonth(st, x) - expMonth(st, x); }); return n + openingOf(st);
+  let n = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {})]).forEach(x => { n += incMonth(st, x) - expMonth(st, x); }); return n;
 }
 function parseAmount(s) {   // "15000", "15.000", "15k", "15rb", "1,5jt" -> angka rupiah atau null
   const m = /^(\d+(?:[.,]\d+)*)\s*(k|rb|ribu|jt|juta)?$/i.exec(String(s || '').trim()); if (!m) return null;
@@ -898,7 +851,7 @@ function payTodo(st, web, i, td) {   // tanggal tagih yang belum dicentang (tert
 }
 async function applyPending(env, roomId, link, st, web, td, mk, p) {   // menulis perubahan yang sudah dikonfirmasi
   const res = await applyPending0(env, roomId, link, st, web, td, mk, p);
-  if (/^(||)/.test(res)) await logBotChange(env, roomId, link.token, (p.t === 'bayar' ? 'Bot: centang kas ' + ((st.students[p.i] || {}).short || '') : p.t === 'bayarlama' ? 'Bot: bayar ' + oldName(st).toLowerCase() + ' ' + ((st.students[p.i] || {}).short || '') : p.t === 'saldoawal' ? 'Bot: saldo awal ' + rp(p.amt) : p.t === 'catat' ? 'Bot: pengeluaran ' + p.desc + ' ' + rp(p.amt) : 'Bot: pengumuman ' + p.title));
+  if (/^(||)/.test(res)) await logBotChange(env, roomId, link.token, (p.t === 'bayar' ? 'Bot: centang kas ' + ((st.students[p.i] || {}).short || '') : p.t === 'catat' ? 'Bot: pengeluaran ' + p.desc + ' ' + rp(p.amt) : 'Bot: pengumuman ' + p.title));
   return res;
 }
 async function applyPending0(env, roomId, link, st, web, td, mk, p) {
@@ -913,24 +866,6 @@ async function applyPending0(env, roomId, link, st, web, td, mk, p) {
     try { await kput(env, 'undo:' + roomId, {t: 'bayar', i: p.i, items: done.map(x => ({mk: x.mk, d: x.d})), at: Date.now()}, 86400); } catch (e) {}
     const paid = done.reduce((a, x) => a + x.val, 0), left = arrDetail(st, web, p.i).reduce((a, e) => a + e.amount, 0) - paid;
     return '' + (s.short || s.long) + ' (absen ' + (p.i + 1) + ') dicentang lunas:\n' + done.map(x => '• ' + dlabel(x.ds) + ' — ' + rp(x.val)).join('\n') + '\nTotal ' + rp(paid) + '\nSisa tunggakan: ' + (left > 0 ? rp(left) : 'tidak ada');
-  }
-  if (p.t === 'bayarlama') {
-    const s = st.students[p.i]; if (!s) return 'Data siswa berubah, ulangi perintahnya.';
-    const done = await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => {
-      const arr = ((((cur.state || {}).oldBoxes) || {})[p.i] || []).map(b => ({...b})), got = [];
-      arr.forEach(b => { if (p.ids.includes(b.id) && !b.paid) { b.paid = {pre: false, at: td}; got.push({id: b.id, date: b.date, amount: Number(b.amount) || 0}); } });
-      if (!got.length) return {sets: [], result: got};
-      return {sets: [[['state', 'oldBoxes', String(p.i)], arr], [['state', 'updatedAt'], Date.now()]], result: got};
-    });
-    if (!done.length) return '' + (s.short || s.long) + ' sudah tidak punya kotak itu yang belum lunas (mungkin baru saja dibayar).';
-    try { await kput(env, 'undo:' + roomId, {t: 'bayarlama', i: p.i, ids: done.map(x => x.id), at: Date.now()}, 86400); } catch (e) {}
-    const paid = done.reduce((a, x) => a + x.amount, 0), left = oldOwed(st, p.i) - paid;
-    return '' + (s.short || s.long) + ' (absen ' + (p.i + 1) + ') — ' + oldName(st).toLowerCase() + ' lunas:\n' + done.map(x => '• ' + dlabel(x.date) + ' — ' + rp(x.amount)).join('\n') + '\nTotal ' + rp(paid) + ' (pemasukan ' + dlabel(td) + ')\nSisa ' + oldName(st).toLowerCase() + ': ' + (left > 0 ? rp(left) : 'tidak ada');
-  }
-  if (p.t === 'saldoawal') {
-    await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => ({sets: [[['state', 'openingBalance'], p.amt], [['state', 'updatedAt'], Date.now()]], result: null}));
-    try { await kput(env, 'undo:' + roomId, {t: 'saldoawal', prev: openingOf(st), at: Date.now()}, 86400); } catch (e) {}
-    return 'Saldo awal kas diubah: ' + rp(openingOf(st)) + ' → ' + rp(p.amt) + '\nSaldo kas sekarang: ' + rp(saldoOf(st) - openingOf(st) + p.amt);
   }
   if (p.t === 'catat') {
     const cres = await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => {
@@ -952,7 +887,7 @@ async function applyPending0(env, roomId, link, st, web, td, mk, p) {
   }
   return 'Perubahan tidak dikenali.';
 }
-const HELP = 'Perintah:\n/tagih — teks tunggakan siap salin untuk grup\n/cek <nama/no> — tunggakan satu siswa\n/lunas — siswa yang sudah lunas\n/saldo — total kas\n/hariini — pemasukan & pengeluaran hari ini\n/bulanini — ringkasan bulan ini\n/pengeluaran — pengeluaran bulan ini\n/rekap — rekap semua bulan\n/datasiswa — data siswa lengkap (absen, NISN, nama, tanggal lahir)\n/ulangtahun — ulang tahun 30 hari ke depan (pengingat otomatis H-1)\n/cari <nama/no> — riwayat pembayaran satu siswa\n/batassaldo <jumlah|off> — peringatan saldo menipis\n/undo — batalkan perubahan bot terakhir (24 jam)\n/backup — kirim file backup ke sini + simpan ke Drive\n/tunggakan10 — 10 tunggakan terbesar\n/kembalian — kembalian yang belum diberikan\n/bayar <nama/no> [jumlah tanggal] — centang kas siswa\n/tunggakanlama — daftar tunggakan lama (nama sesuai aplikasi)\n/bayarlama <nama/no> [jumlah tanggal] — terima bayaran tunggakan lama\n/saldoawal [jumlah] — lihat / atur saldo awal kas\n/catat <jumlah> <keterangan> [#kategori] — catat pengeluaran\n/lapor <isi> — laporkan masalah ke developer\n/kategori — pengeluaran bulan ini per kategori\n/pengumuman <isi> — pasang pengumuman di website\n(perintah yang mengubah data minta konfirmasi: /ya untuk menyimpan, /batal untuk membatalkan)\n/perubahan — perubahan dari website yang menunggu\n/yes [nomor|semua] — konfirmasi perubahan website\n/no [nomor|semua] — tolak perubahan website\n/laporan — laporan dari anggota\n/komentar — komentar terbaru\n/online — yang login website hari ini\n/jadwal [besok|hari ini|senin..] — jadwal pelajaran\n/tugas — tugas yang belum selesai (dari aplikasi Tugas)\n/pengumuman — pengumuman aktif\n/pengingat — hidup/matikan pengingat otomatis\n/hidup — nyalakan notifikasi anggota yang login (aplikasi/website)\n/mati — matikan notifikasi anggota yang login\n/logout — putuskan bot dari ruang ini';
+const HELP = 'Perintah:\n/tagih — teks tunggakan siap salin untuk grup\n/cek <nama/no> — tunggakan satu siswa\n/lunas — siswa yang sudah lunas\n/saldo — total kas\n/hariini — pemasukan & pengeluaran hari ini\n/bulanini — ringkasan bulan ini\n/pengeluaran — pengeluaran bulan ini\n/rekap — rekap semua bulan\n/datasiswa — data siswa lengkap (absen, NISN, nama, tanggal lahir)\n/ulangtahun — ulang tahun 30 hari ke depan (pengingat otomatis H-1)\n/cari <nama/no> — riwayat pembayaran satu siswa\n/batassaldo <jumlah|off> — peringatan saldo menipis\n/undo — batalkan perubahan bot terakhir (24 jam)\n/backup — kirim file backup ke sini + simpan ke Drive\n/tunggakan10 — 10 tunggakan terbesar\n/kembalian — kembalian yang belum diberikan\n/bayar <nama/no> [jumlah tanggal] — centang kas siswa\n/catat <jumlah> <keterangan> [#kategori] — catat pengeluaran\n/lapor <isi> — laporkan masalah ke developer\n/kategori — pengeluaran bulan ini per kategori\n/pengumuman <isi> — pasang pengumuman di website\n(ketiganya minta konfirmasi: /ya untuk menyimpan, /batal untuk membatalkan)\n/perubahan — perubahan dari website yang menunggu\n/yes [nomor|semua] — konfirmasi perubahan website\n/no [nomor|semua] — tolak perubahan website\n/laporan — laporan dari anggota\n/komentar — komentar terbaru\n/online — yang login website hari ini\n/jadwal [besok|hari ini|senin..] — jadwal pelajaran\n/tugas — tugas yang belum selesai (dari aplikasi Tugas)\n/pengumuman — pengumuman aktif\n/pengingat — hidup/matikan pengingat otomatis\n/hidup — nyalakan notifikasi anggota yang login (aplikasi/website)\n/mati — matikan notifikasi anggota yang login\n/logout — putuskan bot dari ruang ini';
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 async function command(env, cmd, args, roomId, link) {
   if (cmd === '/start' || cmd === '/bantuan' || cmd === '/help') return HELP;
@@ -1012,28 +947,6 @@ async function command(env, cmd, args, roomId, link) {
     if (!pick.length) return '' + (s.short || s.long) + ' tidak punya tanggal yang belum dicentang.' + (arrDetail(st, web, i).length ? '\nAda tunggakan tambahan/manual, atur lewat aplikasi atau website.' : '');
     return ask({t: 'bayar', i, cnt}, 'Centang lunas untuk ' + (s.short || s.long) + ' (absen ' + (i + 1) + ')?\n' + pick.map(x => '• ' + dlabel(x.ds) + ' — ' + rp(x.val)).join('\n') + '\nTotal ' + rp(pick.reduce((a, x) => a + x.val, 0)));
   }
-  if (cmd === '/tunggakanlama') {
-    const nm = oldName(st), rows = (st.students || []).map((s, i) => ({no: i + 1, name: s.short || s.long || ('Absen ' + (i + 1)), n: oldOpen(st, i).length, v: oldOwed(st, i)})).filter(x => x.v > 0);
-    if (!rows.length) return (st.oldBoxes && Object.keys(st.oldBoxes).length ? nm + ': semua sudah lunas.' : 'Belum ada data ' + nm.toLowerCase() + '. Atur lewat aplikasi: menu ☰ > Tunggakan Lama.');
-    return nm + ' per ' + dlabel(td) + '\n\n' + rows.map(x => x.name + ' ' + arrFmt(x.v) + ' (' + x.n + ' tgl)').join('\n') + '\n\nTotal ' + rp(rows.reduce((a, x) => a + x.v, 0)) + ' (' + rows.length + ' siswa)';
-  }
-  if (cmd === '/bayarlama') {
-    const nm = oldName(st), parts = (args || '').trim().split(/\s+/).filter(Boolean); let cnt = 1;
-    if (parts.length > 1 && /^\d+$/.test(parts[parts.length - 1])) cnt = Math.min(20, Math.max(1, +parts.pop()));
-    const q = parts.join(' ').toLowerCase(); if (!q) return 'Terima bayaran ' + nm.toLowerCase() + ', contoh:\n/bayarlama fadil\n/bayarlama fadil 2  (dua tanggal tertua sekaligus)';
-    if (isClosedMk(st, mk)) return 'Bulan ' + monthName(mk) + ' sudah ditutup buku. Buka kunci dulu lewat aplikasi.';
-    const hits = findStudents(st, q); if (!hits.length) return 'Siswa "' + parts.join(' ') + '" tidak ditemukan.';
-    if (hits.length > 1) return 'Ada beberapa siswa cocok, tulis lebih lengkap atau pakai nomor:\n' + hits.map(i => (i + 1) + '. ' + (st.students[i].short || st.students[i].long)).join('\n');
-    const i = hits[0], s = st.students[i], pick = oldOpen(st, i).slice(0, cnt);
-    if (!pick.length) return '' + (s.short || s.long) + ' tidak punya ' + nm.toLowerCase() + '.';
-    return ask({t: 'bayarlama', i, ids: pick.map(b => b.id)}, 'Terima bayaran ' + nm.toLowerCase() + ' ' + (s.short || s.long) + ' (absen ' + (i + 1) + ')?\n' + pick.map(b => '• ' + dlabel(b.date) + ' — ' + rp(b.amount)).join('\n') + '\nTotal ' + rp(pick.reduce((a, b) => a + (Number(b.amount) || 0), 0)) + ' (masuk pemasukan hari ini)');
-  }
-  if (cmd === '/saldoawal') {
-    const a = String(args || '').trim().toLowerCase(), cur = openingOf(st);
-    if (!a) return 'Saldo awal kas: ' + (cur ? rp(cur) : 'belum diatur') + '\nUang yang sudah ada saat kelas mulai memakai aplikasi. Ikut dihitung di saldo, bukan pemasukan bulan ini.\nAtur: /saldoawal 350000 (atau 350rb)   Hapus: /saldoawal 0';
-    const n = (a === '0' || a === 'off') ? 0 : parseAmount(a); if (n === null) return 'Format: /saldoawal 350000';
-    return ask({t: 'saldoawal', amt: n}, 'Ubah saldo awal kas?\n' + rp(cur) + ' → ' + rp(n) + '\nSaldo kas jadi ' + rp(saldoOf(st) - cur + n));
-  }
   if (cmd === '/catat') {
     const m = /^(\S+)\s*([\s\S]*)$/.exec((args || '').trim()), amt = m && parseAmount(m[1]);
     if (!amt) return 'Format: /catat <jumlah> <keterangan>\nContoh: /catat 15000 fotokopi   atau   /catat 15rb fotokopi #atk';
@@ -1075,7 +988,7 @@ async function command(env, cmd, args, roomId, link) {
     return '' + (s.long || s.short) + ' (absen ' + (i + 1) + ')\n' + (lines.length ? lines.join('\n') : 'Belum ada data kas.') + '\n\nTotal sudah dibayar (semua bulan): ' + rp(H.reduce((a, h) => a + h.tot, 0)) + '\nTunggakan sekarang: ' + (left > 0 ? rp(left) : 'tidak ada');
   }
   if (cmd === '/undo') {
-    const u = await kget(env, 'undo:' + roomId); if (!u) return 'Tidak ada perubahan bot yang bisa dibatalkan (hanya 24 jam terakhir, satu perubahan terakhir dari /bayar, /bayarlama, /saldoawal, /catat, atau /pengumuman).';
+    const u = await kget(env, 'undo:' + roomId); if (!u) return 'Tidak ada perubahan bot yang bisa dibatalkan (hanya 24 jam terakhir, satu perubahan terakhir dari /bayar, /catat, atau /pengumuman).';
     if (u.t === 'bayar') {
       await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => ({sets: [...u.items.map(x => [['state', 'months', x.mk, 'checks', String(u.i), String(x.d)], DEL]), [['state', 'updatedAt'], Date.now()]], result: null}));
       await env.KV.delete('undo:' + roomId); await logBotChange(env, roomId, link.token, 'Bot: batalkan centang kas ' + ((st.students[u.i] || {}).short || '')); return 'Dibatalkan: centang kas ' + ((st.students[u.i] || {}).short || '') + ' (' + u.items.length + ' tanggal).';
@@ -1084,14 +997,6 @@ async function command(env, cmd, args, roomId, link) {
       const ok = await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => { const list = (((cur.state || {}).expenses || {})[u.mk] || []).slice(); let k = -1; for (let j = list.length - 1; j >= 0; j--) if (list[j].date === u.date && list[j].desc === u.desc && Number(list[j].amount) === u.amt) { k = j; break; } if (k < 0) return {sets: [], result: false}; list.splice(k, 1); return {sets: [[['state', 'expenses', u.mk], list], [['state', 'updatedAt'], Date.now()]], result: true}; });
       await env.KV.delete('undo:' + roomId); if (ok) await logBotChange(env, roomId, link.token, 'Bot: batalkan pengeluaran ' + u.desc + ' ' + rp(u.amt));
       return ok ? 'Dibatalkan: pengeluaran ' + u.desc + ' — ' + rp(u.amt) : 'Catatan pengeluaran itu sudah tidak ditemukan (mungkin sudah diubah/dihapus di aplikasi).';
-    }
-    if (u.t === 'bayarlama') {
-      await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => { const arr = ((((cur.state || {}).oldBoxes) || {})[u.i] || []).map(b => { const c = {...b}; if (u.ids.includes(c.id)) delete c.paid; return c; }); return {sets: [[['state', 'oldBoxes', String(u.i)], arr], [['state', 'updatedAt'], Date.now()]], result: null}; });
-      await env.KV.delete('undo:' + roomId); await logBotChange(env, roomId, link.token, 'Bot: batalkan bayar ' + oldName(st).toLowerCase() + ' ' + ((st.students[u.i] || {}).short || '')); return 'Dibatalkan: ' + oldName(st).toLowerCase() + ' ' + ((st.students[u.i] || {}).short || '') + ' (' + u.ids.length + ' tanggal) kembali menunggak.';
-    }
-    if (u.t === 'saldoawal') {
-      await fsUpdate(env, roomId, link.token, 'kas/' + roomId, cur => ({sets: [[['state', 'openingBalance'], u.prev], [['state', 'updatedAt'], Date.now()]], result: null}));
-      await env.KV.delete('undo:' + roomId); return 'Dibatalkan: saldo awal kembali ' + rp(u.prev) + '.';
     }
     if (u.t === 'pengumuman') {
       await fsUpdate(env, roomId, link.token, 'website/' + roomId, cur => ({sets: [[['announcements'], (cur.announcements || []).filter(a => a.id !== u.id)]], result: null}));
@@ -1109,12 +1014,7 @@ async function command(env, cmd, args, roomId, link) {
     if (hits.length > 1) return 'Ada beberapa siswa cocok, tulis lebih lengkap atau pakai nomor:\n' + hits.map(i => (i + 1) + '. ' + (S[i].short || S[i].long)).join('\n');
     const i = hits[0], s = S[i], d = arrDetail(st, web, i), tot = d.reduce((a, e) => a + e.amount, 0);
     let out = '' + (s.short || s.long) + ' (absen ' + (i + 1) + ')\n';
-    const oo = oldOpen(st, i), ot = oldOwed(st, i);
-    if (!oo.length) out += d.length ? '\nTunggakan:\n' + d.map(e => '• ' + dlabel(e.date) + ' — ' + rp(e.amount) + (e.note ? ' (' + e.note + ')' : '')).join('\n') + '\n\nTotal ' + rp(tot) : '\nLunas, tidak ada tunggakan.';
-    else {
-      out += '\nTunggakan bulan ini:\n' + (d.length ? d.map(e => '• ' + dlabel(e.date) + ' — ' + rp(e.amount) + (e.note ? ' (' + e.note + ')' : '')).join('\n') + '\nSubtotal ' + rp(tot) : 'Lunas');
-      out += '\n\n' + oldName(st) + ':\n' + oo.map(b => '• ' + dlabel(b.date) + ' — ' + rp(b.amount)).join('\n') + '\nSubtotal ' + rp(ot) + '\n\nTOTAL TUNGGAKAN ' + rp(tot + ot);
-    }
+    out += d.length ? '\nTunggakan:\n' + d.map(e => '• ' + dlabel(e.date) + ' — ' + rp(e.amount) + (e.note ? ' (' + e.note + ')' : '')).join('\n') + '\n\nTotal ' + rp(tot) : '\nLunas, tidak ada tunggakan.';
     if (s.pendingChange > 0) out += '\nKembalian belum diberikan: ' + rp(s.pendingChange);
     return out;
   }
@@ -1124,8 +1024,8 @@ async function command(env, cmd, args, roomId, link) {
   }
   if (cmd === '/datasiswa') return 'Data siswa ' + (st.appTitle || '') + ' (' + (st.students || []).length + ')\n\n' + siswaList(st);
   if (cmd === '/saldo') {
-    let inc = 0, exp = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {}), ...oldPayMonths(st)]).forEach(k => { inc += incMonth(st, k); exp += expMonth(st, k); });
-    return 'Kas ' + title + '\nSaldo: ' + rp(inc - exp + openingOf(st)) + (openingOf(st) ? ' (sudah termasuk saldo awal ' + rp(openingOf(st)) + ')' : '') + '\nTotal pemasukan: ' + rp(inc) + '\nTotal pengeluaran: ' + rp(exp);
+    let inc = 0, exp = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {})]).forEach(k => { inc += incMonth(st, k); exp += expMonth(st, k); });
+    return 'Kas ' + title + '\nSaldo: ' + rp(inc - exp) + '\nTotal pemasukan: ' + rp(inc) + '\nTotal pengeluaran: ' + rp(exp);
   }
   if (cmd === '/hariini') {
     const a = incToday(st, td), e = ((st.expenses && st.expenses[mk]) || []).filter(x => x.date === td);
@@ -1142,9 +1042,9 @@ async function command(env, cmd, args, roomId, link) {
     return (L.length ? 'Pengeluaran per kategori — ' + monthName(mk) + '\n\n' + L.map(k => '• ' + k + ': ' + rp(t[k])).join('\n') + '\n\nTotal ' + rp(expMonth(st, mk)) : 'Belum ada pengeluaran bulan ini.') + '\n\nKategori tersedia: ' + catsOf(st).map(c => '#' + c.replace(/\s+/g, '_')).join(' ') + '\nContoh: /catat 15rb fotokopi #atk';
   }
   if (cmd === '/rekap') {
-    const ks = [...new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {}), ...oldPayMonths(st)])].sort();
+    const ks = [...new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {})])].sort();
     let ti = 0, tx = 0; const lines = ks.map(k => { const i = incMonth(st, k), x = expMonth(st, k); ti += i; tx += x; return monthName(k) + '\n  masuk ' + rp(i) + ' · keluar ' + rp(x) + ' · selisih ' + rp(i - x); });
-    return 'Rekap ' + title + '\n\n' + (openingOf(st) ? 'Saldo awal ' + rp(openingOf(st)) + '\n\n' : '') + lines.join('\n') + '\n\nSaldo: ' + rp(ti - tx + openingOf(st));
+    return 'Rekap ' + title + '\n\n' + lines.join('\n') + '\n\nSaldo: ' + rp(ti - tx);
   }
   if (cmd === '/laporan') {
     const r = (web.reports || []).slice(-10).reverse();
@@ -1180,8 +1080,7 @@ const monthName = mk => { const p = mk.split('-'); return MON[+p[1] - 1] + ' ' +
 function tagihText(st, web, td) {
   const r = arrears(st, web).filter(x => x.total > 0), sum = r.reduce((a, x) => a + x.total, 0);
   if (!r.length) return 'Tidak ada tunggakan per ' + dlabel(td) + '. Semua siswa lunas.';
-  const lm = r.reduce((a, x) => a + (x.lama || 0), 0);
-  return 'Tunggakan kas per ' + dlabel(td) + '\n\n' + r.map(x => x.name + ' ' + arrFmt(x.total)).join('\n') + '\n\nTotal ' + rp(sum) + ' (' + r.length + ' siswa)' + (lm ? '\n(termasuk ' + oldName(st).toLowerCase() + ' ' + rp(lm) + ')' : '');
+  return 'Tunggakan kas per ' + dlabel(td) + '\n\n' + r.map(x => x.name + ' ' + arrFmt(x.total)).join('\n') + '\n\nTotal ' + rp(sum) + ' (' + r.length + ' siswa)';
 }
 async function handle(env, chat, m, text) {
   const cmd = text.startsWith('/') ? text.split(/[\s@]/)[0].toLowerCase() : '', args = text.startsWith('/') ? text.replace(/^\S+\s*/, '') : '';
@@ -1504,8 +1403,8 @@ export default {
       try {
         const {state: st, web} = await load(env, roomId), msgs = [];
         if (isTagihDay(st, td)) msgs.push('Hari ini hari tagih kas.\n\n' + tagihText(st, web, td));
-        if (wd === 0) { let inc = 0, exp = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {}), ...oldPayMonths(st)]).forEach(x => { inc += incMonth(st, x); exp += expMonth(st, x); });
-          const rows = arrears(st, web).filter(x => x.total > 0); msgs.push('Ringkasan mingguan ' + (st.appTitle || 'Kas Kelas') + '\nSaldo: ' + rp(inc - exp + openingOf(st)) + '\nTunggakan: ' + rows.length + ' siswa, total ' + rp(rows.reduce((a, x) => a + x.total, 0))); }
+        if (wd === 0) { let inc = 0, exp = 0; new Set([...Object.keys(st.months || {}), ...Object.keys(st.manualIncome || {}), ...Object.keys(st.expenses || {})]).forEach(x => { inc += incMonth(st, x); exp += expMonth(st, x); });
+          const rows = arrears(st, web).filter(x => x.total > 0); msgs.push('Ringkasan mingguan ' + (st.appTitle || 'Kas Kelas') + '\nSaldo: ' + rp(inc - exp) + '\nTunggakan: ' + rows.length + ' siswa, total ' + rp(rows.reduce((a, x) => a + x.total, 0))); }
         const bd = birthdayList(st, td, 1).filter(x => x.left === 1); if (bd.length) msgs.push('Besok ulang tahun: ' + bd.map(x => x.name).join(', ') + ' (' + dlabel(bd[0].ds) + ')');
         const lw = await lowBalanceCheck(env, roomId, st); if (lw) { const lastW = await kget(env, 'lbw:' + roomId); if (!lastW || Date.now() - lastW > 3 * 86400e3) { msgs.push(lw); await kput(env, 'lbw:' + roomId, Date.now()); } }
         const abc = await kget(env, 'ab:' + roomId), abl = await kget(env, 'abl:' + roomId);
@@ -1533,7 +1432,7 @@ export default {
     if (req.method === 'GET' && url.pathname === '/setup') {   // buka sekali: /setup?key=SECRET untuk mendaftarkan webhook & menu perintah
       if (!safeEq(url.searchParams.get('key'), env.SECRET)) return new Response('denied', {status: 403});
       const a = await (await tg(env, 'setWebhook', {url: url.origin + '/', secret_token: env.SECRET, allowed_updates: ['message']})).text();
-      await tg(env, 'setMyCommands', {commands: [['start','Mulai / hubungkan ke token admin'],['perubahan','Perubahan website yang menunggu'],['yes','Konfirmasi perubahan website'],['no','Tolak perubahan website'],['tagih','Teks tunggakan siap salin'],['cek','Tunggakan satu siswa'],['lunas','Siswa yang sudah lunas'],['datasiswa','Data siswa lengkap (absen, NISN, nama, tgl lahir)'],['ulangtahun','Ulang tahun 30 hari ke depan'],['cari','Riwayat pembayaran satu siswa'],['batassaldo','Peringatan saldo menipis'],['undo','Batalkan perubahan bot terakhir'],['saldo','Saldo kas'],['hariini','Pemasukan & pengeluaran hari ini'],['bulanini','Ringkasan bulan ini'],['pengeluaran','Pengeluaran bulan ini'],['rekap','Rekap semua bulan'],['backup','Kirim file backup + simpan ke Drive'],['tunggakan10','10 tunggakan terbesar'],['kembalian','Kembalian yang belum diberikan'],['bayar','Centang kas siswa: /bayar nama'],['tunggakanlama','Daftar tunggakan lama'],['bayarlama','Terima bayaran tunggakan lama: /bayarlama nama'],['saldoawal','Lihat / atur saldo awal kas'],['catat','Catat pengeluaran: /catat 15000 ket #kategori'],['kategori','Pengeluaran per kategori bulan ini'],['lapor','Laporkan masalah ke developer: /lapor isi'],['pengumuman','Lihat / pasang pengumuman website'],['ya','Konfirmasi perubahan yang menunggu'],['batal','Batalkan perubahan yang menunggu'],['laporan','Laporan dari anggota'],['komentar','Komentar terbaru'],['online','Login website hari ini'],['jadwal','Jadwal pelajaran'],['pengingat','Hidup/matikan pengingat otomatis'],['hidup','Nyalakan notifikasi anggota login'],['mati','Matikan notifikasi anggota login'],['bantuan','Daftar perintah'],['logout','Putuskan bot dari ruang ini']].map(c => ({command: c[0], description: c[1]}))});
+      await tg(env, 'setMyCommands', {commands: [['start','Mulai / hubungkan ke token admin'],['perubahan','Perubahan website yang menunggu'],['yes','Konfirmasi perubahan website'],['no','Tolak perubahan website'],['tagih','Teks tunggakan siap salin'],['cek','Tunggakan satu siswa'],['lunas','Siswa yang sudah lunas'],['datasiswa','Data siswa lengkap (absen, NISN, nama, tgl lahir)'],['ulangtahun','Ulang tahun 30 hari ke depan'],['cari','Riwayat pembayaran satu siswa'],['batassaldo','Peringatan saldo menipis'],['undo','Batalkan perubahan bot terakhir'],['saldo','Saldo kas'],['hariini','Pemasukan & pengeluaran hari ini'],['bulanini','Ringkasan bulan ini'],['pengeluaran','Pengeluaran bulan ini'],['rekap','Rekap semua bulan'],['backup','Kirim file backup + simpan ke Drive'],['tunggakan10','10 tunggakan terbesar'],['kembalian','Kembalian yang belum diberikan'],['bayar','Centang kas siswa: /bayar nama'],['catat','Catat pengeluaran: /catat 15000 ket #kategori'],['kategori','Pengeluaran per kategori bulan ini'],['lapor','Laporkan masalah ke developer: /lapor isi'],['pengumuman','Lihat / pasang pengumuman website'],['ya','Konfirmasi perubahan yang menunggu'],['batal','Batalkan perubahan yang menunggu'],['laporan','Laporan dari anggota'],['komentar','Komentar terbaru'],['online','Login website hari ini'],['jadwal','Jadwal pelajaran'],['pengingat','Hidup/matikan pengingat otomatis'],['hidup','Nyalakan notifikasi anggota login'],['mati','Matikan notifikasi anggota login'],['bantuan','Daftar perintah'],['logout','Putuskan bot dari ruang ini']].map(c => ({command: c[0], description: c[1]}))});
       let dv = '';
       if (env.DEV_BOT_TOKEN) {   // bot developer (kedua)
         dv = ' | Bot developer: ' + await (await dtg(env, 'setWebhook', {url: url.origin + '/dev', secret_token: env.SECRET, allowed_updates: ['message']})).text();
