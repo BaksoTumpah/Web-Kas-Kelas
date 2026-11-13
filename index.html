@@ -441,6 +441,8 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 .listrow:last-child{border-bottom:none;}
 
 .sitefooter{max-width:520px;margin:0 auto;padding:var(--s2) var(--s5) calc(120px + env(safe-area-inset-bottom,0px));text-align:center;border-top:1px solid var(--line);margin-top:var(--s2);}
+.wm{text-align:center;font-size:11.5px;letter-spacing:.06em;color:var(--sub);opacity:.75;margin-top:var(--s3);user-select:none;}
+.gate-footer + .wm{margin-top:var(--s4);}
 .sitefooter .vis{font-size:13px;color:var(--sub);padding-top:var(--s4);}
 .stars{display:flex;justify-content:center;gap:var(--s1);margin-top:var(--s2);}
 .stars button{background:none;border:none;font-size:30px;cursor:pointer;color:var(--line-2);padding:2px 5px;line-height:1;min-height:0;}
@@ -739,6 +741,7 @@ img{-webkit-user-drag:none;}
     <button class="btn primary gate-btn" onclick="doLogin()">Login</button>
     </div><div id="loginOffOverlay" onclick="loginOffWarn()" style="display:none;position:absolute;inset:0;z-index:5;cursor:not-allowed;"></div></div>
     <p class="gate-footer">Nama/absen/NISN/NIS harus sudah terdaftar oleh admin dan cocok dengan token yang dipakai.</p>
+    <div class="wm">Website by fadilahh</div>
   </div>
 </div>
 
@@ -934,6 +937,7 @@ img{-webkit-user-drag:none;}
 
 <div class="sitefooter" id="siteFooter">
   <div class="vis" id="visitorText"></div>
+  <div class="wm">Website by fadilahh</div>
 </div>
 </div>
 
