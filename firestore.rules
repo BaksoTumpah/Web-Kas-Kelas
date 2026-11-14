@@ -15,6 +15,14 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/config/dev).data.uid == request.auth.uid;
     }
 
+    // Akun LAYANAN Worker Cloudflare (bot Telegram): akun email/password khusus, uid-nya dicatat developer di config/worker.
+    // Hanya akun itu (selain developer) yang boleh MEMBACA data kelas tanpa memegang token (dipakai bot & verifikasi login di server).
+    function isWorker() {
+      return isPasswordUser()
+        && exists(/databases/$(database)/documents/config/worker)
+        && get(/databases/$(database)/documents/config/worker).data.uid == request.auth.uid;
+    }
+
     // Batas panjang teks opsional (mencegah dokumen raksasa dari klien tak dikenal / bot).
     function okStr(d, k, n) { return !(k in d) || (d[k] is string && d[k].size() <= n); }
 
@@ -60,6 +68,18 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/tokens/$(memberToken())).data.role in ['editor', 'staff'];
     }
 
+    // Membaca data kelas: HANYA pemegang token kelas itu (atau akun layanan Worker). Mengetahui roomId saja tidak cukup.
+    function canRead(room) {
+      return notBlocked() && (isMemberOf(room) || isWorker());
+    }
+    // Aplikasi versi baru menandai dokumen kas dengan sec=2 (data identitas siswa dipisah ke roster/).
+    // Developer bisa memaksa semua penulisan memakai format baru dengan config/app.requireSec = true.
+    function secOk() {
+      return !(exists(/databases/$(database)/documents/config/app)
+               && get(/databases/$(database)/documents/config/app).data.get('requireSec', false) == true)
+        || request.resource.data.get('sec', 0) == 2;
+    }
+
     // Dokumen "pemilik developer": dibuat sekali oleh akun developer pertama, hanya bisa diubah oleh pemiliknya.
     match /config/dev {
       allow get: if isPasswordUser();
@@ -68,6 +88,10 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/config/dev);
       allow update: if isDev() && request.resource.data.uid == request.auth.uid;
       allow delete: if false;
+    }
+
+    match /config/worker {
+      allow read, write: if isDev();
     }
 
     // Pengaturan bersama (Mode Perbaikan, versi & link update APK): dibaca semua perangkat, diubah hanya developer.
@@ -99,12 +123,14 @@ service cloud.firestore {
       allow create: if notBlocked() && maintenanceOff()
         && request.resource.data.keys().hasOnly(['roomId', 'role', 'peers'])
         && request.resource.data.role in ['editor', 'viewer']
-        && (!('peers' in request.resource.data) || request.resource.data.peers is map)
+        && request.resource.data.roomId is string && request.resource.data.roomId.size() >= 4 && request.resource.data.roomId.size() <= 60
+        && (!('peers' in request.resource.data) || (request.resource.data.peers is map && request.resource.data.peers.size() <= 20))
         && !exists(/databases/$(database)/documents/kas/$(request.resource.data.roomId));
       allow create: if notBlocked() && maintenanceOff()
         && request.resource.data.keys().hasOnly(['roomId', 'role', 'peers'])
         && request.resource.data.role in ['editor', 'viewer']
-        && (!('peers' in request.resource.data) || request.resource.data.peers is map)
+        && request.resource.data.roomId is string && request.resource.data.roomId.size() >= 4 && request.resource.data.roomId.size() <= 60
+        && (!('peers' in request.resource.data) || (request.resource.data.peers is map && request.resource.data.peers.size() <= 20))
         && isEditorOf(request.resource.data.roomId);
       allow update: if notBlocked() && maintenanceOff()
         && isEditorOf(resource.data.roomId)
@@ -116,8 +142,8 @@ service cloud.firestore {
     // DATA KAS (dari aplikasi): dibaca semua yang login, ditulis hanya Editor kelas itu.
     match /kas/{roomId} {
       allow read, write: if isDev();
-      allow get: if notBlocked();
-      allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId);
+      allow get: if canRead(roomId);
+      allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId) && secOk();
 
       // RIWAYAT PERUBAHAN KEUANGAN: perubahan dari website menunggu konfirmasi di aplikasi (status 'pending'),
       // perubahan dari aplikasi/bot dicatat sebagai 'applied'. Anggota membaca, Editor menulis.
@@ -128,18 +154,34 @@ service cloud.firestore {
       }
     }
 
+    // IDENTITAS SISWA (NISN, NIS, tanggal lahir): dipisah dari data kas supaya TIDAK terbaca anggota biasa.
+    // Hanya Editor kelas itu dan akun layanan Worker yang boleh membaca; hanya Editor yang menulis.
+    match /roster/{roomId} {
+      allow read, write: if isDev();
+      allow get: if notBlocked() && (isEditorOf(roomId) || isWorker());
+      allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId)
+        && request.resource.data.keys().hasOnly(['pii', 'ts'])
+        && request.resource.data.pii is list && request.resource.data.pii.size() <= 300
+        && request.resource.data.ts is number;
+    }
+
     // DATA WEBSITE (pengumuman, kontak, jadwal, laporan, rating, dll): ditulis pemegang token mana pun milik kelas itu.
     match /website/{roomId} {
       allow read, write: if isDev();
-      allow get: if notBlocked();
-      allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
+      allow get: if canRead(roomId);
+      // Pemegang token biasa (siswa) HANYA boleh mengubah profilnya, rating, dan catatan kunjungan.
+      // Pengumuman, jadwal, tugas, kontak, laporan, tunggakan, dll hanya Editor / Admin Kelas.
+      allow create: if notBlocked() && maintenanceOff() && isMemberOf(roomId)
+        && (isStaffOf(roomId) || request.resource.data.keys().hasOnly(['profiles', 'visitors', 'ratings', 'loginLogs']));
+      allow update: if notBlocked() && maintenanceOff() && isMemberOf(roomId)
+        && (isStaffOf(roomId) || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profiles', 'visitors', 'ratings', 'loginLogs']));
 
       // GALERI BERSAMA: tiap foto satu dokumen terpisah.
       // Permintaan HAPUS biasa tidak membawa data, sehingga menghapus dilakukan dua langkah:
       // (1) update menandai deleted=true + mengosongkan foto, (2) hapus dokumen sisa (hanya kalau sudah deleted).
       match /gallery/{photoId} {
         allow read, write: if isDev();
-        allow get, list: if notBlocked();
+        allow get, list: if canRead(roomId);
         allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
         allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
       }
@@ -147,7 +189,7 @@ service cloud.firestore {
       // ALBUM GALERI: nama + sampul album. Hanya Editor/Admin Kelas yang boleh membuat, mengubah, dan menghapus.
       match /albums/{aid} {
         allow read, write: if isDev();
-        allow get, list: if notBlocked();
+        allow get, list: if canRead(roomId);
         allow create, update, delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
       }
 
@@ -156,7 +198,7 @@ service cloud.firestore {
       // Penanda isAdmin=true hanya sah jika penulisnya memegang token Editor kelas ini.
       match /comments/{cid} {
         allow read, write: if isDev();
-        allow get, list: if notBlocked();
+        allow get, list: if canRead(roomId);
         allow create: if notBlocked() && maintenanceOff() && isMemberOf(roomId)
           && request.resource.data.keys().hasAll(['uid','absen','name','text','ts','isAdmin'])
           && request.resource.data.keys().hasOnly(['uid','absen','name','text','ts','isAdmin','mentions','replyTo','replyAbsen','replyName','replyText'])
@@ -176,7 +218,7 @@ service cloud.firestore {
       // FOTO PROFIL per siswa: satu dokumen per absen, aturan hapus sama seperti galeri.
       match /photos/{absen} {
         allow read, write: if isDev();
-        allow get: if notBlocked();
+        allow get: if canRead(roomId);
         allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
         allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
       }

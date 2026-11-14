@@ -1312,10 +1312,10 @@ function tgNotify(type, d){
   }catch(e){}
 }
 function tgSend(text, room, type){
-  try{ if(!TG_RELAY_URL || !room) return; fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,r:String(room),y:type||'',t:String(text).slice(0,500)})}).catch(function(){}); }catch(e){}
+  try{ if(!TG_RELAY_URL || !room) return; fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,tk:(session&&session.token)||'',r:String(room),y:type||'',t:String(text).slice(0,500)})}).catch(function(){}); }catch(e){}
 }
 function tgDev(text, room, type){   // kabar untuk bot developer (semua kelas masuk ke satu chat developer)
-  try{ if(!TG_RELAY_URL) return; fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,d:true,r:room?String(room):'',y:type||'',t:String(text).slice(0,500)})}).catch(function(){}); }catch(e){}
+  try{ if(!TG_RELAY_URL) return; fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,tk:(session&&session.token)||'',d:true,r:room?String(room):'',y:type||'',t:String(text).slice(0,500)})}).catch(function(){}); }catch(e){}
 }
 function tgWhen(){ return new Date().toLocaleString('id-ID',{timeZone:'Asia/Makassar',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace('.',':')+' WITA'; }
 async function ktLog(type, f){
@@ -1436,7 +1436,7 @@ async function ktCheckVersion(){
 }
 
 /* ---------- PERBARUI TOKEN (admin): token baru menggantikan token lama; data kelas TIDAK disentuh ---------- */
-function ktRandToken(){ const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; return Array.from({length:8},()=>A[Math.floor(Math.random()*A.length)]).join(''); }
+function ktRandToken(){ const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', a=new Uint8Array(10); crypto.getRandomValues(a); return Array.from(a,x=>A[x%32]).join(''); }
 let ktTokUnsub=null, ktTokName='';
 function ktStopTokenWatch(){ if(ktTokUnsub){ try{ ktTokUnsub(); }catch(e){} ktTokUnsub=null; } ktTokName=''; }
 // Pantau token yang sedang dipakai: kalau diganti/dihapus (admin/developer), perangkat ini otomatis keluar.
@@ -1670,12 +1670,13 @@ async function dvOpenRoom(id){ dvScreen='room'; dvRoomId=id; dvRender(); ktLog('
 async function dvRefresh(){ await dvReload(); dvToast('Data dimuat ulang.'); }
 
 async function dvLoadAll(){
-  const [tk,kas,web]=await Promise.all([fbDb.collection('tokens').get(), fbDb.collection('kas').get(), fbDb.collection('website').get()]);
+  const [tk,kas,web,ros]=await Promise.all([fbDb.collection('tokens').get(), fbDb.collection('kas').get(), fbDb.collection('website').get(), fbDb.collection('roster').get().catch(()=>({docs:[]}))]);
   const rooms={};
   const R=id=>rooms[id]||(rooms[id]={id, tokens:[], kas:null, web:null, kasBytes:0, webBytes:0});
   tk.docs.forEach(d=>{ const v=d.data()||{}; if(v.roomId) R(v.roomId).tokens.push({token:d.id, role:v.role, peers:v.peers}); });
   kas.docs.forEach(d=>{ const v=d.data()||{}; const r=R(d.id); r.kas=v.state||{}; r.kasDoc=v; r.kasBytes=dvBytes(v); });
   web.docs.forEach(d=>{ const v=d.data()||{}; const r=R(d.id); r.web=v; r.webDoc=v; r.webBytes=dvBytes(v); });
+  ros.docs.forEach(d=>{ const v=d.data()||{}, r=rooms[d.id]; if(r && r.kas && Array.isArray(r.kas.students) && Array.isArray(v.pii) && v.pii.length===r.kas.students.length) r.kas.students.forEach((s,i)=>{ const p=v.pii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; }); });
   dvData={rooms, loadedAt:Date.now()};
 }
 async function dvReload(){
@@ -2925,41 +2926,32 @@ async function doLogin(){
   try{
     await ensureAnonAuth();
     let tokKey = token.toUpperCase();   // semua token kelas tersimpan HURUF BESAR
-    let tokDoc = await fbDb.collection('tokens').doc(tokKey).get();
-    if(!tokDoc.exists){
-      // bukan token kelas -> mungkin login developer (kolom NISN/absen = username, kolom token = password)
-      let dr = await dvLogin(idVal, token);
-      if(dr.ok){ dvOpen(); return; }
-      if(dr.stage==='rules' || dr.stage==='owner'){ alertBox(''+dvLoginMessage(dr)); return; }   // kredensial BENAR tapi server belum siap
-      console.warn('[login] bukan token kelas / developer:', dr.stage, dr.code||'');
-      ktHash8(token).then(h=>ktFail('token salah / tidak dikenal','tok:'+h));
-      alertBox('Token salah / tidak dikenali.'); return;
+    // Verifikasi identitas dilakukan DI SERVER (Worker): data NISN/NIS/tanggal lahir siswa tidak pernah dikirim ke browser.
+    let lr=null;
+    try{
+      const rr=await fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,lg:{t:tokKey,m:(loginMode==='absen'?'absen':'nisn'),id:idVal,d:birthDay,mo:birthMonth}})});
+      lr=await rr.json();
+    }catch(e){ lr=null; }
+    if(!lr){
+      const td=await fbDb.collection('tokens').doc(tokKey).get();
+      if(td.exists){ alertBox('Server login sedang tidak terjangkau. Coba lagi sebentar.'); return; }
+      lr={ok:false, code:'notoken'};
     }
-    let {roomId, role} = tokDoc.data();
-    let kasDoc = await fbDb.collection('kas').doc(roomId).get();
-    let students = (kasDoc.exists && kasDoc.data().state && kasDoc.data().state.students) || [];
-
-    let absen=null;
-    if(loginMode==='absen'){
-      let idx = parseInt(idVal)-1;
-      if(idx>=0 && idx<students.length){
-        let bd = students[idx].birthDate || '';
-        let expected = String(birthDay).padStart(2,'0')+'-'+String(birthMonth).padStart(2,'0');
-        if(!bd){ alertBox('Tanggal lahir untuk absen ini belum diisi admin. Hubungi admin/bendahara.'); return; }
-        if(bd !== expected){ ktFail('tanggal lahir salah', idVal, roomId); alertBox('Tanggal/bulan lahir tidak cocok dengan absen ini.'); return; }
-        absen=String(idx+1);
+    if(!lr.ok){
+      if(lr.code==='notoken'){
+        // bukan token kelas -> mungkin login developer (kolom NISN/absen = username, kolom token = password)
+        let dr = await dvLogin(idVal, token);
+        if(dr.ok){ dvOpen(); return; }
+        if(dr.stage==='rules' || dr.stage==='owner'){ alertBox(''+dvLoginMessage(dr)); return; }   // kredensial BENAR tapi server belum siap
+        console.warn('[login] bukan token kelas / developer:', dr.stage, dr.code||'');
+        ktHash8(token).then(h=>ktFail('token salah / tidak dikenal','tok:'+h));
+        alertBox('Token salah / tidak dikenali.'); return;
       }
-    } else {
-      let ni = students.findIndex(s=>s.nisn && s.nisn===idVal);
-      if(ni<0) ni = students.findIndex(s=>s.nis && s.nis===idVal);
-      if(ni>=0) absen=String(ni+1);
+      if(lr.code==='bd') ktFail('tanggal lahir salah', idVal);
+      else if(lr.code==='unknown') ktFail('identitas tidak terdaftar', idVal);
+      alertBox(lr.error||'Login gagal.'); return;
     }
-    if(!absen){
-      ktFail('identitas tidak terdaftar', idVal, roomId);
-      alertBox(''+(loginMode==='absen'?'No. Absen':'NISN/NIS')+' tidak terdaftar di data siswa aplikasi. Hubungi admin/bendahara.');
-      return;
-    }
-    session = {roomId, absen, role, token: tokKey};
+    session = {roomId:lr.roomId, absen:String(lr.absen), role:lr.role, token: tokKey, me: lr.me||{}};
     await ktRegisterMember(tokKey);   // daftarkan 'saya pemegang token ini' agar boleh menulis (token tidak disimpan di dokumen data)
     saveSession(remember);
     enterSite(true);
@@ -2969,6 +2961,7 @@ function doLogout(){
   ktLog('logout',{what:'keluar website'}); ktSessionEnd(); ktStopTokenWatch();
   setTimeout(function(){ try{ ktApplyTheme(); }catch(e){} },0);
   if(kasUnsub){ kasUnsub(); kasUnsub=null; }
+  if(rosterUnsub){ rosterUnsub(); rosterUnsub=null; } rosterPii=null;
   if(webUnsub){ webUnsub(); webUnsub=null; }
   if(typeof galleryUnsub!=='undefined' && galleryUnsub){ galleryUnsub(); galleryUnsub=null; }
   galleryList=[]; albumList=[]; galeriView=null; try{ if(albumUnsub) albumUnsub(); }catch(e){} avatarCache={};
@@ -2984,7 +2977,7 @@ function currentStudent(){
   let idx=parseInt(session.absen)-1;
   return (kasState.students && kasState.students[idx]) || {short:'-', long:'-'};
 }
-function currentProfile(){ let st=currentStudent(); return {nisn: st.nisn||'-', nis: st.nis||'-', kelas: st.kelas||'-'}; }
+function currentProfile(){ let st=currentStudent(), me=(session&&session.me)||{}; return {nisn: me.nisn||st.nisn||'-', nis: me.nis||st.nis||'-', kelas: me.kelas||st.kelas||'-'}; }
 
 function enterSite(firstLoginThisSession){
   let gate=document.getElementById('loginGate');
@@ -2998,11 +2991,15 @@ function enterSite(firstLoginThisSession){
     root.addEventListener('animationend', ()=>root.classList.remove('enter-anim'), {once:true});
   }, 280);
   if(session.dev){ renderAll(); if(firstLoginThisSession) setTimeout(showAnnouncePopup, 600); return; }
-  subscribeKas(session.roomId);
-  subscribeWeb(session.roomId);
-  subscribeGallery(session.roomId);
-  window.cmtRoomWanted=session.roomId;
-  try{ if(typeof subscribeComments==='function') subscribeComments(session.roomId); }catch(e){}
+  let __room=session.roomId;
+  Promise.resolve().then(()=>ktRegisterMember(session.token)).catch(()=>{}).then(()=>{
+    if(!session || session.roomId!==__room) return;
+    subscribeKas(session.roomId);
+    subscribeWeb(session.roomId);
+    subscribeGallery(session.roomId);
+    window.cmtRoomWanted=session.roomId;
+    try{ if(typeof subscribeComments==='function') subscribeComments(session.roomId); }catch(e){}
+  });
   setTimeout(registerVisit, 700);
   setTimeout(function(){ try{ if(isAdmin() && session.absen) fbDb.collection('website').doc(session.roomId).set({adminAbsens:firebase.firestore.FieldValue.arrayUnion(String(session.absen))},{merge:true}).catch(function(){}); }catch(e){} }, 2500);
   setTimeout(()=>ktAfterLogin(firstLoginThisSession), 1200);
@@ -3017,10 +3014,29 @@ function applyClassLogo(){
   else{ r.setAttribute('data-logo','1'); if(g) g.src=KT_PIG; if(t) t.src=KT_PIG; try{ localStorage.removeItem('kas_logo'); }catch(e){} }
 }
 try{ var __c=localStorage.getItem('kas_logo'); if(__c){ document.documentElement.setAttribute('data-logo','1'); var __gl=document.getElementById('gateLogo'); if(__gl) __gl.src=__c; var __tl=document.getElementById('topLogo'); if(__tl) __tl.src=__c; __logoKey2=__c; } }catch(e){}
+// Identitas siswa (NISN/NIS/tgl lahir) ada di dokumen roster/ (hanya Admin yang bisa membaca). Admin menggabungkannya ke daftar siswa; anggota biasa tidak pernah menerimanya.
+let rosterPii=null, rosterUnsub=null;
+function mergeRosterInto(){
+  if(!rosterPii || !kasState || !Array.isArray(kasState.students) || rosterPii.length!==kasState.students.length) return;
+  kasState.students.forEach((s,i)=>{ const p=rosterPii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; });
+}
+function kasStateForWrite(){   // salinan state TANPA identitas siswa untuk ditulis ke dokumen kas
+  const c=JSON.parse(JSON.stringify(kasState));
+  (c.students||[]).forEach(s=>{ delete s.nisn; delete s.nis; delete s.birthDate; });
+  return c;
+}
+function piiFromKasState(){ return (kasState.students||[]).map(s=>({nisn:s.nisn||'',nis:s.nis||'',birthDate:s.birthDate||''})); }
 function subscribeKas(roomId){
   if(kasUnsub) kasUnsub();
+  if(rosterUnsub){ rosterUnsub(); rosterUnsub=null; } rosterPii=null;
+  if(session && session.role==='editor' && !session.dev){
+    rosterUnsub = fbDb.collection('roster').doc(roomId).onSnapshot(snap=>{
+      rosterPii = (snap.exists && Array.isArray(snap.data().pii)) ? snap.data().pii : null;
+      mergeRosterInto(); try{ renderAll(); }catch(e){}
+    }, ()=>{});
+  }
   kasUnsub = fbDb.collection('kas').doc(roomId).onSnapshot(snap=>{
-    if(snap.exists && snap.data().state) kasState = snap.data().state;
+    if(snap.exists && snap.data().state){ kasState = snap.data().state; mergeRosterInto(); }
     try{ applyClassLogo(); }catch(e){}
     renderAll();
     try{ kgWebButtons(); if(document.getElementById('view-kegiatan').classList.contains('active')) renderKegiatanWeb(); }catch(e){}
@@ -3066,6 +3082,7 @@ function pushWeb(){
   webPushTimer=setTimeout(()=>{
     // visitors & ratings ditulis lewat jalur terpisah (per-field) supaya tidak saling menimpa
     let payload=Object.assign({}, webState); delete payload.visitors; delete payload.ratings;
+    if(!(session.role==='editor'||session.role==='staff')) payload={profiles:webState.profiles};   // siswa biasa hanya boleh mengubah profil
     fbDb.collection('website').doc(session.roomId).set(payload,{merge:true}).then(()=>{ webDirty=false; }).catch(e=>{ webDirty=false; alertBox('Gagal menyimpan: '+e.message); });
   }, 500);
 }
@@ -3272,8 +3289,8 @@ function renderAll(){
   let roleTxt = (session.dev ? 'Developer · ' : '') + (isAdmin() ? 'Admin' : (isStaff() ? 'Admin Kelas' : 'Anggota'));
   document.getElementById('greetText').innerHTML = 'Halo, '+(st.short||'-')+' <span class="roleLabel">'+roleTxt+'</span>';
   document.getElementById('profName').textContent = st.long||st.short||'-';
-  document.getElementById('profNisn').textContent = st.nisn||'-';
-  document.getElementById('profNis').textContent = st.nis||'-';
+  document.getElementById('profNisn').textContent = pr.nisn||'-';
+  document.getElementById('profNis').textContent = pr.nis||'-';
   document.getElementById('profKelas').textContent = pr.kelas||'-';
   document.getElementById('profAbsen').textContent = session.absen;
   document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
@@ -3959,14 +3976,23 @@ async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis){
   if(!isAdmin()){ alertBox('Hanya admin yang bisa mengubah data ini.'); return false; }
   if(session.dev){ if(!kasState.students[idx]) return false; kasState.students[idx].nisn=nisn; kasState.students[idx].nis=nis||''; kasState.students[idx].birthDate=birthDate; kasState.students[idx].kelas=kelas; renderAll(); return true; }
   try{
+    await ktRegisterMember();
     let fresh = await fbDb.collection('kas').doc(session.roomId).get();
-    let st8 = (fresh.exists && fresh.data().state) ? fresh.data().state : kasState;
+    let st8 = (fresh.exists && fresh.data().state) ? fresh.data().state : kasStateForWrite();
     if(!st8.students || !st8.students[idx]) return false;
-    st8.students[idx].nisn = nisn;
-    st8.students[idx].nis = nis||'';
-    st8.students[idx].birthDate = birthDate;
+    let ro = await fbDb.collection('roster').doc(session.roomId).get();
+    let pii = (ro.exists && Array.isArray(ro.data().pii)) ? ro.data().pii.slice() : [];
+    while(pii.length<st8.students.length) pii.push({nisn:'',nis:'',birthDate:''});
+    st8.students.forEach((s,i)=>{   // data lama yang masih tercampur di kas ikut dipindahkan
+      const o=pii[i]||{}; pii[i]={nisn:o.nisn||s.nisn||'', nis:o.nis||s.nis||'', birthDate:o.birthDate||s.birthDate||''};
+      delete s.nisn; delete s.nis; delete s.birthDate;
+    });
+    pii[idx]={nisn:nisn, nis:nis||'', birthDate:birthDate};
     st8.students[idx].kelas = kelas;
-    await fbDb.collection('kas').doc(session.roomId).set({state: st8});
+    const ts=Date.now(), b=fbDb.batch();
+    b.set(fbDb.collection('kas').doc(session.roomId),{state: st8, sec:2});
+    b.set(fbDb.collection('roster').doc(session.roomId),{pii:pii, ts:ts});
+    await b.commit();
     return true;
   }catch(e){ alertBox('Gagal simpan ke aplikasi: '+e.message); return false; }
 }
@@ -4308,7 +4334,7 @@ async function setClassMode(m){
   if(!ktModeValid(m)) return;
   var prev=kasState.mode; kasState.mode=m; ktApplyTheme(); renderModeSeg();
   try{
-    await ktRegisterMember(); await fbDb.collection('kas').doc(session.roomId).set({state: JSON.parse(JSON.stringify(kasState))});
+    await ktRegisterMember(); await fbDb.collection('kas').doc(session.roomId).set({state: kasStateForWrite(), sec:2});
     var g=(ktCfg&&ktCfg.modeAll);
     alertBox((g==='light'||g==='dark') ? 'Mode kelas disimpan. (Sedang dikunci developer)' : 'Mode "'+KT_MODE_NAMES[m]+'" disimpan untuk semua anggota kelas (aplikasi & website).');
   }catch(e){ kasState.mode=prev; ktApplyTheme(); renderModeSeg(); alertBox('Gagal menyimpan mode (dikembalikan): '+((e&&e.message)||'')); }
@@ -4324,7 +4350,7 @@ async function setClassTheme(id){
   if(!ktThemeValid(id)) return;
   var prev=kasState.theme; kasState.theme=id; ktApplyTheme(); renderThemeSwatches();
   try{
-    await ktRegisterMember(); await fbDb.collection('kas').doc(session.roomId).set({state: JSON.parse(JSON.stringify(kasState))});
+    await ktRegisterMember(); await fbDb.collection('kas').doc(session.roomId).set({state: kasStateForWrite(), sec:2});
     alertBox(ktThemeValid(ktCfg.themeAll) ? 'Tema kelas disimpan. (Sedang dikunci developer)' : 'Tema "'+KT_THEMES[id].name+'" disimpan untuk kelas ini (aplikasi & website).');
   }catch(e){ kasState.theme=prev; ktApplyTheme(); renderThemeSwatches(); alertBox('Gagal menyimpan tema (dikembalikan): '+((e&&e.message)||'')); }
 }
