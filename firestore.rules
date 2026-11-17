@@ -160,7 +160,8 @@ service cloud.firestore {
       allow read, write: if isDev();
       allow get: if notBlocked() && (isEditorOf(roomId) || isWorker());
       allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId)
-        && request.resource.data.keys().hasOnly(['pii', 'ts'])
+        && request.resource.data.keys().hasOnly(['pii', 'ts', 'wali'])
+        && (!('wali' in request.resource.data) || (request.resource.data.wali is map && request.resource.data.wali.size() <= 6))
         && request.resource.data.pii is list && request.resource.data.pii.size() <= 300
         && request.resource.data.ts is number;
     }
@@ -191,6 +192,13 @@ service cloud.firestore {
         allow read, write: if isDev();
         allow get, list: if canRead(roomId);
         allow create, update, delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
+      }
+
+      // PENGUMUMAN GURU WALI: hanya Worker (akun layanan) yang boleh menulis, setelah NIP guru wali diperiksa di server.
+      match /waliAnn/{aid} {
+        allow read, write: if isDev();
+        allow get, list: if canRead(roomId);
+        allow create, update, delete: if notBlocked() && isWorker();
       }
 
       // KOMENTAR: satu dokumen per komentar. Siapa pun pemegang token kelas boleh MENULIS komentar baru

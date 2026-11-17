@@ -652,7 +652,7 @@ input[type=checkbox]:checked{background:var(--gold);border-color:var(--brand-2);
 .modal::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--coral),var(--gold),var(--mint),var(--sky),var(--lilac));}
 
 /* pengumuman: kartu dengan pita warna bergantian */
-#announceList .card,#cmtHomeList .cmt:not(.cmt-admin){border-left:6px solid var(--gold);}
+#announceList .card,#cmtHomeList .cmt:not(.cmt-admin):not(.cmt-wali){border-left:6px solid var(--gold);}
 #announceList .card:nth-child(5n+1){border-left-color:var(--coral);}
 #announceList .card:nth-child(5n+2){border-left-color:var(--gold);}
 #announceList .card:nth-child(5n+3){border-left-color:var(--mint);}
@@ -704,6 +704,32 @@ button,a,.mitem,.bnav-item,.seg div,.swatch,.dv-tile,.dv-btn,.iconbtn,summary,la
 #announceList .card,.cmt,.gphoto,.album-card,.tugas-row,.dv-row,.listrow,.datarow{content-visibility:auto;contain-intrinsic-size:auto 96px;}
 .tblwrap{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;}
 img{-webkit-user-drag:none;}
+/* ===== Tampilan GURU WALI ===== */
+/* Popup/menu terbuka: halaman di belakangnya terkunci (tidak ikut tergulir oleh sentuhan/roda mouse) */
+html.kt-lock,html.kt-lock body{overflow:hidden!important;overscroll-behavior:none;}
+.modal-bg,.dv-modal,.menu,.dv-root{overscroll-behavior:contain;}
+.wali-only{display:none;}
+.cmt.cmt-wali{background:linear-gradient(135deg,color-mix(in srgb,#8b5cf6 26%,var(--card)) 0%,color-mix(in srgb,#8b5cf6 8%,var(--card)) 100%);border:2px solid #8b5cf6;padding-left:20px;box-shadow:0 10px 26px -14px rgba(139,92,246,.7);}
+.cmt.cmt-wali::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:7px;border-radius:0 5px 5px 0;background:linear-gradient(#a78bfa,#7c3aed);}
+.cmt-badge.wali{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;}
+#announceList .card.ann-wali{border:2px solid #8b5cf6;border-left:7px solid #8b5cf6;background:linear-gradient(135deg,color-mix(in srgb,#8b5cf6 20%,var(--card)) 0%,color-mix(in srgb,#8b5cf6 6%,var(--card)) 100%);}
+.ann-wali-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:3px 9px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;margin-bottom:4px;}
+.tw-bar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.tw-bar .btn{flex:1;min-width:0;padding:8px 6px;font-size:13px;}
+.tw-bar .btn.on{background:var(--amber);color:#1f1300;border-color:var(--amber);font-weight:700;}
+body.is-wali .wali-only{display:block;}
+body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCard{display:none !important;}
+.wl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wl-grid>div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0;}
+.wl-grid span{display:block;font-size:12px;opacity:.75;}
+.wl-grid b{display:block;font-size:16px;margin-top:2px;overflow-wrap:anywhere;}
+.wl-grid em{display:block;font-style:normal;font-size:11.5px;opacity:.75;margin-top:2px;}
+.wl-sc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px;}
+.wl-sc .btn{width:100%;text-align:center;}
+.tw-row{cursor:pointer;margin:6px 0;}
+.tw-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;}
+.tw-det{display:none;margin-top:6px;font-size:12.5px;opacity:.85;line-height:1.5;}
+.tw-row.open .tw-det{display:block;}
 </style>
 </head>
 <body>
@@ -762,8 +788,8 @@ img{-webkit-user-drag:none;}
     <div class="avatar" id="avatarBox"><i class="ic" data-ic="person"></i></div>
     <div class="profile-info" style="flex:1;">
       <div><b id="profName">-</b></div>
-      <div class="small">NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span></div>
-      <div class="small">Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span></div>
+      <div class="small" id="profL1">NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span></div>
+      <div class="small" id="profL2">Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span></div>
     </div>
   </div>
   <div class="mrow" style="margin-top:-6px;margin-bottom:12px;">
@@ -771,7 +797,29 @@ img{-webkit-user-drag:none;}
     <button class="btn" style="width:100%;" onclick="document.getElementById('avatarInput').click()">Ubah Foto Profil</button>
   </div>
 
-  <div class="card">
+  <div class="card wali-only" id="waliSummary">
+    <div class="small" style="margin-bottom:8px;">RINGKASAN KAS KELAS</div>
+    <div class="wl-grid">
+      <div><span>Saldo kas saat ini</span><b id="wlSaldo">Rp0</b></div>
+      <div><span>Total tunggakan</span><b id="wlArr" style="color:var(--amber);">Rp0</b><em id="wlArrN"></em></div>
+      <div><span>Pemasukan <i id="wlMon1">bulan ini</i></span><b id="wlIn" style="color:var(--blue);">Rp0</b></div>
+      <div><span>Pengeluaran <i id="wlMon2">bulan ini</i></span><b id="wlOut" style="color:var(--red);">Rp0</b></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:10px;" onclick="waliCopySummary()">Salin ringkasan kas</button>
+  </div>
+  <div class="wali-only" id="waliShortcuts">
+    <div class="small" style="margin:2px 0 4px;">PINTASAN DATA KAS</div>
+    <div class="wl-sc">
+      <button class="btn primary" onclick="openView('tunggakanwali')">Daftar Tunggakan</button>
+      <button class="btn" onclick="openView('datakas')">Tabel Kas Siswa</button>
+      <button class="btn" onclick="waliGo('datakas','dkRekapHead')">Rekap &amp; Saldo</button>
+      <button class="btn" onclick="waliGo('datakas','dkDetailHead')">Pemasukan &amp; Pengeluaran</button>
+      <button class="btn" style="grid-column:1/-1;" onclick="openView('kegiatan')">Kas Kegiatan</button>
+      <button class="btn" style="grid-column:1/-1;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-color:#7c3aed;" onclick="openModal('waliann')">+ Buat Pengumuman untuk Kelas</button>
+    </div>
+  </div>
+
+  <div class="card" id="tunggakanCard">
     <div class="small" style="margin-bottom:6px;">TUNGGAKAN KAS (otomatis dari data aplikasi)</div>
     <div id="tunggakanBox"></div>
   </div>
@@ -824,14 +872,14 @@ img{-webkit-user-drag:none;}
   <div id="kasLegend" style="margin:6px 0;"></div>
   <div class="tblwrap"><table><thead><tr id="kasTheadRow"></tr></thead><tbody id="kasTbody"></tbody></table></div>
 
-  <h2 class="h" style="margin-top:16px;">Rekap</h2>
+  <h2 class="h" id="dkRekapHead" style="margin-top:16px;">Rekap</h2>
   <div class="card"><div class="small">Total Kas Saat Ini</div><div style="font-size:20px;font-weight:700;" id="dkTotal">Rp0</div></div>
   <div class="card"><div class="small">Pemasukan Bulan Ini</div><div style="font-size:16px;font-weight:700;color:var(--blue);" id="dkIncMonth">Rp0</div></div>
   <div class="card"><div class="small">Total Pemasukan</div><div style="font-size:16px;font-weight:700;color:var(--blue);" id="dkIn">Rp0</div></div>
   <div class="card"><div class="small">Pengeluaran Bulan Ini</div><div style="font-size:16px;font-weight:700;color:var(--red);" id="dkOutMonth">Rp0</div></div>
   <div class="card"><div class="small">Total Pengeluaran</div><div style="font-size:16px;font-weight:700;color:var(--red);" id="dkOut">Rp0</div></div>
 
-  <h2 class="h" style="margin-top:16px;">Rincian Bulan Ini</h2>
+  <h2 class="h" id="dkDetailHead" style="margin-top:16px;">Rincian Bulan Ini</h2>
   <p class="small">Transparansi: semua pemasukan manual dan pengeluaran bulan yang dipilih. Tautan &quot;Bukti&quot; membuka foto struk di Google Drive.</p>
   <div id="dkDetail"></div>
   <div class="mrow">
@@ -840,6 +888,17 @@ img{-webkit-user-drag:none;}
   </div>
   <button class="btn" id="btnInstallPwa" style="display:none;width:100%;margin-top:8px;" onclick="pwaInstall()">Pasang sebagai aplikasi</button>
 
+  <button class="btn" style="margin-top:14px;" onclick="openView('home')">← Kembali</button>
+</div>
+
+<div class="view" id="view-tunggakanwali">
+  <h2 class="h">Daftar Tunggakan Siswa</h2>
+  <p class="small">Dihitung otomatis dari data aplikasi sampai hari ini. Ketuk nama untuk melihat tanggalnya.</p>
+  <div class="card" id="twSummary"></div>
+  <div class="tw-bar"><button class="btn primary" onclick="waliCopyArrears()">Salin daftar tunggakan</button></div>
+  <div class="tw-bar" id="twSort"><button class="btn on" data-s="total" onclick="waliSort('total')">Terbesar</button><button class="btn" data-s="name" onclick="waliSort('name')">Nama A-Z</button><button class="btn" data-s="absen" onclick="waliSort('absen')">No. Absen</button></div>
+  <input type="text" id="twSearch" placeholder="Cari nama atau nomor absen" oninput="renderWaliArrears()" style="margin-bottom:6px;">
+  <div id="twList"></div>
   <button class="btn" style="margin-top:14px;" onclick="openView('home')">← Kembali</button>
 </div>
 
@@ -855,10 +914,12 @@ img{-webkit-user-drag:none;}
 </div>
 
 <div class="view" id="view-jadwal">
+  <div class="tugas-sec">
   <h2 class="h">Tugas</h2>
   <p class="small" style="margin:0 0 8px;">Tugas disinkronkan dengan aplikasi Tugas (lewat token kelas). Hanya admin yang bisa menambah, mengubah, atau menceklis.</p>
   <div id="tugasBox"></div>
   <button class="btn primary" id="tugasAddBtn" style="display:none;margin:8px 0 18px;width:100%;" onclick="openTugasModal(0)">+ Tambah Tugas</button>
+  </div>
   <h2 class="h">Jadwal Pelajaran</h2>
   <div id="jadwalBox"></div>
   <button class="btn" id="jadwalEditBtn" style="display:none;margin-top:10px;" onclick="openModal('editjadwal')">Edit Jadwal</button>
@@ -962,6 +1023,14 @@ img{-webkit-user-drag:none;}
   <h2 class="h">Pindah ke album</h2>
   <select id="moveAlbumSel"></select>
   <div class="mrow"><button class="btn" onclick="closeModal('movephoto')">Batal</button><button class="btn primary" onclick="confirmMovePhoto()">Pindahkan</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-waliann"><div class="modal">
+  <h2 class="h">Pengumuman Guru Wali</h2>
+  <p class="small">Tampil paling atas di Beranda semua siswa dengan warna khusus. Hapus kapan saja lewat kartunya di Beranda.</p>
+  <input type="text" id="waTitle" maxlength="80" placeholder="Judul pengumuman">
+  <textarea id="waBody" rows="5" maxlength="500" placeholder="Isi pengumuman (maks. 500 karakter)"></textarea>
+  <div class="mrow"><button class="btn" onclick="closeModal('waliann')">Batal</button><button class="btn primary" id="waSendBtn" onclick="waliAnnSend()">Kirim</button></div>
 </div></div>
 
 <div class="modal-bg" id="modal-report"><div class="modal">
@@ -2753,7 +2822,7 @@ function ktCtx(){
   if(dvActive()) return {role:'developer', roomId:'', who:'Developer'};
   if(!session) return {};
   let st=currentStudent();
-  return {role: session.role==='editor'?'admin':(session.role==='staff'?'staff':'user'), roomId:session.roomId, who:(st.short||'?')+' (absen '+session.absen+')'};
+  return {role: session.role==='editor'?'admin':(session.role==='staff'?'staff':'user'), roomId:session.roomId, who:(st.short||'?')+(isWali()?' (guru wali)':' (absen '+session.absen+')')};
 }
 function ktOnForced(reason){
   alertBox(reason==='blocked' ? 'Akses perangkat ini dihentikan oleh developer.' : 'Sesi kamu dihentikan oleh developer.');
@@ -2973,6 +3042,7 @@ async function doLogin(){
       alertBox(lr.error||'Login gagal.'); return;
     }
     session = {roomId:lr.roomId, absen:String(lr.absen), role:lr.role, token: tokKey, me: lr.me||{}};
+    if(lr.wali) session.wali=true;
     await ktRegisterMember(tokKey);   // daftarkan 'saya pemegang token ini' agar boleh menulis (token tidak disimpan di dokumen data)
     saveSession(remember);
     enterSite(true);
@@ -2987,6 +3057,7 @@ function doLogout(){
   if(typeof galleryUnsub!=='undefined' && galleryUnsub){ galleryUnsub(); galleryUnsub=null; }
   galleryList=[]; albumList=[]; galeriView=null; try{ if(albumUnsub) albumUnsub(); }catch(e){} avatarCache={};
   try{ if(typeof cmtCleanup==='function') cmtCleanup(); }catch(e){}
+  if(waliAnnUnsub){ try{ waliAnnUnsub(); }catch(e){} waliAnnUnsub=null; } waliAnnList=[];
   session=null;
   kasState=emptyKas(); webState=emptyWeb();
   try{ localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }catch(e){}
@@ -2994,7 +3065,13 @@ function doLogout(){
   document.getElementById('loginGate').style.display='flex';
 }
 
+function isWali(){ return !!session && !!session.wali; }
+function waliInfo(){ return (session && session.me && session.me.wali) || {}; }
 function currentStudent(){
+  if(isWali()){
+    let w=waliInfo(), nm=String(w.pgl||w.nama||'Wali');
+    return {short:(/^(ibu|bu)\b/i.test(nm)?nm:'Ibu '+nm).slice(0,36), long:w.nama||w.pgl||'Guru Wali', kelas:''};
+  }
   let idx=parseInt(session.absen)-1;
   return (kasState.students && kasState.students[idx]) || {short:'-', long:'-'};
 }
@@ -3020,6 +3097,7 @@ function enterSite(firstLoginThisSession){
     subscribeGallery(session.roomId);
     window.cmtRoomWanted=session.roomId;
     try{ if(typeof subscribeComments==='function') subscribeComments(session.roomId); }catch(e){}
+    try{ subscribeWaliAnn(session.roomId); }catch(e){}
   });
   setTimeout(registerVisit, 700);
   setTimeout(function(){ try{ if(isAdmin() && session.absen) fbDb.collection('website').doc(session.roomId).set({adminAbsens:firebase.firestore.FieldValue.arrayUnion(String(session.absen))},{merge:true}).catch(function(){}); }catch(e){} }, 2500);
@@ -3094,7 +3172,7 @@ async function submitChange(kind, data, summary){
   }catch(e){ alertBox('Gagal mengirim perubahan: '+e.message); return false; }
 }
 const CHG_SENT_MSG='Perubahan dikirim. Belum tertulis di data — menunggu konfirmasi admin di aplikasi (menu Riwayat Perubahan).';
-function stuShort(ab){ let s=(kasState.students||[])[ab-1]; return s?esc(s.short):('absen '+ab); }
+function stuShort(ab){ if(String(ab)==='W') return 'Guru wali'; let s=(kasState.students||[])[ab-1]; return s?esc(s.short):('absen '+ab); }
 let webDirty=false;
 function pushWeb(){
   if(!session || session.dev) return;
@@ -3307,13 +3385,22 @@ function renderAll(){
   try{ ktApplyTheme(); }catch(e){}
   try{ if(typeof renderComments==='function') renderComments(); }catch(e){}
   let st=currentStudent(); let pr=currentProfile();
-  let roleTxt = (session.dev ? 'Developer · ' : '') + (isAdmin() ? 'Admin' : (isStaff() ? 'Admin Kelas' : 'Anggota'));
+  document.body.classList.toggle('is-wali', isWali());
+  let roleTxt = (session.dev ? 'Developer · ' : '') + (isWali() ? 'Guru Wali' : (isAdmin() ? 'Admin' : (isStaff() ? 'Admin Kelas' : 'Anggota')));
   document.getElementById('greetText').innerHTML = 'Halo, '+(st.short||'-')+' <span class="roleLabel">'+roleTxt+'</span>';
-  document.getElementById('profName').textContent = st.long||st.short||'-';
-  document.getElementById('profNisn').textContent = pr.nisn||'-';
-  document.getElementById('profNis').textContent = pr.nis||'-';
-  document.getElementById('profKelas').textContent = pr.kelas||'-';
-  document.getElementById('profAbsen').textContent = session.absen;
+  if(isWali()){
+    let w=waliInfo();
+    document.getElementById('profName').textContent = (/^(ibu|bu)\b/i.test(w.nama||'')?'':'Ibu ')+(w.nama||st.long||'-');
+    document.getElementById('profL1').innerHTML = 'NIP: <span>'+esc(w.nip||'-')+'</span>';
+    document.getElementById('profL2').innerHTML = 'Guru Wali'+(w.mapel?' · Mapel '+esc(w.mapel):'')+' · '+esc(kasState.appTitle||'Kelas');
+  } else {
+    if(!document.getElementById('profNisn')){ document.getElementById('profL1').innerHTML='NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span>'; document.getElementById('profL2').innerHTML='Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span>'; }
+    document.getElementById('profName').textContent = st.long||st.short||'-';
+    document.getElementById('profNisn').textContent = pr.nisn||'-';
+    document.getElementById('profNis').textContent = pr.nis||'-';
+    document.getElementById('profKelas').textContent = pr.kelas||'-';
+    document.getElementById('profAbsen').textContent = session.absen;
+  }
   document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(session.absen).then(photo=>{
     if(photo) document.getElementById('avatarBox').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
@@ -3325,7 +3412,7 @@ function renderAll(){
   document.getElementById('jadwalEditBtn').style.display = isStaff() ? 'block':'none';
   document.getElementById('tugasAddBtn').style.display = isStaff() ? 'block':'none';
   document.getElementById('kontakEditBtn').style.display = isStaff() ? 'block':'none';
-  [renderTunggakan, renderAnnounce, renderGaleri, renderJadwal, renderTugas, renderKontak, renderDataKas, renderFooter].forEach(fn=>{
+  [renderTunggakan, renderWali, renderAnnounce, renderGaleri, renderJadwal, renderTugas, renderKontak, renderDataKas, renderFooter].forEach(fn=>{
     try{ fn(); }catch(e){ console.error('Gagal render '+fn.name+':', e); }
   });
 }
@@ -3362,6 +3449,7 @@ function calcTunggakanFor(absen){
   return list;
 }
 function renderTunggakan(){
+  if(isWali()) return;
   let list = calcTunggakanFor(session.absen);
   let total = list.reduce((a,e)=>a+e.amount,0);
   let box=document.getElementById('tunggakanBox');
@@ -3517,10 +3605,47 @@ function myPersonalAnnouncements(){
   let myAbsen=parseInt(session.absen);
   return (webState.personalAnnouncements||[]).filter(a=>(a.targets||[]).includes(myAbsen));
 }
+var waliAnnList=[], waliAnnUnsub=null;
+function subscribeWaliAnn(roomId){
+  if(waliAnnUnsub){ try{ waliAnnUnsub(); }catch(e){} waliAnnUnsub=null; }
+  try{
+    waliAnnUnsub=fbDb.collection('website').doc(roomId).collection('waliAnn').orderBy('ts','desc').limit(20).onSnapshot(function(snap){
+      waliAnnList=snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      try{ renderAnnounce(); }catch(e){}
+    }, function(){ waliAnnList=[]; });
+  }catch(e){}
+}
+function waliAnnHtml(){
+  return (waliAnnList||[]).map(function(a){
+    let del=isWali()?'<div style="margin-top:6px;"><button class="btn" style="padding:4px 10px;font-size:12px;" onclick="waliAnnDel(\''+esc(a.id)+'\')">Hapus</button></div>':'';
+    return '<div class="card ann-wali"><span class="ann-wali-tag">DARI GURU WALI</span><br><b>'+esc(a.title)+'</b><div class="small" style="margin:4px 0;">'+esc(a.date||'')+' · '+esc(a.by||'Guru wali')+'</div><div>'+esc(a.body)+'</div>'+del+'</div>';
+  }).join('');
+}
+async function waliRelay(payload){
+  const w=waliInfo(); if(!session||!w.nip) return {ok:false,error:'Sesi guru wali tidak lengkap. Keluar lalu masuk lagi.'};
+  try{
+    const r=await fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,wa:Object.assign({t:session.token,nip:w.nip,date:new Date().toISOString().slice(0,10)},payload)})});
+    return await r.json();
+  }catch(e){ return {ok:false,error:'Server tidak terjangkau. Coba lagi sebentar.'}; }
+}
+async function waliAnnSend(){
+  let ti=document.getElementById('waTitle'), bo=document.getElementById('waBody'), btn=document.getElementById('waSendBtn');
+  let title=ti.value.trim(), body=bo.value.trim();
+  if(!title||!body){ alertBox('Isi judul dan isi pengumuman dulu.'); return; }
+  btn.disabled=true; let r=await waliRelay({act:'add',title:title,body:body}); btn.disabled=false;
+  if(!r.ok){ alertBox(r.error||'Gagal mengirim pengumuman.'); return; }
+  ti.value=''; bo.value=''; closeModal('waliann'); alertBox('Pengumuman terkirim. Seluruh kelas bisa melihatnya.');
+  try{ ktExport('Pengumuman guru wali'); }catch(e){}
+}
+async function waliAnnDel(id){
+  if(!confirm('Hapus pengumuman ini?')) return;
+  let r=await waliRelay({act:'del',id:id});
+  if(!r.ok) alertBox(r.error||'Gagal menghapus.'); else waliAnnList=waliAnnList.filter(function(a){return a.id!==id;}), renderAnnounce();
+}
 function renderAnnounce(){
   let tmr=tomorrowName();
   let sch=webState.schedule[tmr]||[];
-  let html = `<div class="card"><b>Jadwal Besok (${tmr})</b>` +
+  let html = waliAnnHtml() + `<div class="card"><b>Jadwal Besok (${tmr})</b>` +
     (sch.length ? sch.map(j=>`<div class="listrow"><span>${esc(j.jam)}</span><span>${esc(j.mapel)}</span></div>`).join('') : '<div class="small">Tidak ada jadwal tercatat.</div>') +
     `</div>`;
   let mine=[...myPersonalAnnouncements()].sort((a,b)=>b.date.localeCompare(a.date));
@@ -3545,6 +3670,7 @@ function showAnnouncePopup(only){
       </div>`;
     }
     html += cn;
+    if((waliAnnList||[]).length){ let wl=waliAnnList[0]; html += `<div class="card" style="border:2px solid #8b5cf6;margin-bottom:10px;"><span class="ann-wali-tag">DARI GURU WALI</span><br><b>${esc(wl.title)}</b><p>${esc(wl.body)}</p></div>`; }
     html += `<div style="margin-bottom:10px;"><b>Jadwal Besok (${tmr})</b>` +
       (sch.length ? sch.map(j=>`<div class="listrow"><span>${esc(j.jam)}</span><span>${esc(j.mapel)}</span></div>`).join('') : '<div class="small">Tidak ada jadwal tercatat.</div>') + `</div>`;
     let myLatestPersonal=[...myPersonalAnnouncements()].sort((a,b)=>b.date.localeCompare(a.date))[0];
@@ -4221,6 +4347,68 @@ function renderKegiatanWeb(){
       <details style="margin-top:8px;"><summary class="small">Rincian (${(k.entries||[]).length} catatan)</summary>${(k.entries||[]).slice().reverse().map(e=>`<div class="listrow"><span>${esc(e.name)}<div class="small">${esc(e.date)}</div></span><span style="color:${e.type==='in'?'var(--blue)':'var(--red)'};">${e.type==='in'?'+':'−'}${fmtRp(e.amount)}</span></div>`).join('')||'<div class="small">Belum ada catatan.</div>'}</details></div>`;
   }).join('') : '<p class="small">Belum ada kegiatan.</p>';
 }
+/* ---- Guru wali: ringkasan kas, pintasan, daftar tunggakan seluruh siswa ---- */
+function waliGo(view, anchorId){ openView(view); setTimeout(function(){ var e=document.getElementById(anchorId); if(e) e.scrollIntoView({block:'start',behavior:'smooth'}); },120); }
+var waliSortMode="total", waliSumText="";
+function waliSort(m){
+  waliSortMode=m;
+  document.querySelectorAll('#twSort .btn').forEach(function(b){ b.classList.toggle('on', b.dataset.s===m); });
+  renderWaliArrears();
+}
+async function waliCopyText(t, msg){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(t);
+    else throw 0;
+  }catch(e){
+    try{ let ta=document.createElement('textarea'); ta.value=t; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); let ok=document.execCommand('copy'); ta.remove(); if(!ok) throw 0; }
+    catch(e2){ alertBox('Tidak bisa menyalin otomatis di perangkat ini.'); return; }
+  }
+  alertBox(msg);
+}
+function waliKasName(){ let t=String(kasState.appTitle||'Kelas').trim(); return (/^kas\b/i.test(t)?t:'Kas '+t).toUpperCase(); }
+function waliTodayId(){ return new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+function waliCopyArrears(){
+  let all=waliArrearsAll(), n=(kasState.students||[]).length;
+  if(!all.length){ alertBox('Tidak ada tunggakan. Semua siswa lunas.'); return; }
+  let tot=all.reduce(function(a,r){ return a+r.total; },0);
+  let t='TUNGGAKAN '+waliKasName()+'\nPer '+waliTodayId()+'\n\n'+all.map(function(r,i){ return (i+1)+'. '+r.name+' - '+fmtRp(r.total)+' ('+r.n+'x)'; }).join('\n')+'\n\nTotal: '+fmtRp(tot)+' ('+all.length+' dari '+n+' siswa)';
+  waliCopyText(t,'Daftar tunggakan disalin ('+all.length+' siswa).'); try{ ktExport('Salin tunggakan (wali)'); }catch(e){}
+}
+function waliCopySummary(){ if(waliSumText) waliCopyText(waliSumText,'Ringkasan kas disalin.'); }
+function waliArrearsAll(){
+  let today=new Date().toISOString().slice(0,10), out=[];
+  (kasState.students||[]).forEach(function(st,i){
+    let list=calcTunggakanFor(String(i+1)); if(!list.length) return;
+    out.push({absen:i+1, name:st.long||st.short||('Absen '+(i+1)), n:list.length, total:list.reduce(function(a,e){ return a+(Number(e.amount)||0); },0), list:list});
+  });
+  out.sort(waliSortMode==='name' ? function(a,b){ return a.name.localeCompare(b.name,'id'); } : waliSortMode==='absen' ? function(a,b){ return a.absen-b.absen; } : function(a,b){ return b.total-a.total || a.absen-b.absen; });
+  return out;
+}
+function renderWali(){
+  if(!isWali()) return;
+  let all=waliArrearsAll(), tot=all.reduce(function(a,r){ return a+r.total; },0), n=(kasState.students||[]).length;
+  let mk=new Date().toISOString().slice(0,7);
+  if(!(kasState.months||{})[mk]){ let ks=Object.keys(kasState.months||{}).sort(); mk=ks[ks.length-1]||mk; }
+  let setT=function(id,t){ let e=document.getElementById(id); if(e) e.textContent=t; };
+  setT('wlSaldo', fmtRp(totalKasAll())); setT('wlIn', fmtRp(incomeForKasMonth(mk))); setT('wlOut', fmtRp(expenseForKasMonth(mk)));
+  setT('wlArr', fmtRp(tot)); setT('wlArrN', all.length+' dari '+n+' siswa menunggak');
+  let mn=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][(parseInt(mk.slice(5,7))||1)-1]+' '+mk.slice(0,4);
+  setT('wlMon1', mn); setT('wlMon2', mn);
+  waliSumText='RINGKASAN '+waliKasName()+'\nPer '+waliTodayId()+'\n\nSaldo kas: '+fmtRp(totalKasAll())+'\nPemasukan '+mn+': '+fmtRp(incomeForKasMonth(mk))+'\nPengeluaran '+mn+': '+fmtRp(expenseForKasMonth(mk))+'\nTotal tunggakan: '+fmtRp(tot)+' ('+all.length+' dari '+n+' siswa menunggak)';
+  if(document.getElementById('view-tunggakanwali').classList.contains('active')) renderWaliArrears();
+}
+function renderWaliArrears(){
+  if(!isWali()) return;
+  let all=waliArrearsAll(), n=(kasState.students||[]).length, q=(document.getElementById('twSearch').value||'').trim().toLowerCase();
+  let tot=all.reduce(function(a,r){ return a+r.total; },0);
+  document.getElementById('twSummary').innerHTML='<div class="small">Total tunggakan seluruh kelas</div><div style="font-size:20px;font-weight:700;color:var(--amber);">'+fmtRp(tot)+'</div><div class="small">'+all.length+' dari '+n+' siswa menunggak'+(all.length?'':' — semua lunas') +'</div>';
+  let match=function(r){ return !q || r.name.toLowerCase().indexOf(q)>=0 || String(r.absen)===q; };
+  let rows=all.filter(match).map(function(r){
+    return '<div class="card tw-row" onclick="this.classList.toggle(\'open\')"><div class="tw-top"><b>'+r.absen+'. '+esc(r.name)+'</b><b style="color:var(--amber);">'+fmtRp(r.total)+'</b></div><div class="small">Menunggak '+r.n+'x</div><div class="tw-det">'+r.list.map(function(e){ return esc(e.date)+(e.note?' ('+esc(e.note)+')':'')+' · '+fmtRp(e.amount); }).join('<br>')+'</div></div>';
+  }).join('');
+  let paid=new Set(all.map(function(r){ return r.absen; })), lunas=(kasState.students||[]).map(function(st,i){ return {absen:i+1,name:st.long||st.short||''}; }).filter(function(r){ return !paid.has(r.absen) && match({name:r.name,absen:r.absen}); });
+  document.getElementById('twList').innerHTML = rows + (lunas.length ? '<div class="card"><div class="small" style="margin-bottom:4px;">LUNAS ('+lunas.length+' siswa)</div><div style="font-size:13.5px;line-height:1.6;">'+lunas.map(function(r){ return esc(r.name); }).join(', ')+'</div></div>' : '') + ((!rows && !lunas.length) ? '<p class="small">Tidak ada siswa yang cocok.</p>' : '');
+}
 function openView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
@@ -4228,6 +4416,8 @@ function openView(id){
   if(id==='jadwal') renderJadwal();
   if(id==='kontak') renderKontak();
   if(id==='kegiatan'){ renderKegiatanWeb(); ktView('Kas Kegiatan'); }
+  if(id==='tunggakanwali' && !isWali()){ document.getElementById('view-home').classList.add('active'); document.getElementById('view-tunggakanwali').classList.remove('active'); return; }
+  if(id==='tunggakanwali'){ renderWaliArrears(); ktView('Daftar tunggakan (wali)'); }
   if(id==='datakas'){ renderDataKas(); ktView('Data Kas (keuangan)'); }
   if(id==='kelolaanggotaview'){ renderMemberEditList(); ktView('Daftar siswa (NISN, NIS & tanggal lahir)'); }
   if(id==='komentar'){ try{ cmtOnOpenPage(); }catch(e){} }
@@ -4501,8 +4691,9 @@ function cmtItemHtml(c){
   var forMe=cmtKind(c)?' for-me':'';
   var del=canDel ? '<button class="cmt-act del'+(cmtDelPending===c.id?' sure':'')+'" onclick="cmtDelete(\''+c.id+'\')">'+(cmtDelPending===c.id?'Yakin hapus?':'Hapus')+'</button>' : '';
   var rq=c.replyTo ? '<div class="cmt-rq">membalas <b>'+cmtEsc(c.replyName||'')+'</b>: “'+cmtEsc(cmtSnip(c.replyText,80))+'”</div>' : '';
-  return '<div class="cmt'+(c.isAdmin?' cmt-admin':'')+forMe+'" id="cmt-'+c.id+'">'
-    +'<div class="cmt-h"><span class="cmt-name">'+cmtEsc(c.name||'-')+'</span>'+(c.isAdmin?'<span class="cmt-badge">ADMIN</span>':'')+(c.absen===cmtMe()?'<span class="cmt-tag">Kamu</span>':'')+'<span class="cmt-date">'+cmtFmt(cmtMs(c))+'</span></div>'
+  var isW=String(c.absen)==='W'&&!c.isAdmin;
+  return '<div class="cmt'+(c.isAdmin?' cmt-admin':'')+(isW?' cmt-wali':'')+forMe+'" id="cmt-'+c.id+'">'
+    +'<div class="cmt-h"><span class="cmt-name">'+cmtEsc(c.name||'-')+'</span>'+(c.isAdmin?'<span class="cmt-badge">ADMIN</span>':'')+(isW?'<span class="cmt-badge wali">GURU WALI</span>':'')+(c.absen===cmtMe()?'<span class="cmt-tag">Kamu</span>':'')+'<span class="cmt-date">'+cmtFmt(cmtMs(c))+'</span></div>'
     +rq+'<div class="cmt-b">'+cmtBody(c.text)+'</div>'
     +'<div class="cmt-acts"><button class="cmt-act" onclick="cmtReplyTo(\''+c.id+'\')">Balas</button>'+del+'</div></div>';
 }
@@ -4631,6 +4822,42 @@ function cmtDelete(id){
 cmtInitComposers();
 /* sesi tersimpan: enterSite() bisa berjalan sebelum skrip ini selesai dimuat -> langganan dijalankan di sini */
 if(window.cmtRoomWanted && typeof session!=='undefined' && session && !cmtUnsub){ try{ subscribeComments(window.cmtRoomWanted); }catch(e){} }
+</script>
+<script>
+/* Kunci gulir halaman saat popup/menu terbuka (semua tampilan): sentuhan & roda mouse tidak diteruskan ke halaman di bawahnya.
+   Isi popup yang panjang tetap bisa digulir sendiri; di ujung atas/bawahnya gulir juga tidak merembet ke halaman. */
+(function(){
+  var LAYERS='.modal-bg,.dv-modal,.menu,.dv-root,.kt-maint', locked=false, raf=0, sy=0;
+  function check(){
+    raf=0; var on=false, els=document.querySelectorAll('.modal-bg.open,.dv-modal.open,.overlay.open,.menu.open,#devRoot,#maintOverlay');
+    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.classList.contains('open') || getComputedStyle(e).display!=='none'){ on=true; break; } }
+    locked=on; document.documentElement.classList.toggle('kt-lock', on);
+  }
+  function sched(){ if(!raf) raf=requestAnimationFrame(check); }
+  try{ new MutationObserver(sched).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style']}); }catch(e){}
+  check();
+  function scroller(t){
+    for(var n=t; n && n!==document.body && n!==document.documentElement; n=n.parentElement){
+      if(n.nodeType!==1) continue;
+      var cs=getComputedStyle(n), oy=cs.overflowY;
+      if((oy==='auto'||oy==='scroll') && n.scrollHeight>n.clientHeight+1) return n;
+      if(n.matches && n.matches(LAYERS)) break;
+    }
+    return null;
+  }
+  function atEdge(el,dy){ return (dy<0 && el.scrollTop<=0) || (dy>0 && el.scrollTop+el.clientHeight>=el.scrollHeight-1); }
+  document.addEventListener('touchstart',function(e){ if(e.touches[0]) sy=e.touches[0].clientY; },{passive:true,capture:true});
+  document.addEventListener('touchmove',function(e){
+    if(!locked || !e.touches[0]) return;
+    var dy=sy-e.touches[0].clientY, sc=scroller(e.target);
+    if(!sc || atEdge(sc,dy)){ if(e.cancelable) e.preventDefault(); }
+  },{passive:false,capture:true});
+  document.addEventListener('wheel',function(e){
+    if(!locked) return;
+    var sc=scroller(e.target);
+    if(!sc || atEdge(sc,e.deltaY)){ if(e.cancelable) e.preventDefault(); }
+  },{passive:false,capture:true});
+})();
 </script>
 </body>
 </html>
