@@ -3065,12 +3065,13 @@ function doLogout(){
   document.getElementById('loginGate').style.display='flex';
 }
 
+function waliSapa(w){ return (w&&w.sapa==='Bapak')?'Bapak':'Ibu'; }
 function isWali(){ return !!session && !!session.wali; }
 function waliInfo(){ return (session && session.me && session.me.wali) || {}; }
 function currentStudent(){
   if(isWali()){
     let w=waliInfo(), nm=String(w.pgl||w.nama||'Wali');
-    return {short:(/^(ibu|bu)\b/i.test(nm)?nm:'Ibu '+nm).slice(0,36), long:w.nama||w.pgl||'Guru Wali', kelas:''};
+    return {short:(/^(ibu|bu|bapak|pak)\b/i.test(nm)?nm:waliSapa(w)+' '+nm).slice(0,36), long:w.nama||w.pgl||'Guru Wali', kelas:''};
   }
   let idx=parseInt(session.absen)-1;
   return (kasState.students && kasState.students[idx]) || {short:'-', long:'-'};
@@ -3390,7 +3391,7 @@ function renderAll(){
   document.getElementById('greetText').innerHTML = 'Halo, '+(st.short||'-')+' <span class="roleLabel">'+roleTxt+'</span>';
   if(isWali()){
     let w=waliInfo();
-    document.getElementById('profName').textContent = (/^(ibu|bu)\b/i.test(w.nama||'')?'':'Ibu ')+(w.nama||st.long||'-');
+    document.getElementById('profName').textContent = (/^(ibu|bu|bapak|pak)\b/i.test(w.nama||'')?'':waliSapa(w)+' ')+(w.nama||st.long||'-');
     document.getElementById('profL1').innerHTML = 'NIP: <span>'+esc(w.nip||'-')+'</span>';
     document.getElementById('profL2').innerHTML = 'Guru Wali'+(w.mapel?' · Mapel '+esc(w.mapel):'')+' · '+esc(kasState.appTitle||'Kelas');
   } else {

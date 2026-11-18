@@ -160,8 +160,9 @@ service cloud.firestore {
       allow read, write: if isDev();
       allow get: if notBlocked() && (isEditorOf(roomId) || isWorker());
       allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId)
-        && request.resource.data.keys().hasOnly(['pii', 'ts', 'wali'])
+        && request.resource.data.keys().hasOnly(['pii', 'ts', 'wali', 'walis'])
         && (!('wali' in request.resource.data) || (request.resource.data.wali is map && request.resource.data.wali.size() <= 6))
+        && (!('walis' in request.resource.data) || (request.resource.data.walis is list && request.resource.data.walis.size() <= 5))
         && request.resource.data.pii is list && request.resource.data.pii.size() <= 300
         && request.resource.data.ts is number;
     }
