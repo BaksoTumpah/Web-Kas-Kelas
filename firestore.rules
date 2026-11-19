@@ -144,6 +144,10 @@ service cloud.firestore {
       allow read, write: if isDev();
       allow get: if canRead(roomId);
       allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId) && secOk();
+      // Akun layanan Worker hanya boleh mengubah daftar siswa (nama panggilan dari profil siswa) dan penanda waktu, tidak yang lain.
+      allow update: if notBlocked() && maintenanceOff() && isWorker() && secOk()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['state'])
+        && request.resource.data.state.diff(resource.data.state).affectedKeys().hasOnly(['students', 'updatedAt']);
 
       // RIWAYAT PERUBAHAN KEUANGAN: perubahan dari website menunggu konfirmasi di aplikasi (status 'pending'),
       // perubahan dari aplikasi/bot dicatat sebagai 'applied'. Anggota membaca, Editor menulis.
@@ -159,7 +163,7 @@ service cloud.firestore {
     match /roster/{roomId} {
       allow read, write: if isDev();
       allow get: if notBlocked() && (isEditorOf(roomId) || isWorker());
-      allow create, update: if notBlocked() && maintenanceOff() && isEditorOf(roomId)
+      allow create, update: if notBlocked() && maintenanceOff() && (isEditorOf(roomId) || isWorker())
         && request.resource.data.keys().hasOnly(['pii', 'ts', 'wali', 'walis'])
         && (!('wali' in request.resource.data) || (request.resource.data.wali is map && request.resource.data.wali.size() <= 6))
         && (!('walis' in request.resource.data) || (request.resource.data.walis is list && request.resource.data.walis.size() <= 5))
@@ -193,6 +197,13 @@ service cloud.firestore {
         allow read, write: if isDev();
         allow get, list: if canRead(roomId);
         allow create, update, delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
+      }
+
+      // BIO PROFIL SISWA: ditulis Worker setelah bukti sesi siswa diperiksa; semua anggota kelas boleh membaca.
+      match /bio/{absen} {
+        allow read, write: if isDev();
+        allow get: if canRead(roomId);
+        allow create, update, delete: if notBlocked() && isWorker();
       }
 
       // PENGUMUMAN GURU WALI: hanya Worker (akun layanan) yang boleh menulis, setelah NIP guru wali diperiksa di server.
