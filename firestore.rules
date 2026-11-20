@@ -227,20 +227,34 @@ service cloud.firestore {
           && request.resource.data.absen is string
           && request.resource.data.name is string && request.resource.data.name.size() <= 40
           && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+          && !request.resource.data.text.lower().matches('(?s).*(anjing|anjink|bangsat|bajingan|brengsek|keparat|kontol|memek|ngentot|jancok|jancuk|goblok|kampret|sialan|pelacur|pukimak|asshole|bastard|nigger|fuck|bitch).*')   // filter kata kasar (cadangan; filter utama di website)
           && request.resource.data.isAdmin is bool
           && (request.resource.data.isAdmin == false || isEditorOf(roomId))
           && (!('mentions' in request.resource.data) || (request.resource.data.mentions is list && request.resource.data.mentions.size() <= 15))
           && (!('replyText' in request.resource.data) || (request.resource.data.replyText is string && request.resource.data.replyText.size() <= 130));
         allow delete: if notBlocked() && maintenanceOff()
-          && (resource.data.uid == request.auth.uid || isEditorOf(roomId));
+          && (resource.data.uid == request.auth.uid || isStaffOf(roomId));   // pemilik, Admin, atau Admin Kelas
       }
 
       // FOTO PROFIL per siswa: satu dokumen per absen, aturan hapus sama seperti galeri.
       match /photos/{absen} {
         allow read, write: if isDev();
         allow get: if canRead(roomId);
-        allow create, update: if notBlocked() && maintenanceOff() && isMemberOf(roomId);
-        allow delete: if notBlocked() && maintenanceOff() && isMemberOf(roomId) && resource.data.deleted == true;
+        allow create, update, delete: if notBlocked() && isWorker();   // ditulis Worker (bukti sesi siswa / NIP wali / token admin)
+      }
+
+      // LAPORAN bio/foto yang tidak pantas: anggota boleh melapor (1 laporan per pelapor-target-jenis); hanya Admin/Admin Kelas yang membaca & menutup.
+      match /reports/{rid} {
+        allow read, write: if isDev();
+        allow get, list, delete: if canRead(roomId) && isStaffOf(roomId);
+        allow create: if notBlocked() && maintenanceOff() && isMemberOf(roomId)
+          && request.resource.data.keys().hasOnly(['uid','absen','target','kind','reason','ts'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.ts == request.time
+          && request.resource.data.absen is string && request.resource.data.target is string
+          && request.resource.data.kind in ['bio','foto','nama']
+          && request.resource.data.reason is string && request.resource.data.reason.size() <= 100
+          && rid == request.auth.uid + '_' + request.resource.data.target + '_' + request.resource.data.kind;
       }
     }
 

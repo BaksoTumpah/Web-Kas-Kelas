@@ -9,6 +9,10 @@
 <meta name="theme-color" content="#fbf4e2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kas Kelas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -717,8 +721,22 @@ html.kt-lock,html.kt-lock body{overflow:hidden!important;overscroll-behavior:non
 .ps-hero{display:flex;gap:14px;align-items:center;}
 .ps-hero .avatar{width:84px;height:84px;flex:none;}
 .ps-mask{letter-spacing:.14em;}
+.bday-card{border:2px solid #ec4899;background:linear-gradient(135deg,color-mix(in srgb,#ec4899 22%,var(--card)),color-mix(in srgb,#f59e0b 12%,var(--card)));}
+.bday-big{font-size:40px;line-height:1;text-align:center;margin:4px 0 8px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chip{display:inline-block;font-size:12px;font-weight:700;border-radius:var(--r-pill);padding:5px 11px;background:var(--tint-brand);color:var(--blue);border:1px solid transparent;font-family:var(--font);}
+.chip.role{background:var(--amber);color:#1b1b1b;}
+.chip.ok{background:color-mix(in srgb,#16a34a 18%,var(--card));color:#15803d;}
+.chip.ach{background:color-mix(in srgb,#8b5cf6 16%,var(--card));color:#7c3aed;}
+.chip.bday{background:color-mix(in srgb,#ec4899 18%,var(--card));color:#be185d;}
+button.chip{cursor:pointer;background:var(--card);color:var(--text);border:1px solid var(--line);}
+button.chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.ps-count{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px;text-align:center;}
+.ps-count div{background:var(--tint-brand);border-radius:12px;padding:8px 2px;}
+.ps-count b{display:block;font-size:20px;font-variant-numeric:tabular-nums;}
+.ps-count span{font-size:10px;opacity:.75;}
 .ps-bio{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;}
-body.is-wali #btnEditProfil{display:none;}
+body.is-wali #btnEditProfil,body.is-wali #btnNotif{display:none;}
 .cmt.cmt-wali{background:linear-gradient(135deg,color-mix(in srgb,#8b5cf6 26%,var(--card)) 0%,color-mix(in srgb,#8b5cf6 8%,var(--card)) 100%);border:2px solid #8b5cf6;padding-left:20px;box-shadow:0 10px 26px -14px rgba(139,92,246,.7);}
 .cmt.cmt-wali::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:7px;border-radius:0 5px 5px 0;background:linear-gradient(#a78bfa,#7c3aed);}
 .cmt-badge.wali{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;}
@@ -800,11 +818,13 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
       <div><b id="profName">-</b></div>
       <div class="small" id="profL1">NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span></div>
       <div class="small" id="profL2">Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span></div>
+      <div class="small" id="profAge"></div>
     </div>
   </div>
   <div class="mrow" style="margin-top:-6px;margin-bottom:12px;">
     <input type="file" accept="image/*" id="avatarInput" style="display:none;" onchange="uploadAvatar()">
     <button class="btn" id="btnEditProfil" style="width:100%;" onclick="openEditProfil()">Edit Profil</button>
+    <button class="btn" id="btnNotif" style="width:100%;" onclick="openNotif()">Notifikasi Pengingat</button>
     <div class="wali-only" style="width:100%;"><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;" onclick="document.getElementById('avatarInput').click()">Ubah Foto</button><button class="btn" id="btnWaliDelPhoto" style="flex:1;color:var(--red);display:none;" onclick="waliRemovePhoto()">Hapus Foto</button></div></div>
   </div>
 
@@ -962,14 +982,24 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
         <div style="font-weight:800;overflow-wrap:anywhere;" id="psLong">-</div>
         <div class="small" id="psKelas">-</div>
         <div class="small ps-mask" id="psMask">-</div>
+        <div class="small" id="psAge" style="margin-top:2px;"></div>
       </div>
     </div>
+    <div class="chips" id="psBadges"></div>
   </div>
   <div class="card">
     <div class="small" style="margin-bottom:6px;">BIO</div>
     <div class="ps-bio" id="psBio">Memuat…</div>
   </div>
+  <div class="card" id="psBdCard" style="display:none;">
+    <div class="small">ULANG TAHUN</div>
+    <div id="psBdInfo" style="font-weight:700;margin-top:2px;"></div>
+    <div class="ps-count" id="psCount"></div>
+  </div>
+  <div class="card" id="psHobCard" style="display:none;"><div class="small">HOBI</div><div class="chips" id="psHob"></div></div>
+  <div class="card" id="psAchCard" style="display:none;"><div class="small">PENCAPAIAN</div><div class="chips" id="psAch"></div></div>
   <button class="btn primary" id="psEditBtn" style="width:100%;margin-bottom:8px;display:none;" onclick="openEditProfil()">Edit Profil</button>
+  <button class="btn" id="psRepBtn" style="width:100%;margin-bottom:8px;display:none;color:var(--red);" onclick="openLapProfil()">Laporkan profil ini</button>
   <button class="btn" style="width:100%;" onclick="profBack()">← Kembali</button>
 </div>
 
@@ -995,8 +1025,14 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
       <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
     </select>
   </div>
-  <p class="small">Tanggal lahir dipakai untuk verifikasi login dan ikut diperbarui di aplikasi bendahara. Tidak ditampilkan ke teman.</p>
-  <label for="epBio">Bio</label>
+  <p class="small">Tanggal lahir dipakai untuk verifikasi login dan ikut diperbarui di aplikasi bendahara. Teman bisa melihat hitung mundur ulang tahunmu, kecuali kamu menyembunyikannya di bawah.</p>
+  <label for="epYear">Tahun lahir (opsional, untuk menampilkan umur)</label>
+  <input type="number" id="epYear" min="1990" max="2030" placeholder="Contoh: 2010">
+  <label>Hobi (pilih maksimal 5)</label>
+  <div class="chips" id="epHobBox"></div>
+  <label style="display:flex;gap:8px;align-items:center;margin-top:12px;font-weight:600;"><input type="checkbox" id="epHideBd" style="width:auto;"> Sembunyikan tanggal lahir &amp; umur dari teman</label>
+  <label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-weight:600;"><input type="checkbox" id="epHideKas" style="width:auto;"> Sembunyikan lencana status kas (Lunas / Rajin bayar)</label>
+  <label for="epBio" style="margin-top:12px;">Bio</label>
   <textarea id="epBio" rows="3" maxlength="150" placeholder="Ceritakan singkat tentangmu (maks. 150 karakter)" oninput="document.getElementById('epBioN').textContent=this.value.length"></textarea>
   <div class="small" style="text-align:right;"><span id="epBioN">0</span>/150</div>
   <div class="mrow"><button class="btn" onclick="openProfile(session.absen)">Batal</button><button class="btn primary" id="epSaveBtn" onclick="epSave()">Simpan</button></div>
@@ -1017,6 +1053,7 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
       <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
     </select>
   </div>
+  <label>Tahun Lahir (untuk umur)</label><input type="number" id="esBirthYear" min="1990" max="2030" placeholder="Contoh: 2010">
   <p class="small">NISN, NIS &amp; tanggal lahir ini otomatis tersinkron dua arah dengan aplikasi Kas Kelas (dipakai untuk verifikasi login).</p>
   <label>Kelas</label><input type="text" id="esKelas">
   <label>Foto Profil</label>
@@ -1026,6 +1063,9 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
     <button class="btn" onclick="document.getElementById('esPhotoInput').click()">Ganti Foto</button>
     <button class="btn" style="color:var(--red);" onclick="esRemovePhoto()">Hapus Foto</button>
   </div>
+  <label>Peran di kelas (tampil sebagai lencana di profil)</label>
+  <select id="esRole"><option value="">(tidak ada)</option></select>
+  <div class="mrow"><button class="btn" onclick="esSaveRole()">Simpan Peran</button><button class="btn" style="color:var(--red);" onclick="esResetBio()">Reset Bio</button></div>
   <div class="mrow"><button class="btn primary" style="width:100%;" onclick="esSaveBiodata()">Simpan Biodata</button></div>
   <hr style="border-color:var(--line);margin:16px 0;">
   <h2 class="h">Tunggakan Kas</h2>
@@ -1100,6 +1140,45 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
   <div class="mrow"><button class="btn" onclick="closeModal('report')">Batal</button><button class="btn primary" id="rpSendBtn" onclick="reportSend()">Kirim</button></div>
 </div></div>
 
+<div class="modal-bg" id="modal-notif"><div class="modal">
+  <h2 class="h">Notifikasi Pengingat</h2>
+  <p class="small">Pengingat dikirim ke HP ini lewat notifikasi, tanpa perlu membuka website.</p>
+  <div id="ntStatus" class="small" style="margin:6px 0;font-weight:700;"></div>
+  <div id="ntHint" class="small" style="margin-bottom:8px;"></div>
+  <div id="ntOpts">
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600;"><input type="checkbox" id="ntTg" style="width:auto;" onchange="notifPrefSave()"> Tunggakan kas (tiap Senin pagi)</label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntKs" style="width:auto;" onchange="notifPrefSave()"> Hari bayar kas (pagi hari tagih &amp; sore sebelumnya)</label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntTk" style="width:auto;" onchange="notifPrefSave()"> Tugas yang dikumpulkan hari ini &amp; besok</label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntJd" style="width:auto;" onchange="notifPrefSave()"> Mapel besok (sore hari)</label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntUl" style="width:auto;" onchange="notifPrefSave()"> Ulang tahun teman &amp; ucapan untukmu</label>
+  </div>
+  <div class="mrow"><button class="btn primary" id="ntToggle" onclick="notifToggle()">Aktifkan</button><button class="btn" id="ntTest" onclick="notifTest()">Kirim Uji</button></div>
+  <div class="mrow"><button class="btn" onclick="closeModal('notif')">Tutup</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-bdaypopup"><div class="modal bday-card">
+  <div class="bday-big">🎂🎉</div>
+  <h2 class="h" id="bdayPopTitle" style="text-align:center;">Selamat Ulang Tahun!</h2>
+  <p id="bdayPopMsg" style="text-align:center;"></p>
+  <div class="mrow"><button class="btn primary" style="width:100%;" onclick="closeModal('bdaypopup')">Terima kasih!</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-lapprofil"><div class="modal">
+  <h2 class="h">Laporkan Profil</h2>
+  <p class="small" id="lapProfInfo"></p>
+  <label>Yang dilaporkan</label>
+  <select id="lapKind"><option value="bio">Bio</option><option value="foto">Foto profil</option><option value="nama">Nama panggilan</option></select>
+  <label>Alasan singkat</label>
+  <input type="text" id="lapReason" maxlength="100" placeholder="Contoh: berisi kata kasar">
+  <div class="mrow"><button class="btn" onclick="closeModal('lapprofil')">Batal</button><button class="btn primary" onclick="lapProfilSend()">Kirim Laporan</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-laprofillist"><div class="modal">
+  <h2 class="h">Laporan Profil</h2>
+  <div id="lapProfList" class="small">Memuat…</div>
+  <div class="mrow"><button class="btn" onclick="closeModal('laprofillist')">Tutup</button></div>
+</div></div>
+
 <div class="modal-bg" id="modal-adminmenu"><div class="modal">
   <h2 class="h">Menu Admin</h2>
   <div class="mrow" style="flex-direction:column;">
@@ -1109,6 +1188,7 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
     <button class="btn" onclick="closeModal('adminmenu');openView('jadwal')">Kelola Jadwal</button>
     <button class="btn" onclick="closeModal('adminmenu');openView('kontak')">Kelola Kontak</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('lihatlaporan')">Lihat Laporan Masuk</button>
+    <button class="btn" onclick="closeModal('adminmenu');openModal('laprofillist')">Laporan Profil (bio/foto)</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('loginlog')">Log Kunjungan</button>
     <button class="btn" onclick="closeModal('adminmenu');openModal('personalannounce')">Pengumuman Personal</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('recount')">Recount Tunggakan</button>
@@ -1826,7 +1906,7 @@ async function dvLoadAll(){
   tk.docs.forEach(d=>{ const v=d.data()||{}; if(v.roomId) R(v.roomId).tokens.push({token:d.id, role:v.role, peers:v.peers}); });
   kas.docs.forEach(d=>{ const v=d.data()||{}; const r=R(d.id); r.kas=v.state||{}; r.kasDoc=v; r.kasBytes=dvBytes(v); });
   web.docs.forEach(d=>{ const v=d.data()||{}; const r=R(d.id); r.web=v; r.webDoc=v; r.webBytes=dvBytes(v); });
-  ros.docs.forEach(d=>{ const v=d.data()||{}, r=rooms[d.id]; if(r && r.kas && Array.isArray(r.kas.students) && Array.isArray(v.pii) && v.pii.length===r.kas.students.length) r.kas.students.forEach((s,i)=>{ const p=v.pii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; }); });
+  ros.docs.forEach(d=>{ const v=d.data()||{}, r=rooms[d.id]; if(r && r.kas && Array.isArray(r.kas.students) && Array.isArray(v.pii) && v.pii.length===r.kas.students.length) r.kas.students.forEach((s,i)=>{ const p=v.pii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; s.birthYear=p.birthYear||0; }); });
   dvData={rooms, loadedAt:Date.now()};
 }
 async function dvReload(){
@@ -3117,7 +3197,7 @@ function doLogout(){
   if(typeof galleryUnsub!=='undefined' && galleryUnsub){ galleryUnsub(); galleryUnsub=null; }
   galleryList=[]; albumList=[]; galeriView=null; try{ if(albumUnsub) albumUnsub(); }catch(e){} avatarCache={};
   try{ if(typeof cmtCleanup==='function') cmtCleanup(); }catch(e){}
-  if(waliAnnUnsub){ try{ waliAnnUnsub(); }catch(e){} waliAnnUnsub=null; } waliAnnList=[];
+  if(waliAnnUnsub){ try{ waliAnnUnsub(); }catch(e){} waliAnnUnsub=null; } waliAnnList=[]; bdayToday=[]; bdayOwn=false;
   session=null;
   kasState=emptyKas(); webState=emptyWeb();
   try{ localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }catch(e){}
@@ -3149,7 +3229,7 @@ function enterSite(firstLoginThisSession){
     root.classList.remove('enter-anim'); void root.offsetWidth; root.classList.add('enter-anim');
     root.addEventListener('animationend', ()=>root.classList.remove('enter-anim'), {once:true});
   }, 280);
-  if(session.dev){ renderAll(); if(firstLoginThisSession) setTimeout(showAnnouncePopup, 600); return; }
+  if(session.dev){ renderAll(); try{ bdayInit(); }catch(e){} if(firstLoginThisSession) setTimeout(showAnnouncePopup, 600); return; }
   let __room=session.roomId;
   Promise.resolve().then(()=>ktRegisterMember(session.token)).catch(()=>{}).then(()=>{
     if(!session || session.roomId!==__room) return;
@@ -3159,6 +3239,7 @@ function enterSite(firstLoginThisSession){
     window.cmtRoomWanted=session.roomId;
     try{ if(typeof subscribeComments==='function') subscribeComments(session.roomId); }catch(e){}
     try{ subscribeWaliAnn(session.roomId); }catch(e){}
+    try{ bdayInit(); }catch(e){}
   });
   setTimeout(registerVisit, 700);
   setTimeout(function(){ try{ if(isAdmin() && session.absen) fbDb.collection('website').doc(session.roomId).set({adminAbsens:firebase.firestore.FieldValue.arrayUnion(String(session.absen))},{merge:true}).catch(function(){}); }catch(e){} }, 2500);
@@ -3178,14 +3259,14 @@ try{ var __c=localStorage.getItem('kas_logo'); if(__c){ document.documentElement
 let rosterPii=null, rosterUnsub=null;
 function mergeRosterInto(){
   if(!rosterPii || !kasState || !Array.isArray(kasState.students) || rosterPii.length!==kasState.students.length) return;
-  kasState.students.forEach((s,i)=>{ const p=rosterPii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; });
+  kasState.students.forEach((s,i)=>{ const p=rosterPii[i]||{}; s.nisn=p.nisn||''; s.nis=p.nis||''; s.birthDate=p.birthDate||''; s.birthYear=p.birthYear||0; });
 }
 function kasStateForWrite(){   // salinan state TANPA identitas siswa untuk ditulis ke dokumen kas
   const c=JSON.parse(JSON.stringify(kasState));
-  (c.students||[]).forEach(s=>{ delete s.nisn; delete s.nis; delete s.birthDate; });
+  (c.students||[]).forEach(s=>{ delete s.nisn; delete s.nis; delete s.birthDate; delete s.birthYear; });
   return c;
 }
-function piiFromKasState(){ return (kasState.students||[]).map(s=>({nisn:s.nisn||'',nis:s.nis||'',birthDate:s.birthDate||''})); }
+function piiFromKasState(){ return (kasState.students||[]).map(s=>({nisn:s.nisn||'',nis:s.nis||'',birthDate:s.birthDate||'',birthYear:s.birthYear||0})); }
 function subscribeKas(roomId){
   if(kasUnsub) kasUnsub();
   if(rosterUnsub){ rosterUnsub(); rosterUnsub=null; } rosterPii=null;
@@ -3268,24 +3349,22 @@ async function fetchAvatarFor(absen){
     return avatarCache[absen];
   }catch(e){ return null; }
 }
+function phAuth(absen){
+  if(isWali()) return {nip:waliInfo().nip};
+  if(isStaff() && String(absen)!==String(session.absen)) return {adm:1,absen:String(absen)};
+  return {pt:session.pt};
+}
 async function setAvatarFor(absen, dataUrl){
-  avatarCache[String(absen)] = dataUrl;
-  if(session.dev) return;
-  try{
-    await fbDb.collection('website').doc(session.roomId).collection('photos').doc(String(absen))
-      .set({photo:dataUrl});
-  }catch(e){ alertBox('Gagal menyimpan foto: '+e.message); }
+  if(session.dev){ avatarCache[String(absen)]=dataUrl; return true; }
+  let r=await relayCall({ph:Object.assign({t:session.token,act:'set',photo:dataUrl},phAuth(absen))});
+  if(!r.ok){ alertBox('Gagal menyimpan foto: '+(r.error||'')); return false; }
+  avatarCache[String(absen)]=dataUrl; return true;
 }
 async function removeAvatarFor(absen){
-  avatarCache[String(absen)] = null;
-  if(session.dev) return;
-  let ref=fbDb.collection('website').doc(session.roomId).collection('photos').doc(String(absen));
-  try{
-    // 1) tandai terhapus & kosongkan isi foto (membawa token -> lolos aturan "update")
-    await ref.set({deleted:true, photo:''},{merge:true});
-  }catch(e){ alertBox('Gagal menghapus foto: '+e.message); return; }
-  // 2) buang dokumen sisa; kalau aturan terbaru belum dipublish, sisa kecil ini tidak terlihat siapa pun
-  try{ await ref.delete(); }catch(e){}
+  if(session.dev){ avatarCache[String(absen)]=null; return true; }
+  let r=await relayCall({ph:Object.assign({t:session.token,act:'del'},phAuth(absen))});
+  if(!r.ok){ alertBox('Gagal menghapus foto: '+(r.error||'')); return false; }
+  avatarCache[String(absen)]=null; return true;
 }
 
 /* ---- Mode developer: data contoh lokal (tanpa Firebase) ---- */
@@ -3453,6 +3532,7 @@ function renderAll(){
     let w=waliInfo();
     document.getElementById('profName').textContent = (/^(ibu|bu|bapak|pak)\b/i.test(w.nama||'')?'':waliSapa(w)+' ')+(w.nama||st.long||'-');
     document.getElementById('profL1').innerHTML = 'NIP: <span>'+esc(w.nip||'-')+'</span>';
+    document.getElementById('profAge').textContent='';
     document.getElementById('profL2').innerHTML = 'Guru Wali'+(w.mapel?' · Mapel '+esc(w.mapel):'')+' · '+esc(kasState.appTitle||'Kelas');
   } else {
     if(!document.getElementById('profNisn')){ document.getElementById('profL1').innerHTML='NISN: <span id="profNisn">-</span> · NIS: <span id="profNis">-</span>'; document.getElementById('profL2').innerHTML='Kelas <span id="profKelas">-</span> · Absen <span id="profAbsen">-</span>'; }
@@ -3461,6 +3541,8 @@ function renderAll(){
     document.getElementById('profNis').textContent = pr.nis||'-';
     document.getElementById('profKelas').textContent = pr.kelas||'-';
     document.getElementById('profAbsen').textContent = session.absen;
+    (function(){ let bd=bdParts(session.me&&session.me.bd), by=parseInt((session.me&&session.me.by)||0), e=document.getElementById('profAge');
+      if(bd&&by>=1990){ let a=ageOf(bd,by,new Date()); e.textContent='Umur: '+a.y+' tahun'+(a.m?' '+a.m+' bulan':''); } else e.textContent='Umur: belum diisi (isi tahun lahir di Edit Profil)'; })();
   }
   document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(session.absen).then(photo=>{
@@ -3667,6 +3749,109 @@ function myPersonalAnnouncements(){
   let myAbsen=parseInt(session.absen);
   return (webState.personalAnnouncements||[]).filter(a=>(a.targets||[]).includes(myAbsen));
 }
+/* ---- Notifikasi pengingat (Web Push) ---- */
+var ntState={on:false,pr:{tg:1,ks:1,tk:1,jd:1,ul:1}};
+function ntSupported(){ return !!(('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window)); }
+function ntIsIos(){ return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
+function ntStandalone(){ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
+function ntPrFromUi(){ return {tg:+document.getElementById('ntTg').checked,ks:+document.getElementById('ntKs').checked,tk:+document.getElementById('ntTk').checked,jd:+document.getElementById('ntJd').checked,ul:+document.getElementById('ntUl').checked}; }
+function ntRender(){
+  var sup=ntSupported(), perm=sup?Notification.permission:'denied', hint='';
+  if(!sup) hint=(ntIsIos()&&!ntStandalone())?'Di iPhone/iPad, buka menu Bagikan lalu pilih "Tambahkan ke Layar Utama", buka website dari ikon itu, lalu aktifkan di sini.':'Browser ini belum mendukung notifikasi. Coba Chrome di Android.';
+  else if(perm==='denied') hint='Izin notifikasi diblokir. Buka pengaturan situs di browser dan izinkan Notifikasi, lalu coba lagi.';
+  document.getElementById('ntStatus').textContent=ntState.on?'Status: aktif di HP ini':'Status: belum aktif';
+  document.getElementById('ntHint').textContent=hint;
+  document.getElementById('ntOpts').style.display=ntState.on?'':'none';
+  ['Tg','Ks','Tk','Jd','Ul'].forEach(function(k){ document.getElementById('nt'+k).checked=!!ntState.pr[k.toLowerCase()]; });
+  var b=document.getElementById('ntToggle'); b.textContent=ntState.on?'Matikan':'Aktifkan'; b.disabled=!sup||perm==='denied';
+  document.getElementById('ntTest').style.display=ntState.on?'':'none';
+}
+async function ntCurrentSub(){ try{ var reg=await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }catch(e){ return null; } }
+async function openNotif(){
+  if(!session||isWali()) return;
+  openModal('notif'); ntRender();
+  if(!ntSupported()||session.dev) return;
+  var sub=await ntCurrentSub();
+  var r=session.pt?await relayCall({ps:{t:session.token,pt:session.pt,act:'get'}}):{ok:false};
+  if(r&&r.ok){ ntState.pr=r.pr||ntState.pr; ntState.on=!!sub&&r.on; }
+  else ntState.on=false;
+  ntRender();
+}
+async function notifToggle(){
+  if(!session||isWali()) return;
+  if(!session.pt){ alertBox('Sesi login lama belum bisa mengatur notifikasi. Keluar, lalu masuk lagi.'); return; }
+  var btn=document.getElementById('ntToggle'); btn.disabled=true;
+  try{
+    if(ntState.on){
+      var sub=await ntCurrentSub(), e=sub?sub.endpoint:'';
+      try{ if(sub) await sub.unsubscribe(); }catch(x){}
+      await relayCall({ps:{t:session.token,pt:session.pt,act:'unsub',e:e}});
+      ntState.on=false; alertBox('Notifikasi dimatikan di HP ini.');
+    }else{
+      var perm=await Notification.requestPermission();
+      if(perm!=='granted'){ alertBox('Izin notifikasi tidak diberikan.'); return; }
+      var k=await relayCall({ps:{act:'key'}}); if(!k.ok){ alertBox('Server tidak terjangkau. Coba lagi.'); return; }
+      var reg=await navigator.serviceWorker.ready, sub2=await reg.pushManager.getSubscription();
+      if(!sub2) sub2=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ntKeyBytes(k.key)});
+      var js=sub2.toJSON(), r=await relayCall({ps:{t:session.token,pt:session.pt,act:'sub',sub:{endpoint:js.endpoint,keys:js.keys},pr:ntState.pr}});
+      if(!r.ok){ alertBox(r.error||'Gagal mengaktifkan notifikasi.'); return; }
+      ntState.on=true; ntState.pr=r.pr||ntState.pr; alertBox('Notifikasi aktif. Tekan "Kirim Uji" untuk mencoba.');
+    }
+  }catch(e){ alertBox('Gagal: '+((e&&e.message)||e)); }
+  finally{ btn.disabled=false; ntRender(); }
+}
+function ntKeyBytes(b64){ var s=b64.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var raw=atob(s), a=new Uint8Array(raw.length); for(var i=0;i<raw.length;i++) a[i]=raw.charCodeAt(i); return a; }
+async function notifPrefSave(){
+  ntState.pr=ntPrFromUi(); if(!session||!session.pt) return;
+  var r=await relayCall({ps:{t:session.token,pt:session.pt,act:'pr',pr:ntState.pr}});
+  if(!r.ok) alertBox(r.error||'Gagal menyimpan pengaturan.');
+}
+async function notifTest(){
+  var r=await relayCall({ps:{t:session.token,pt:session.pt,act:'test'}});
+  alertBox(r.ok?'Notifikasi uji dikirim. Cek bar notifikasi HP kamu.':(r.error||'Gagal mengirim.'));
+}
+/* ---- Pengumuman ulang tahun ---- */
+var bdayToday=[], bdayOwn=false;
+function bdLocalDay(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function bdayNames(){ return bdayToday.map(function(a){ var st=(kasState.students||[])[parseInt(a)-1]; return st?(st.short||st.long):''; }).filter(Boolean); }
+function bdayOwnMsg(){ var st=(session&&!isWali())?currentStudent():{}; return 'Selamat ulang tahun, '+esc(st.short||'')+'! Semoga sehat, bahagia, dan sukses selalu. Jangan lupa bayar kas ya!'; }
+function bdayAnnHtml(){
+  var h='';
+  if(bdayOwn) h+='<div class="card bday-card"><b>Selamat ulang tahun! 🎂</b><div style="margin-top:4px;">'+bdayOwnMsg()+'</div></div>';
+  var n=bdayNames();
+  if(n.length){ var t=n.length>1?n.slice(0,-1).join(', ')+' dan '+n[n.length-1]:n[0]; h+='<div class="card"><b>Ulang tahun hari ini</b><div class="small" style="margin-top:4px;">'+esc(t)+' berulang tahun hari ini. Ucapkan selamat ya!</div></div>'; }
+  return h;
+}
+function bdayPopup(tries){
+  tries=tries||0; if(!bdayOwn||!session) return;
+  var key='bd_seen_'+session.roomId+'_'+session.absen, td=bdLocalDay(new Date());
+  try{ if(localStorage.getItem(key)===td) return; }catch(e){}
+  if(tries<1){ setTimeout(function(){ bdayPopup(1); },1800); return; }
+  if(document.querySelector('.modal-bg.open')&&tries<120){ setTimeout(function(){ bdayPopup(tries+1); },1000); return; }   // tunggu pengumuman biasa ditutup dulu
+  document.getElementById('bdayPopMsg').innerHTML=bdayOwnMsg(); openModal('bdaypopup');
+  try{ localStorage.setItem(key,td); }catch(e){}
+}
+async function bdayInit(){
+  bdayToday=[]; bdayOwn=false; if(!session) return;
+  var now=new Date(), key='bd_list_'+session.roomId, td=bdLocalDay(now), list=null;
+  if(!isWali()){ var ob=bdParts(session.me&&session.me.bd); if(ob&&bdToday(ob,now)) bdayOwn=true; }
+  if(session.dev){ list=[]; (kasState.students||[]).forEach(function(st,i){ var b=bdParts(st.birthDate); if(b&&bdToday(b,now)) list.push(String(i+1)); }); }
+  else{
+    try{ var c=JSON.parse(localStorage.getItem(key)||'null'); if(c&&c.d===td) list=c.l; }catch(e){}
+    if(!list){
+      list=[];
+      try{
+        var q=await fbDb.collection('website').doc(session.roomId).collection('bio').get();
+        q.docs.forEach(function(d){ var p=d.data(); pubCache[d.id]=p; bioCache[d.id]=String(p.text||''); var b=bdParts(p.bd); if(b&&!p.hb&&bdToday(b,now)) list.push(d.id); });
+        try{ localStorage.setItem(key,JSON.stringify({d:td,l:list})); }catch(e){}
+      }catch(e){}
+    }
+  }
+  bdayToday=list.filter(function(a){ return !session||String(a)!==String(session.absen)||isWali(); });
+  if(!session) return;
+  try{ renderAnnounce(); }catch(e){}
+  if(bdayOwn) bdayPopup();
+}
 var waliAnnList=[], waliAnnUnsub=null;
 function subscribeWaliAnn(roomId){
   if(waliAnnUnsub){ try{ waliAnnUnsub(); }catch(e){} waliAnnUnsub=null; }
@@ -3694,6 +3879,7 @@ async function waliAnnSend(){
   let ti=document.getElementById('waTitle'), bo=document.getElementById('waBody'), btn=document.getElementById('waSendBtn');
   let title=ti.value.trim(), body=bo.value.trim();
   if(!title||!body){ alertBox('Isi judul dan isi pengumuman dulu.'); return; }
+  if(kasarTolak(title,body)) return;
   btn.disabled=true; let r=await waliRelay({act:'add',title:title,body:body}); btn.disabled=false;
   if(!r.ok){ alertBox(r.error||'Gagal mengirim pengumuman.'); return; }
   ti.value=''; bo.value=''; closeModal('waliann'); alertBox('Pengumuman terkirim. Seluruh kelas bisa melihatnya.');
@@ -3707,7 +3893,7 @@ async function waliAnnDel(id){
 function renderAnnounce(){
   let tmr=tomorrowName();
   let sch=webState.schedule[tmr]||[];
-  let html = waliAnnHtml() + `<div class="card"><b>Jadwal Besok (${tmr})</b>` +
+  let html = bdayAnnHtml() + waliAnnHtml() + `<div class="card"><b>Jadwal Besok (${tmr})</b>` +
     (sch.length ? sch.map(j=>`<div class="listrow"><span>${esc(j.jam)}</span><span>${esc(j.mapel)}</span></div>`).join('') : '<div class="small">Tidak ada jadwal tercatat.</div>') +
     `</div>`;
   let mine=[...myPersonalAnnouncements()].sort((a,b)=>b.date.localeCompare(a.date));
@@ -4129,6 +4315,7 @@ function removeKontak(i){ webState.contacts.splice(i,1); pushWeb(); renderKontak
 function kirimLaporan(){
   let msg=document.getElementById('laporMsg').value.trim();
   if(!msg){ alertBox('Tulis pesan dulu.'); return; }
+  if(kasarTolak(msg)) return;
   let st=currentStudent();
   webState.reports.push({id:Date.now(), from:st.short||session.absen, date:new Date().toISOString().slice(0,16).replace('T',' '), msg});
   pushWeb(); closeModal('lapor');
@@ -4150,7 +4337,7 @@ async function waliRemovePhoto(){
   if(!session||!isWali()) return;
   if(!avatarCache[String(session.absen)] && !document.querySelector('#avatarBox img')){ alertBox('Belum ada foto profil.'); return; }
   if(!confirm('Hapus foto profil?')) return;
-  await removeAvatarFor(session.absen);
+  if(!(await removeAvatarFor(session.absen))) return;
   document.getElementById('avatarBox').innerHTML='<i class="ic" data-ic="person"></i>';
   waliPhotoBtns(); alertBox('Foto profil dihapus.');
 }
@@ -4158,7 +4345,7 @@ function uploadAvatar(){
   let f=document.getElementById('avatarInput').files[0];
   if(!f) return;
   compressImage(f,480,0.8).then(async dataUrl=>{
-    await setAvatarFor(session.absen, dataUrl);
+    if(!(await setAvatarFor(session.absen, dataUrl))) return;
     document.getElementById('avatarBox').innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
     waliPhotoBtns(); alertBox('Foto profil tersimpan.');
   }).catch(e=>alertBox(e.message)).finally(()=>{ document.getElementById('avatarInput').value=''; });
@@ -4181,18 +4368,20 @@ function openEditSiswa(absen){
   let [bd,bm]=(st.birthDate||'').split('-');
   document.getElementById('esBirthDay').value = bd?parseInt(bd):'';
   document.getElementById('esBirthMonth').value = bm?parseInt(bm):'';
+  document.getElementById('esBirthYear').value = st.birthYear||'';
   document.getElementById('esKelas').value=st.kelas||'';
   document.getElementById('esAvatar').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(absen).then(photo=>{
     if(photo) document.getElementById('esAvatar').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
   });
+  (function(){ let sel=document.getElementById('esRole'); if(sel.options.length<2) EP_PERAN.forEach(function(r){ let o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); }); sel.value=''; fetchPubFor(absen).then(function(p){ if(String(activeEditAbsen)===String(absen)) sel.value=p.role||''; }); })();
   renderEsTunggakan();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-editsiswa').classList.add('active');
 }
-async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis){
+async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis, birthYear){
   if(!isAdmin()){ alertBox('Hanya admin yang bisa mengubah data ini.'); return false; }
-  if(session.dev){ if(!kasState.students[idx]) return false; kasState.students[idx].nisn=nisn; kasState.students[idx].nis=nis||''; kasState.students[idx].birthDate=birthDate; kasState.students[idx].kelas=kelas; renderAll(); return true; }
+  if(session.dev){ if(!kasState.students[idx]) return false; kasState.students[idx].nisn=nisn; kasState.students[idx].nis=nis||''; kasState.students[idx].birthDate=birthDate; kasState.students[idx].birthYear=birthYear||0; kasState.students[idx].kelas=kelas; renderAll(); return true; }
   try{
     await ktRegisterMember();
     let fresh = await fbDb.collection('kas').doc(session.roomId).get();
@@ -4200,12 +4389,12 @@ async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis){
     if(!st8.students || !st8.students[idx]) return false;
     let ro = await fbDb.collection('roster').doc(session.roomId).get();
     let pii = (ro.exists && Array.isArray(ro.data().pii)) ? ro.data().pii.slice() : [];
-    while(pii.length<st8.students.length) pii.push({nisn:'',nis:'',birthDate:''});
+    while(pii.length<st8.students.length) pii.push({nisn:'',nis:'',birthDate:'',birthYear:0});
     st8.students.forEach((s,i)=>{   // data lama yang masih tercampur di kas ikut dipindahkan
-      const o=pii[i]||{}; pii[i]={nisn:o.nisn||s.nisn||'', nis:o.nis||s.nis||'', birthDate:o.birthDate||s.birthDate||''};
-      delete s.nisn; delete s.nis; delete s.birthDate;
+      const o=pii[i]||{}; pii[i]={nisn:o.nisn||s.nisn||'', nis:o.nis||s.nis||'', birthDate:o.birthDate||s.birthDate||'', birthYear:o.birthYear||s.birthYear||0};
+      delete s.nisn; delete s.nis; delete s.birthDate; delete s.birthYear;
     });
-    pii[idx]={nisn:nisn, nis:nis||'', birthDate:birthDate};
+    pii[idx]={nisn:nisn, nis:nis||'', birthDate:birthDate, birthYear:birthYear||0};
     st8.students[idx].kelas = kelas;
     const ts=Date.now(), b=fbDb.batch();
     b.set(fbDb.collection('kas').doc(session.roomId),{state: st8, sec:2});
@@ -4214,17 +4403,30 @@ async function pushKasStudentEdit(idx, nisn, birthDate, kelas, nis){
     return true;
   }catch(e){ alertBox('Gagal simpan ke aplikasi: '+e.message); return false; }
 }
+var EP_PERAN=['Ketua Kelas','Wakil Ketua','Sekretaris','Wakil Sekretaris','Bendahara','Wakil Bendahara','Seksi Kebersihan','Seksi Keamanan','Seksi Humas','Seksi Olahraga','Seksi Agama'];
+async function esSaveRole(){
+  let role=document.getElementById('esRole').value, abs=String(activeEditAbsen);
+  if(session.dev){ pubCache[abs]=Object.assign({},pubCache[abs]||{},{role:role}); alertBox('Peran disimpan (demo).'); return; }
+  let r=await relayCall({ad:{t:session.token,op:'role',absen:abs,role:role}});
+  if(!r.ok){ alertBox(r.error||'Gagal menyimpan peran.'); return; }
+  pubCache[abs]=Object.assign({},pubCache[abs]||{},{role:role}); alertBox(role?'Peran disimpan: '+role+'.':'Peran dikosongkan.');
+}
+async function esResetBio(){
+  let abs=String(activeEditAbsen); if(!confirm('Kosongkan bio siswa ini?')) return;
+  if(!session.dev){ let r=await relayCall({ad:{t:session.token,op:'resetbio',absen:abs}}); if(!r.ok){ alertBox(r.error||'Gagal mereset bio.'); return; } }
+  bioCache[abs]=''; pubCache[abs]=Object.assign({},pubCache[abs]||{},{text:''}); alertBox('Bio dikosongkan.');
+}
 function esUploadPhoto(){
   let f=document.getElementById('esPhotoInput').files[0];
   if(!f) return;
   compressImage(f,480,0.8).then(async dataUrl=>{
-    await setAvatarFor(activeEditAbsen, dataUrl);
+    if(!(await setAvatarFor(activeEditAbsen, dataUrl))) return;
     document.getElementById('esAvatar').innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     alertBox('Foto siswa tersimpan.');
   }).catch(e=>alertBox(e.message)).finally(()=>{ document.getElementById('esPhotoInput').value=''; });
 }
 async function esRemovePhoto(){
-  await removeAvatarFor(activeEditAbsen);
+  if(!(await removeAvatarFor(activeEditAbsen))) return;
   document.getElementById('esAvatar').innerHTML='<i class="ic" data-ic="person"></i>';
 }
 async function esSaveBiodata(){
@@ -4233,8 +4435,10 @@ async function esSaveBiodata(){
   let kelas = document.getElementById('esKelas').value.trim();
   let d=parseInt(document.getElementById('esBirthDay').value), m=parseInt(document.getElementById('esBirthMonth').value);
   let birthDate = (d && m) ? String(d).padStart(2,'0')+'-'+String(m).padStart(2,'0') : '';
+  let yrRaw=document.getElementById('esBirthYear').value.trim(), yr=yrRaw?parseInt(yrRaw):0, yNow=new Date().getFullYear();
+  if(yrRaw&&!(yr>=yNow-30&&yr<=yNow-5)){ alertBox('Tahun lahir tidak masuk akal.'); return; }
   let idx=parseInt(activeEditAbsen)-1;
-  let ok = await pushKasStudentEdit(idx, nisn, birthDate, kelas, nis);
+  let ok = await pushKasStudentEdit(idx, nisn, birthDate, kelas, nis, yr);
   alertBox(ok ? 'Biodata siswa tersimpan ke aplikasi.' : 'Gagal menyimpan biodata.');
 }
 
@@ -4350,6 +4554,7 @@ async function saveKasEntry(){
 async function reportSend(){
   var ta=document.getElementById('rpText'), msg=(ta.value||'').replace(/\r/g,'').trim();
   if(msg.length<5){ alertBox('Tulis laporanmu dulu (minimal 5 huruf).'); return; }
+  if(kasarTolak(msg)) return;
   if(msg.length>800) msg=msg.slice(0,800);
   try{ var last=+localStorage.getItem('kas_rep_last')||0; if(Date.now()-last<60000){ alertBox('Tunggu sebentar sebelum mengirim laporan lagi.'); return; } }catch(e){}
   if(session.dev){ alertBox('Mode developer: laporan tidak dikirim.'); closeModal('report'); return; }
@@ -4483,20 +4688,87 @@ function renderWaliArrears(){
 /* ---- Profil siswa (bisa dibuka teman) + Edit Profil sendiri ---- */
 var bioCache={}, profPrev='home', profAbs='', epPhoto;
 function stuLink(abs,html){ return '<a class="stu-link" onclick="event.stopPropagation();openProfile(\''+abs+'\')">'+html+'</a>'; }
+var pubCache={};
+async function fetchPubFor(abs){
+  abs=String(abs);
+  if(abs in pubCache) return pubCache[abs];
+  if(session.dev) return {};
+  try{
+    let d=await fbDb.collection('website').doc(session.roomId).collection('bio').doc(abs).get();
+    pubCache[abs]=d.exists?d.data():{}; bioCache[abs]=String(pubCache[abs].text||''); return pubCache[abs];
+  }catch(e){ return {}; }
+}
 async function fetchBioFor(abs){
   abs=String(abs);
   if(session.dev) return bioCache[abs]||'';
-  if(abs in bioCache) return bioCache[abs];
-  try{
-    let d=await fbDb.collection('website').doc(session.roomId).collection('bio').doc(abs).get();
-    bioCache[abs]=d.exists?String(d.data().text||''):''; return bioCache[abs];
-  }catch(e){ return ''; }
+  let p=await fetchPubFor(abs); return String(p.text||'');
 }
 function openProfile(abs){
   abs=String(abs); if(!session||!/^\d+$/.test(abs)||!(kasState.students||[])[parseInt(abs)-1]) return;
   let cur=document.querySelector('.view.active');
   if(cur && cur.id!=='view-profilsiswa' && cur.id!=='view-editprofil') profPrev=cur.id.replace('view-','');
   profAbs=abs; openView('profilsiswa'); window.scrollTo(0,0);
+}
+/* ---- Relay ke Worker ---- */
+async function relayCall(o){
+  try{ let r=await fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({k:TG_RELAY_KEY},o))}); return await r.json(); }
+  catch(e){ return {ok:false,error:'Server tidak terjangkau. Coba lagi sebentar.'}; }
+}
+/* ---- Filter kata kasar (daftar & aturan sama dengan Worker) ---- */
+var BAD_SUB=['anjing','anjink','bangsat','bajingan','brengsek','keparat','kontol','memek','ngentot','jancok','jancuk','goblok','kampret','sialan','pelacur','pukimak','asshole','bastard','nigger','nigga','fuck','bitch'];
+var BAD_EXACT=['asu','babi','tai','taik','tolol','bego','idiot','dungu','lonte','jablay','pepek','titit','bokep','sundal','kimak','bacot','shit','dick','pussy','slut','whore','cunt','anjir','anjrit','kntl','ngntd'];
+function badNorm(w){ return w.replace(/(.)\1+/g,'$1'); }
+var BAD_SUB_N=BAD_SUB.map(badNorm), BAD_EXACT_N=BAD_EXACT.map(badNorm);
+function kasar(txt){
+  var t=String(txt==null?'':txt).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'');
+  t=t.replace(/[0-9@$!|]/g,function(c){ return {'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','$':'s','!':'i','|':'i'}[c]; });
+  var toks=t.split(/[^a-z]+/).filter(Boolean).map(badNorm), i, j;
+  for(i=0;i<toks.length;i++){ if(BAD_EXACT_N.indexOf(toks[i])>=0) return true; for(j=0;j<BAD_SUB_N.length;j++) if(toks[i].indexOf(BAD_SUB_N[j])>=0) return true; }
+  var sq=badNorm(t.replace(/[^a-z]/g,''));
+  for(j=0;j<BAD_SUB_N.length;j++) if(BAD_SUB_N[j].length>=6&&sq.indexOf(BAD_SUB_N[j])>=0) return true;
+  return false;
+}
+function kasarTolak(){ for(var i=0;i<arguments.length;i++){ if(kasar(arguments[i])){ alertBox('Tulisan mengandung kata tidak pantas. Ganti dulu ya.'); return true; } } return false; }
+/* ---- Laporan bio/foto ---- */
+var lapTarget='';
+function openLapProfil(){
+  if(!session||isWali()||!profAbs) return; lapTarget=profAbs;
+  let st=(kasState.students||[])[parseInt(lapTarget)-1]||{};
+  document.getElementById('lapProfInfo').textContent='Melaporkan profil '+(st.short||('absen '+lapTarget))+'. Laporan hanya dibaca Admin / Admin Kelas.';
+  document.getElementById('lapReason').value=''; document.getElementById('lapKind').value='bio'; openModal('lapprofil');
+}
+async function lapProfilSend(){
+  let kind=document.getElementById('lapKind').value, reason=document.getElementById('lapReason').value.trim().slice(0,100);
+  if(reason.length<3){ alertBox('Tulis alasan singkat dulu.'); return; }
+  if(kasarTolak(reason)) return;
+  if(session.dev){ closeModal('lapprofil'); alertBox('Mode demo: laporan tidak dikirim.'); return; }
+  let uid=cmtUid(); if(!uid){ alertBox('Belum terhubung ke server.'); return; }
+  try{
+    await fbDb.collection('website').doc(session.roomId).collection('reports').doc(uid+'_'+lapTarget+'_'+kind).set({uid:uid,absen:String(session.absen),target:lapTarget,kind:kind,reason:reason,ts:firebase.firestore.FieldValue.serverTimestamp()});
+    closeModal('lapprofil'); alertBox('Laporan terkirim ke admin. Terima kasih!');
+  }catch(e){ alertBox((e&&e.code==='permission-denied')?'Laporan ditolak: kamu sudah pernah melaporkan hal yang sama, atau aturan Firestore belum diperbarui.':'Gagal mengirim: '+((e&&e.message)||'')); }
+}
+var lapProfData=[];
+async function renderLapProfilList(){
+  let box=document.getElementById('lapProfList'); box.textContent='Memuat…';
+  if(session.dev){ box.textContent='Mode demo: belum ada laporan.'; return; }
+  try{
+    let q=await fbDb.collection('website').doc(session.roomId).collection('reports').get();
+    lapProfData=q.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+  }catch(e){ box.textContent='Tidak bisa memuat laporan (hanya Admin / Admin Kelas, atau aturan Firestore belum diperbarui).'; return; }
+  if(!lapProfData.length){ box.textContent='Belum ada laporan profil.'; return; }
+  let nm=function(a){ let s=(kasState.students||[])[parseInt(a)-1]; return s?(s.short||s.long):('absen '+a); };
+  box.innerHTML=lapProfData.map(function(r,i){ return '<div class="card" style="margin:8px 0;"><div><b>'+esc(nm(r.target))+'</b> · '+esc({bio:'Bio',foto:'Foto',nama:'Nama'}[r.kind]||r.kind)+'</div><div class="small">Alasan: '+esc(r.reason)+' (dari '+esc(nm(r.absen))+')</div><div class="mrow" style="margin-top:6px;">'+(r.kind==='foto'?'<button class="btn" style="color:var(--red);" onclick="lapAct('+i+',\'foto\')">Hapus foto</button>':'')+(r.kind==='bio'?'<button class="btn" style="color:var(--red);" onclick="lapAct('+i+',\'bio\')">Reset bio</button>':'')+'<button class="btn" onclick="lapAct('+i+',\'x\')">Abaikan</button></div></div>'; }).join('');
+}
+async function lapAct(i,act){
+  let r=lapProfData[i]; if(!r) return;
+  if(act==='foto'||act==='bio'){
+    let o=await relayCall({ad:{t:session.token,op:act==='foto'?'delphoto':'resetbio',absen:String(r.target)}});
+    if(!o.ok){ alertBox(o.error||'Gagal.'); return; }
+    if(act==='foto') avatarCache[String(r.target)]=null; else { bioCache[String(r.target)]=''; if(pubCache[String(r.target)]) pubCache[String(r.target)].text=''; }
+  }
+  try{ await fbDb.collection('website').doc(session.roomId).collection('reports').doc(r.id).delete(); }catch(e){}
+  renderLapProfilList();
 }
 function profBack(){ openView(profPrev&&document.getElementById('view-'+profPrev)?profPrev:'home'); }
 function openEditProfil(){
@@ -4519,6 +4791,77 @@ function renderProfilSiswa(){
   av.innerHTML='<i class="ic" data-ic="person"></i>'; bio.textContent='Memuat…';
   fetchAvatarFor(abs).then(function(ph){ if(ph&&profAbs===abs) av.innerHTML='<img src="'+ph+'" style="width:100%;height:100%;object-fit:cover;">'; });
   fetchBioFor(abs).then(function(t){ if(profAbs!==abs) return; if(t) bio.textContent=t; else bio.innerHTML='<span class="small">Belum ada bio.</span>'; });
+  document.getElementById('psRepBtn').style.display=(!own&&!isWali())?'':'none';
+  ['psBadges','psAge','psCount','psHob','psAch'].forEach(function(i){ document.getElementById(i).innerHTML=''; });
+  ['psBdCard','psHobCard','psAchCard'].forEach(function(i){ document.getElementById(i).style.display='none'; });
+  psStopTick();
+  Promise.all([fetchPubFor(abs),fetchAvatarFor(abs)]).then(function(r){ if(profAbs===abs) psFill(abs,r[0]||{},!!r[1],own); });
+}
+/* ---- Isi profil: lencana, umur, hitung mundur ulang tahun, hobi, pencapaian ---- */
+var psTimer=null, psBd=null;
+function psStopTick(){ if(psTimer){ clearInterval(psTimer); psTimer=null; } psBd=null; }
+function bdParts(bd){ var p=String(bd||'').split('-'), d=parseInt(p[0]), m=parseInt(p[1]); return (d>=1&&m>=1&&m<=12)?{d:d,m:m}:null; }
+function bdDate(y,b){ var d=b.d; if(b.m===2&&d===29&&!((y%4===0&&y%100!==0)||y%400===0)) d=28; return new Date(y,b.m-1,d,0,0,0); }
+function bdToday(b,now){ var t=bdDate(now.getFullYear(),b); return t.getMonth()===now.getMonth()&&t.getDate()===now.getDate(); }
+function addMonths(dt,n){ var r=new Date(dt.getFullYear(),dt.getMonth()+n,1,dt.getHours(),dt.getMinutes(),dt.getSeconds()); var last=new Date(r.getFullYear(),r.getMonth()+1,0).getDate(); r.setDate(Math.min(dt.getDate(),last)); return r; }
+function calDiff(now,t){
+  var m=(t.getFullYear()-now.getFullYear())*12+(t.getMonth()-now.getMonth()), c=addMonths(now,m);
+  if(c>t){ m--; c=addMonths(now,m); }
+  var ms=t-c; return {mo:m,d:Math.floor(ms/864e5),h:Math.floor(ms%864e5/36e5),mi:Math.floor(ms%36e5/6e4),s:Math.floor(ms%6e4/1e3)};
+}
+function bdNextDate(b,now){ var t=bdDate(now.getFullYear(),b); if(t<=now) t=bdDate(now.getFullYear()+1,b); return t; }
+function ageOf(b,by,now){
+  var mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()), passed=mid>=bdDate(now.getFullYear(),b);
+  var last=bdDate(passed?now.getFullYear():now.getFullYear()-1,b), yrs=last.getFullYear()-by;
+  var mo=(now.getFullYear()-last.getFullYear())*12+now.getMonth()-last.getMonth(); if(now.getDate()<last.getDate()) mo--;
+  return {y:yrs,m:Math.max(0,mo)};
+}
+function psTick(){
+  var el=document.getElementById('psCount'), v=document.getElementById('view-profilsiswa');
+  if(!psBd||!el||!v||!v.classList.contains('active')){ psStopTick(); return; }
+  var now=new Date(), d=calDiff(now,bdNextDate(psBd,now));
+  el.innerHTML=[['Bulan',d.mo],['Hari',d.d],['Jam',d.h],['Menit',d.mi],['Detik',d.s]].map(function(x){ return '<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'; }).join('');
+}
+function cashInfo(abs){
+  var idx=parseInt(abs)-1, todayStr=new Date().toISOString().slice(0,10), rows=[];
+  Object.keys(kasState.months||{}).sort().forEach(function(mk){ var m=kasState.months[mk];
+    (m.dates||[]).slice().sort(function(a,b){return a-b;}).forEach(function(d){
+      if(m.holiday&&m.holiday[d]) return; var ds=mk+'-'+String(d).padStart(2,'0'); if(ds>todayStr) return;
+      var c=m.checks&&m.checks[String(idx)]&&m.checks[String(idx)][d]; rows.push(!!(c&&c.on)); }); });
+  var paid=0, run=0, best=0; rows.forEach(function(x){ if(x){ paid++; run++; if(run>best) best=run; } else run=0; });
+  return {total:rows.length,paid:paid,best:best,lunas:rows.length>0&&calcTunggakanFor(abs).length===0};
+}
+function chipH(cls,t){ return '<span class="chip '+cls+'">'+esc(t)+'</span>'; }
+function psFill(abs,pub,hasPhoto,own){
+  var now=new Date(), badges=[], ach=[];
+  var bdS=own?String((session.me&&session.me.bd)||pub.bd||''):String(pub.bd||''), byN=own?parseInt((session.me&&session.me.by)||pub.by||0):parseInt(pub.by||0);
+  var b=bdParts(bdS), hidden=!!pub.hb&&!own, ageEl=document.getElementById('psAge');
+  if(pub.role) badges.push(chipH('role',pub.role));
+  if(b&&!hidden&&bdToday(b,now)){ badges.push(chipH('bday','Ulang tahun hari ini')); ach.push(chipH('bday','Berulang tahun hari ini')); }
+  if(hidden){ ageEl.textContent='Tanggal lahir disembunyikan'; }
+  else if(b&&byN>=1990){ var a=ageOf(b,byN,now); ageEl.textContent='Umur: '+a.y+' tahun'+(a.m?' '+a.m+' bulan':''); }
+  else ageEl.textContent='Umur: belum diisi';
+  if(own&&pub.hb) ageEl.textContent+=(ageEl.textContent?' ':'')+'(disembunyikan dari teman)';
+  if(b&&!hidden){
+    document.getElementById('psBdCard').style.display='';
+    var mn=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][b.m-1];
+    if(bdToday(b,now)){ document.getElementById('psBdInfo').textContent='Hari ini ulang tahun! ('+b.d+' '+mn+')'; document.getElementById('psCount').innerHTML=''; }
+    else{ document.getElementById('psBdInfo').textContent='Hitung mundur ke ulang tahun berikutnya'; psBd=b; psTick(); psTimer=setInterval(psTick,1000); }
+  }
+  if(!pub.hk||own){
+    var ci=cashInfo(abs);
+    if(ci.lunas) badges.push(chipH('ok','Lunas'));
+    if(ci.total>=10&&ci.paid/ci.total>=0.85) badges.push(chipH('ok','Rajin bayar'));
+    if(ci.best>=20) ach.push(chipH('ach','Streak bayar 20 hari'));
+    else if(ci.best>=10) ach.push(chipH('ach','Streak bayar 10 hari'));
+    else if(ci.best>=5) ach.push(chipH('ach','Streak bayar 5 hari'));
+  }
+  if(cmtLoaded&&cmtList.filter(function(c){ return String(c.absen)===String(abs); }).length>=10) ach.push(chipH('ach','Komentator aktif'));
+  var hob=Array.isArray(pub.hob)?pub.hob:[];
+  if(pub.text&&hasPhoto&&hob.length&&b) ach.push(chipH('ach','Profil lengkap'));
+  document.getElementById('psBadges').innerHTML=badges.join('');
+  if(hob.length){ document.getElementById('psHobCard').style.display=''; document.getElementById('psHob').innerHTML=hob.map(function(h){ return chipH('',h); }).join(''); }
+  if(ach.length){ document.getElementById('psAchCard').style.display=''; document.getElementById('psAch').innerHTML=ach.join(''); }
 }
 function epSetAvatar(ph){ document.getElementById('epAvatar').innerHTML=ph?'<img src="'+ph+'" style="width:100%;height:100%;object-fit:cover;">':'<i class="ic" data-ic="person"></i>'; }
 function renderEditProfil(){
@@ -4528,9 +4871,15 @@ function renderEditProfil(){
   document.getElementById('epDay').value=p[0]?parseInt(p[0]):''; document.getElementById('epMonth').value=p[1]?parseInt(p[1]):'';
   document.getElementById('epBio').value=''; document.getElementById('epBioN').textContent='0';
   epPhoto=undefined; epSetAvatar(null);
+  document.getElementById('epYear').value=(session.me&&session.me.by)||'';
+  epHob=[]; document.getElementById('epHideBd').checked=false; document.getElementById('epHideKas').checked=false; epHobRender();
+  fetchPubFor(abs).then(function(p){ epHob=(Array.isArray(p.hob)?p.hob:[]).slice(0,5); document.getElementById('epHideBd').checked=!!p.hb; document.getElementById('epHideKas').checked=!!p.hk; if(!document.getElementById('epYear').value&&p.by) document.getElementById('epYear').value=p.by; epHobRender(); });
   fetchAvatarFor(abs).then(function(ph){ if(epPhoto===undefined) epSetAvatar(ph); });
   fetchBioFor(abs).then(function(t){ let e=document.getElementById('epBio'); if(!e.value){ e.value=t; document.getElementById('epBioN').textContent=t.length; } });
 }
+var EP_HOBI=['Membaca','Menggambar','Menulis','Olahraga','Sepak bola','Basket','Voli','Badminton','Berenang','Musik','Menyanyi','Gaming','Memasak','Fotografi','Traveling','Menari','Coding','Menonton film','Berkebun','Mendaki'], epHob=[];
+function epHobRender(){ document.getElementById('epHobBox').innerHTML=EP_HOBI.map(function(h,i){ return '<button type="button" class="chip'+(epHob.indexOf(h)>=0?' on':'')+'" onclick="epToggleHob('+i+')">'+esc(h)+'</button>'; }).join(''); }
+function epToggleHob(i){ var h=EP_HOBI[i], k=epHob.indexOf(h); if(k>=0) epHob.splice(k,1); else if(epHob.length>=5){ alertBox('Maksimal 5 hobi.'); return; } else epHob.push(h); epHobRender(); }
 function epPickPhoto(){
   let f=document.getElementById('epPhotoInput').files[0]; if(!f) return;
   compressImage(f,480,0.8).then(function(d){ epPhoto=d; epSetAvatar(d); }).catch(function(e){ alertBox(e.message); }).finally(function(){ document.getElementById('epPhotoInput').value=''; });
@@ -4541,24 +4890,28 @@ async function epSave(){
   let nick=document.getElementById('epNick').value.trim(), day=document.getElementById('epDay').value, mon=document.getElementById('epMonth').value, bio=document.getElementById('epBio').value.trim();
   if(nick.length<2){ alertBox('Nama panggilan minimal 2 huruf.'); return; }
   if((day&&!mon)||(!day&&mon)){ alertBox('Isi tanggal DAN bulan lahir, atau kosongkan keduanya.'); return; }
+  if(kasarTolak(nick,bio)) return;
+  let yr=document.getElementById('epYear').value.trim(), hb=document.getElementById('epHideBd').checked, hk=document.getElementById('epHideKas').checked;
+  if(yr&&!(parseInt(yr)>=new Date().getFullYear()-25&&parseInt(yr)<=new Date().getFullYear()-6)){ alertBox('Tahun lahir tidak masuk akal.'); return; }
   let btn=document.getElementById('epSaveBtn'), abs=String(session.absen), idx=parseInt(abs)-1, r;
   btn.disabled=true;
   try{
-    if(session.dev){ r={ok:true,nick:nick.replace(/[<>]/g,'').slice(0,20),bd:(day&&mon)?String(day).padStart(2,'0')+'-'+String(mon).padStart(2,'0'):'',bio:bio.replace(/[<>]/g,'').slice(0,150)}; }
+    if(session.dev){ r={ok:true,nick:nick.replace(/[<>]/g,'').slice(0,20),bd:(day&&mon)?String(day).padStart(2,'0')+'-'+String(mon).padStart(2,'0'):'',by:parseInt(yr)||0,bio:bio.replace(/[<>]/g,'').slice(0,150),hob:epHob.slice(),hk:hk?1:0,hb:hb?1:0}; }
     else if(!session.pt){ alertBox('Sesi login lama belum bisa mengubah profil. Keluar, lalu masuk lagi.'); return; }
     else{
       try{
-        let rs=await fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,pf:{t:session.token,pt:session.pt,nick:nick,bd:day,bm:mon,bio:bio}})});
+        let rs=await fetch(TG_RELAY_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({k:TG_RELAY_KEY,pf:{t:session.token,pt:session.pt,nick:nick,bd:day,bm:mon,by:yr,bio:bio,hob:epHob,hk:hk,hb:hb}})});
         r=await rs.json();
       }catch(e){ r={ok:false,error:'Server tidak terjangkau. Coba lagi sebentar.'}; }
       if(!r.ok){ alertBox(r.error||'Gagal menyimpan profil.'); return; }
     }
-    if(epPhoto===null) await removeAvatarFor(abs); else if(epPhoto) await setAvatarFor(abs,epPhoto);
+    let phOk=true; if(epPhoto===null) phOk=await removeAvatarFor(abs); else if(epPhoto) phOk=await setAvatarFor(abs,epPhoto);
     let s=(kasState.students||[])[idx]; if(s){ s.short=r.nick; if(s.auto==='short') delete s.auto; }
-    if(r.bd){ session.me=session.me||{}; session.me.bd=r.bd; }
+    session.me=session.me||{}; if(r.bd) session.me.bd=r.bd; if(r.by) session.me.by=r.by;
     bioCache[abs]=r.bio||'';
+    pubCache[abs]=Object.assign({},pubCache[abs]||{},{text:r.bio||'',bd:r.hb?'':(r.bd||session.me.bd||''),by:r.hb?0:(r.by||session.me.by||0),hob:r.hob||[],hk:r.hk?1:0,hb:r.hb?1:0});
     try{ saveSession(!!localStorage.getItem(SESSION_KEY)); }catch(e){}
-    renderAll(); alertBox('Profil tersimpan. Perubahan nama panggilan dan tanggal lahir sudah diteruskan ke seluruh data.'); openProfile(abs);
+    renderAll(); if(!phOk){ return; } alertBox('Profil tersimpan. Perubahan nama panggilan dan tanggal lahir sudah diteruskan ke seluruh data.'); openProfile(abs);
   }finally{ btn.disabled=false; }
 }
 function openView(id){
@@ -4583,6 +4936,7 @@ function openModal(id){
   if(id==='editjadwal') renderJadwalEditList();
   if(id==='editkontak') renderKontakEditList();
   if(id==='lihatlaporan') renderLaporanList();
+  if(id==='laprofillist') renderLapProfilList();
   if(id==='loginlog') renderLoginLog();
   if(id==='arrears'){ renderArrearsModal(); ktView('Daftar tunggakan siswa'); }
   if(id==='rotate') rotReset();
@@ -4864,8 +5218,9 @@ function cmtApplyAv(){
   });
 }
 function cmtItemHtml(c){
-  var mine=cmtUid() && c.uid===cmtUid();
-  var canDel=mine||isAdmin();
+  /* Anggota hanya boleh menghapus komentarnya sendiri (perangkat DAN nomor absen cocok, jadi siswa lain yang login di HP yang sama tidak ikut bisa menghapus). Admin & Admin Kelas boleh menghapus komentar siapa pun. */
+  var mine=cmtUid() && c.uid===cmtUid() && !!session && String(c.absen)===String(session.absen);
+  var canDel=mine||isStaff();
   var forMe=cmtKind(c)?' for-me':'';
   var del=canDel ? '<button class="cmt-act del'+(cmtDelPending===c.id?' sure':'')+'" onclick="cmtDelete(\''+c.id+'\')">'+(cmtDelPending===c.id?'Yakin hapus?':'Hapus')+'</button>' : '';
   var rq=c.replyTo ? '<div class="cmt-rq">membalas <b>'+cmtEsc(c.replyName||'')+'</b>: “'+cmtEsc(cmtSnip(c.replyText,80))+'”</div>' : '';
@@ -4963,6 +5318,7 @@ async function cmtSend(p){
   var ta=document.getElementById('cmt-ta-'+p); if(!ta) return;
   var text=ta.value.replace(/\s+$/,'').replace(/^\s+/,'');
   if(!text){ alertBox('Tulis komentar dulu.'); return; }
+  if(kasarTolak(text)) return;
   if(Date.now()-cmtLastSend<2500){ alertBox('Tunggu sebentar sebelum mengirim lagi.'); return; }
   var uid=cmtUid(); if(!uid){ alertBox('Belum terhubung ke server.'); return; }
   var st=currentStudent(), me=cmtMe();
@@ -4996,7 +5352,7 @@ function cmtDelete(id){
   cmtDelPending=null;
   fbDb.collection('website').doc(session.roomId).collection('comments').doc(id).delete()
     .then(function(){ alertBox('Komentar dihapus.'); })
-    .catch(function(e){ alertBox((e&&e.code==='permission-denied') ? 'Tidak bisa menghapus: komentar milik perangkat lain (hanya admin yang bisa).' : 'Gagal menghapus: '+((e&&e.message)||'')); renderComments(); });
+    .catch(function(e){ alertBox((e&&e.code==='permission-denied') ? 'Tidak bisa menghapus: hanya pemilik komentar, Admin, atau Admin Kelas yang bisa.' : 'Gagal menghapus: '+((e&&e.message)||'')); renderComments(); });
 }
 cmtInitComposers();
 /* sesi tersimpan: enterSite() bisa berjalan sebelum skrip ini selesai dimuat -> langganan dijalankan di sini */
