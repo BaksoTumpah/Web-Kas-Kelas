@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>try{var __t=localStorage.getItem("kas_theme");if(__t&&/^[a-z-]+$/.test(__t))document.documentElement.setAttribute("data-theme",__t);}catch(e){}</script>
-<script>try{var __d=document.documentElement,__m=localStorage.getItem("kas_mode");if(__m!=="light"&&__m!=="dark")__m="auto";__d.setAttribute("data-mode",__m);var __k=__m==="dark"||(__m==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);__d.setAttribute("data-scheme",__k?"dark":"light");}catch(e){}</script>
+<script>try{var __t=localStorage.getItem("kas_theme");document.documentElement.setAttribute("data-theme",(__t&&/^[a-z-]+$/.test(__t))?__t:"baby-pink");}catch(e){}</script>
+<script>try{var __d=document.documentElement,__m=localStorage.getItem("kas_mode");if(__m!=="light"&&__m!=="dark"&&__m!=="auto")__m="light";__d.setAttribute("data-mode",__m);var __k=__m==="dark"||(__m==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);__d.setAttribute("data-scheme",__k?"dark":"light");}catch(e){}</script>
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#fbf4e2">
+<meta name="theme-color" content="#fbc9de">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -440,6 +440,9 @@ button.btn.primary.gate-btn::after{content:"→";font-weight:500;transition:tran
 .gphoto img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-lg);display:block;transition:transform .5s var(--ease);}
 .gphoto .gbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px;}
 .gphoto .gbtns button{padding:5px 9px;font-size:13px;border-radius:var(--r-sm);min-height:0;}
+.gphoto .gdl{position:absolute;left:8px;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;font-size:13px;font-weight:800;text-decoration:none;border:0;border-radius:var(--r-pill);background:var(--brand-2);color:var(--brand-ink);box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;min-height:0;font-family:var(--font);}
+.gphoto .gdl:active{transform:scale(.97);}
+.gphoto .gdl .ic{width:16px;height:16px;}
 @media (hover:hover) and (pointer:fine){ .gphoto:hover img{transform:scale(1.06);} }
 .listrow{display:flex;justify-content:space-between;align-items:center;padding:var(--s3) var(--s2);border-bottom:1px solid var(--line);gap:var(--s2);border-radius:var(--r-sm);}
 .listrow:last-child{border-bottom:none;}
@@ -736,7 +739,7 @@ button.chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
 .ps-count b{display:block;font-size:20px;font-variant-numeric:tabular-nums;}
 .ps-count span{font-size:10px;opacity:.75;}
 .ps-bio{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;}
-body.is-wali #btnEditProfil,body.is-wali #btnNotif{display:none;}
+body.is-wali #btnEditProfil{display:none;}
 .cmt.cmt-wali{background:linear-gradient(135deg,color-mix(in srgb,#8b5cf6 26%,var(--card)) 0%,color-mix(in srgb,#8b5cf6 8%,var(--card)) 100%);border:2px solid #8b5cf6;padding-left:20px;box-shadow:0 10px 26px -14px rgba(139,92,246,.7);}
 .cmt.cmt-wali::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:7px;border-radius:0 5px 5px 0;background:linear-gradient(#a78bfa,#7c3aed);}
 .cmt-badge.wali{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;}
@@ -1111,7 +1114,7 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
   <p class="small" style="margin:0 0 6px;">Isi jika foto album diambil dari folder Drive (diatur "Siapa saja yang memiliki link: Viewer"). Nama album otomatis mengikuti nama folder.</p>
   <label>Nama album</label>
   <input type="text" id="albumName" maxlength="40" placeholder="Contoh: Study Tour 2026">
-  <label>Sampul album</label>
+  <label id="albumCoverLbl">Sampul album (hanya Admin)</label>
   <p class="small" style="margin:0;" id="albumCoverHint">Kosongkan untuk memakai foto pertama di album.</p>
   <img class="cover-prev" id="albumCoverPrev" alt="" style="display:none;">
   <input type="file" accept="image/*" id="albumCoverInput" style="display:none;" onchange="albumPickCover()">
@@ -1146,11 +1149,12 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
   <div id="ntStatus" class="small" style="margin:6px 0;font-weight:700;"></div>
   <div id="ntHint" class="small" style="margin-bottom:8px;"></div>
   <div id="ntOpts">
-    <label style="display:flex;gap:8px;align-items:center;font-weight:600;"><input type="checkbox" id="ntTg" style="width:auto;" onchange="notifPrefSave()"> Tunggakan kas (tiap Senin pagi)</label>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntKs" style="width:auto;" onchange="notifPrefSave()"> Hari bayar kas (pagi hari tagih &amp; sore sebelumnya)</label>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntTk" style="width:auto;" onchange="notifPrefSave()"> Tugas yang dikumpulkan hari ini &amp; besok</label>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntJd" style="width:auto;" onchange="notifPrefSave()"> Mapel besok (sore hari)</label>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntUl" style="width:auto;" onchange="notifPrefSave()"> Ulang tahun teman &amp; ucapan untukmu</label>
+    <label class="nt-row" data-k="an" style="display:flex;gap:8px;align-items:center;font-weight:600;"><input type="checkbox" id="ntAn" style="width:auto;" onchange="notifPrefSave()"> Pengumuman baru (admin &amp; guru wali)</label>
+    <label class="nt-row" data-k="tg" style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntTg" style="width:auto;" onchange="notifPrefSave()"> <span id="ntTgTxt">Tunggakan kas (tiap Senin pagi)</span></label>
+    <label class="nt-row" data-k="ks" style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntKs" style="width:auto;" onchange="notifPrefSave()"> Hari bayar kas (pagi hari tagih &amp; sore sebelumnya)</label>
+    <label class="nt-row" data-k="tk" style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntTk" style="width:auto;" onchange="notifPrefSave()"> Tugas yang dikumpulkan hari ini &amp; besok</label>
+    <label class="nt-row" data-k="jd" style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntJd" style="width:auto;" onchange="notifPrefSave()"> Mapel besok (sore hari)</label>
+    <label class="nt-row" data-k="ul" style="display:flex;gap:8px;align-items:center;font-weight:600;margin-top:6px;"><input type="checkbox" id="ntUl" style="width:auto;" onchange="notifPrefSave()"> Ulang tahun teman &amp; ucapan untukmu</label>
   </div>
   <div class="mrow"><button class="btn primary" id="ntToggle" onclick="notifToggle()">Aktifkan</button><button class="btn" id="ntTest" onclick="notifTest()">Kirim Uji</button></div>
   <div class="mrow"><button class="btn" onclick="closeModal('notif')">Tutup</button></div>
@@ -1161,6 +1165,18 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
   <h2 class="h" id="bdayPopTitle" style="text-align:center;">Selamat Ulang Tahun!</h2>
   <p id="bdayPopMsg" style="text-align:center;"></p>
   <div class="mrow"><button class="btn primary" style="width:100%;" onclick="closeModal('bdaypopup')">Terima kasih!</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-badwords"><div class="modal">
+  <h2 class="h">Kata Terlarang</h2>
+  <p class="small">Kata kasar bawaan sudah disaring di semua kolom isian anggota (nama panggilan, bio, komentar, pengumuman wali, laporan). Tambahkan kata lain yang perlu diblokir di kelasmu. Variasi huruf, angka pengganti (4=a, 3=e), dan huruf berulang ikut terdeteksi.</p>
+  <div class="chips" id="badList"></div>
+  <label>Tambah kata</label>
+  <div class="mrow"><input type="text" id="badInput" maxlength="24" placeholder="Contoh: kata lain" style="flex:1;"><button class="btn primary" onclick="badAdd()">Tambah</button></div>
+  <label>Coba kalimat (cek filter)</label>
+  <input type="text" id="badTestInput" placeholder="Ketik untuk menguji" oninput="badTest()">
+  <div class="small" id="badTestRes" style="margin-top:4px;font-weight:700;"></div>
+  <div class="mrow"><button class="btn" onclick="closeModal('badwords')">Tutup</button></div>
 </div></div>
 
 <div class="modal-bg" id="modal-lapprofil"><div class="modal">
@@ -1189,6 +1205,7 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
     <button class="btn" onclick="closeModal('adminmenu');openView('kontak')">Kelola Kontak</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('lihatlaporan')">Lihat Laporan Masuk</button>
     <button class="btn" onclick="closeModal('adminmenu');openModal('laprofillist')">Laporan Profil (bio/foto)</button>
+    <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('badwords')">Kata Terlarang (filter)</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('loginlog')">Log Kunjungan</button>
     <button class="btn" onclick="closeModal('adminmenu');openModal('personalannounce')">Pengumuman Personal</button>
     <button class="btn adm-only" onclick="closeModal('adminmenu');openModal('recount')">Recount Tunggakan</button>
@@ -1263,6 +1280,7 @@ body.is-wali .tugas-sec, body.is-wali #tunggakanCard, body.is-wali #tugasHomeCar
   <input type="text" id="newAnnounceTitle">
   <label>Isi</label>
   <textarea id="newAnnounceBody" rows="3"></textarea>
+  <div class="small" style="margin-top:8px;">🔔 Notifikasi otomatis dikirim ke HP anggota yang mengaktifkannya.</div>
   <div class="mrow">
     <button class="btn" onclick="closeModal('editpengumuman')">Tutup</button>
     <button class="btn primary" onclick="addAnnouncement()">+ Tambah</button>
@@ -2933,7 +2951,7 @@ function dvPaintTheme(){
   const mc=(ktCfg.modeAll==='light'||ktCfg.modeAll==='dark')?ktCfg.modeAll:'';
   const ms=dvEl('dvModeState'); if(ms) ms.innerHTML=mc?'<b>Terkunci</b>: semua pengguna memakai mode <b>'+KT_MODE_NAMES[mc]+'</b>.':'<b>Tidak dikunci</b>: tiap kelas memakai mode pilihan adminnya (bawaan: ikuti HP).';
   const r=dvEl('dvThemeRooms');
-  if(r) r.innerHTML=Object.values(dvData.rooms).map(room=>{ const id=(room.kas&&room.kas.theme)||'', k=KT_THEMES[id]||KT_THEMES['hijau-gelap'];
+  if(r) r.innerHTML=Object.values(dvData.rooms).map(room=>{ const id=(room.kas&&room.kas.theme)||'', k=KT_THEMES[id]||KT_THEMES[KT_THEME_DEFAULT];
     return '<div class="dv-row"><b>'+dvEsc(dvTitleOf(room))+'</b><span class="dv-sub"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:linear-gradient(135deg,'+k.c1+','+k.c2+');"></span>'+dvEsc(ktThemeValid(id)?k.name:'Hijau Gelap (bawaan)')+' · '+dvEsc(KT_MODE_ICONS[(room.kas&&ktModeValid(room.kas.mode))?room.kas.mode:'auto']+' '+KT_MODE_NAMES[(room.kas&&ktModeValid(room.kas.mode))?room.kas.mode:'auto'])+'</span></div>'; }).join('')||'<span class="dv-sub">Belum ada kelas.</span>';
 }
 async function dvSetModeAll(m){
@@ -3240,6 +3258,7 @@ function enterSite(firstLoginThisSession){
     try{ if(typeof subscribeComments==='function') subscribeComments(session.roomId); }catch(e){}
     try{ subscribeWaliAnn(session.roomId); }catch(e){}
     try{ bdayInit(); }catch(e){}
+    try{ badLoad(); }catch(e){}
   });
   setTimeout(registerVisit, 700);
   setTimeout(function(){ try{ if(isAdmin() && session.absen) fbDb.collection('website').doc(session.roomId).set({adminAbsens:firebase.firestore.FieldValue.arrayUnion(String(session.absen))},{merge:true}).catch(function(){}); }catch(e){} }, 2500);
@@ -3541,8 +3560,7 @@ function renderAll(){
     document.getElementById('profNis').textContent = pr.nis||'-';
     document.getElementById('profKelas').textContent = pr.kelas||'-';
     document.getElementById('profAbsen').textContent = session.absen;
-    (function(){ let bd=bdParts(session.me&&session.me.bd), by=parseInt((session.me&&session.me.by)||0), e=document.getElementById('profAge');
-      if(bd&&by>=1990){ let a=ageOf(bd,by,new Date()); e.textContent='Umur: '+a.y+' tahun'+(a.m?' '+a.m+' bulan':''); } else e.textContent='Umur: belum diisi (isi tahun lahir di Edit Profil)'; })();
+    homeAgeRefresh();
   }
   document.getElementById('avatarBox').innerHTML = '<i class="ic" data-ic="person"></i>';
   fetchAvatarFor(session.absen).then(photo=>{
@@ -3750,11 +3768,12 @@ function myPersonalAnnouncements(){
   return (webState.personalAnnouncements||[]).filter(a=>(a.targets||[]).includes(myAbsen));
 }
 /* ---- Notifikasi pengingat (Web Push) ---- */
-var ntState={on:false,pr:{tg:1,ks:1,tk:1,jd:1,ul:1}};
+var ntState={on:false,pr:{tg:1,ks:1,tk:1,jd:1,ul:1,an:1}};
+function ntAuth(){ return isWali()?{nip:waliInfo().nip}:{pt:session.pt}; }
 function ntSupported(){ return !!(('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window)); }
 function ntIsIos(){ return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
 function ntStandalone(){ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true; }
-function ntPrFromUi(){ return {tg:+document.getElementById('ntTg').checked,ks:+document.getElementById('ntKs').checked,tk:+document.getElementById('ntTk').checked,jd:+document.getElementById('ntJd').checked,ul:+document.getElementById('ntUl').checked}; }
+function ntPrFromUi(){ return {an:+document.getElementById('ntAn').checked,tg:+document.getElementById('ntTg').checked,ks:+document.getElementById('ntKs').checked,tk:+document.getElementById('ntTk').checked,jd:+document.getElementById('ntJd').checked,ul:+document.getElementById('ntUl').checked}; }
 function ntRender(){
   var sup=ntSupported(), perm=sup?Notification.permission:'denied', hint='';
   if(!sup) hint=(ntIsIos()&&!ntStandalone())?'Di iPhone/iPad, buka menu Bagikan lalu pilih "Tambahkan ke Layar Utama", buka website dari ikon itu, lalu aktifkan di sini.':'Browser ini belum mendukung notifikasi. Coba Chrome di Android.';
@@ -3762,30 +3781,32 @@ function ntRender(){
   document.getElementById('ntStatus').textContent=ntState.on?'Status: aktif di HP ini':'Status: belum aktif';
   document.getElementById('ntHint').textContent=hint;
   document.getElementById('ntOpts').style.display=ntState.on?'':'none';
-  ['Tg','Ks','Tk','Jd','Ul'].forEach(function(k){ document.getElementById('nt'+k).checked=!!ntState.pr[k.toLowerCase()]; });
+  ['An','Tg','Ks','Tk','Jd','Ul'].forEach(function(k){ document.getElementById('nt'+k).checked=ntState.pr[k.toLowerCase()]!==0&&ntState.pr[k.toLowerCase()]!==false; });
+  [].forEach.call(document.querySelectorAll('#ntOpts .nt-row'),function(r){ var k=r.getAttribute('data-k'); r.style.display=(isWali()&&k!=='an'&&k!=='tg')?'none':'flex'; });
+  document.getElementById('ntTgTxt').textContent=isWali()?'Ringkasan tunggakan kelas (tiap Senin pagi)':'Tunggakan kas (tiap Senin pagi)';
   var b=document.getElementById('ntToggle'); b.textContent=ntState.on?'Matikan':'Aktifkan'; b.disabled=!sup||perm==='denied';
   document.getElementById('ntTest').style.display=ntState.on?'':'none';
 }
 async function ntCurrentSub(){ try{ var reg=await navigator.serviceWorker.ready; return await reg.pushManager.getSubscription(); }catch(e){ return null; } }
 async function openNotif(){
-  if(!session||isWali()) return;
+  if(!session) return;
   openModal('notif'); ntRender();
   if(!ntSupported()||session.dev) return;
   var sub=await ntCurrentSub();
-  var r=session.pt?await relayCall({ps:{t:session.token,pt:session.pt,act:'get'}}):{ok:false};
+  var r=(isWali()||session.pt)?await relayCall({ps:Object.assign({t:session.token,act:'get'},ntAuth())}):{ok:false};
   if(r&&r.ok){ ntState.pr=r.pr||ntState.pr; ntState.on=!!sub&&r.on; }
   else ntState.on=false;
   ntRender();
 }
 async function notifToggle(){
-  if(!session||isWali()) return;
-  if(!session.pt){ alertBox('Sesi login lama belum bisa mengatur notifikasi. Keluar, lalu masuk lagi.'); return; }
+  if(!session) return;
+  if(!isWali()&&!session.pt){ alertBox('Sesi login lama belum bisa mengatur notifikasi. Keluar, lalu masuk lagi.'); return; }
   var btn=document.getElementById('ntToggle'); btn.disabled=true;
   try{
     if(ntState.on){
       var sub=await ntCurrentSub(), e=sub?sub.endpoint:'';
       try{ if(sub) await sub.unsubscribe(); }catch(x){}
-      await relayCall({ps:{t:session.token,pt:session.pt,act:'unsub',e:e}});
+      await relayCall({ps:Object.assign({t:session.token,act:'unsub',e:e},ntAuth())});
       ntState.on=false; alertBox('Notifikasi dimatikan di HP ini.');
     }else{
       var perm=await Notification.requestPermission();
@@ -3793,7 +3814,7 @@ async function notifToggle(){
       var k=await relayCall({ps:{act:'key'}}); if(!k.ok){ alertBox('Server tidak terjangkau. Coba lagi.'); return; }
       var reg=await navigator.serviceWorker.ready, sub2=await reg.pushManager.getSubscription();
       if(!sub2) sub2=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ntKeyBytes(k.key)});
-      var js=sub2.toJSON(), r=await relayCall({ps:{t:session.token,pt:session.pt,act:'sub',sub:{endpoint:js.endpoint,keys:js.keys},pr:ntState.pr}});
+      var js=sub2.toJSON(), r=await relayCall({ps:Object.assign({t:session.token,act:'sub',sub:{endpoint:js.endpoint,keys:js.keys},pr:ntState.pr},ntAuth())});
       if(!r.ok){ alertBox(r.error||'Gagal mengaktifkan notifikasi.'); return; }
       ntState.on=true; ntState.pr=r.pr||ntState.pr; alertBox('Notifikasi aktif. Tekan "Kirim Uji" untuk mencoba.');
     }
@@ -3802,13 +3823,30 @@ async function notifToggle(){
 }
 function ntKeyBytes(b64){ var s=b64.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var raw=atob(s), a=new Uint8Array(raw.length); for(var i=0;i<raw.length;i++) a[i]=raw.charCodeAt(i); return a; }
 async function notifPrefSave(){
-  ntState.pr=ntPrFromUi(); if(!session||!session.pt) return;
-  var r=await relayCall({ps:{t:session.token,pt:session.pt,act:'pr',pr:ntState.pr}});
+  ntState.pr=ntPrFromUi(); if(!session||(!isWali()&&!session.pt)) return;
+  var r=await relayCall({ps:Object.assign({t:session.token,act:'pr',pr:ntState.pr},ntAuth())});
   if(!r.ok) alertBox(r.error||'Gagal menyimpan pengaturan.');
 }
 async function notifTest(){
-  var r=await relayCall({ps:{t:session.token,pt:session.pt,act:'test'}});
+  var r=await relayCall({ps:Object.assign({t:session.token,act:'test'},ntAuth())});
   alertBox(r.ok?'Notifikasi uji dikirim. Cek bar notifikasi HP kamu.':(r.error||'Gagal mengirim.'));
+}
+/* ---- Tanggal/tahun lahir dari server (selalu terbaru, tanpa menunggu tiap siswa login) ---- */
+var pbMap={}, pbReady=Promise.resolve();
+function homeAgeRefresh(){
+  var e=document.getElementById('profAge'); if(!e||!session||isWali()) return;
+  var bd=bdParts(session.me&&session.me.bd), by=parseInt((session.me&&session.me.by)||0);
+  if(bd&&by>=1990){ var a=ageOf(bd,by,new Date()); e.textContent='Umur: '+a.y+' tahun'+(a.m?' '+a.m+' bulan':''); } else e.textContent='Umur: belum diisi (isi tahun lahir di Edit Profil)';
+}
+function pbInit(){
+  pbReady=(async function(){
+    if(!session||session.dev) return;
+    var r=await relayCall({pb:{t:session.token,pt:session.pt}});
+    if(!(r&&r.ok)) return;
+    pbMap=r.l||{};
+    if(r.me&&!isWali()){ session.me=session.me||{}; if(r.me.bd) session.me.bd=r.me.bd; if(r.me.by) session.me.by=r.me.by; homeAgeRefresh(); }
+  })().catch(function(){});
+  return pbReady;
 }
 /* ---- Pengumuman ulang tahun ---- */
 var bdayToday=[], bdayOwn=false;
@@ -3837,15 +3875,9 @@ async function bdayInit(){
   if(!isWali()){ var ob=bdParts(session.me&&session.me.bd); if(ob&&bdToday(ob,now)) bdayOwn=true; }
   if(session.dev){ list=[]; (kasState.students||[]).forEach(function(st,i){ var b=bdParts(st.birthDate); if(b&&bdToday(b,now)) list.push(String(i+1)); }); }
   else{
-    try{ var c=JSON.parse(localStorage.getItem(key)||'null'); if(c&&c.d===td) list=c.l; }catch(e){}
-    if(!list){
-      list=[];
-      try{
-        var q=await fbDb.collection('website').doc(session.roomId).collection('bio').get();
-        q.docs.forEach(function(d){ var p=d.data(); pubCache[d.id]=p; bioCache[d.id]=String(p.text||''); var b=bdParts(p.bd); if(b&&!p.hb&&bdToday(b,now)) list.push(d.id); });
-        try{ localStorage.setItem(key,JSON.stringify({d:td,l:list})); }catch(e){}
-      }catch(e){}
-    }
+    await pbInit(); if(!session) return;
+    if(!isWali()){ var ob2=bdParts(session.me&&session.me.bd); if(ob2&&bdToday(ob2,now)) bdayOwn=true; }
+    list=[]; Object.keys(pbMap).forEach(function(a){ var b=bdParts(pbMap[a].bd); if(b&&bdToday(b,now)) list.push(a); });
   }
   bdayToday=list.filter(function(a){ return !session||String(a)!==String(session.absen)||isWali(); });
   if(!session) return;
@@ -3941,7 +3973,9 @@ function addAnnouncement(){
   if(!title||!body){ alertBox('Isi judul dan isi pengumuman.'); return; }
   webState.announcements.push({id:Date.now(), title, body, date:new Date().toISOString().slice(0,10)});
   pushWeb(); renderPengumumanEditList(); renderAnnounce();
+  var wantN=true;
   document.getElementById('newAnnounceTitle').value=''; document.getElementById('newAnnounceBody').value='';
+  if(wantN&&!session.dev) relayCall({an:{t:session.token,title:title,body:body}}).then(function(r){ alertBox(r.ok?'Pengumuman ditambahkan dan notifikasi dikirim ke HP anggota yang mengaktifkannya.':'Pengumuman ditambahkan, tetapi notifikasi gagal: '+(r.error||'')); });
 }
 function renderPengumumanEditList(){
   document.getElementById('pengumumanEditList').innerHTML = webState.announcements.map((a,i)=>
@@ -4040,32 +4074,30 @@ function renderGaleri(){
     add.style.display='none';
     bar.innerHTML='<div class="album-head"><a class="btn" target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/'+cur.driveFolderId+'">Buka folder Drive</a>'
       +(adm?'<button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">Ubah</button><button class="btn" onclick="reloadDriveAlbum()">Muat ulang</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button>':'')+'</div>'
-      +(adm?'<p class="small" style="margin:0 0 8px;">Tekan ★ pada foto untuk menjadikannya sampul album. Tombol mengunduh file asli resolusi penuh dari Drive.</p>':'');
+      +'<p class="small" style="margin:0 0 8px;">Tombol <b>Unduh Asli</b> di tiap foto menyimpan file resolusi penuh dari Drive.'+(isAdmin()?' Tekan ★ untuk menjadikan foto sebagai sampul album.':'')+'</p>';
     var c=driveCache[cur.driveFolderId];
     if(!c || c.loading){ grid.innerHTML='<p class="small">Memuat foto dari Google Drive…</p>'; driveList(cur.driveFolderId).then(function(cc){ syncAlbumName(cur,cc); if(galeriView===cur.id) renderGaleri(); }); return; }
     if(c.err){ grid.innerHTML='<p class="small">Gagal memuat folder Drive: '+galeriEsc(c.err)+'</p>'; return; }
     grid.innerHTML = c.files.length ? c.files.map(function(f){
       return '<div class="gphoto"><a href="'+driveThumb(f.id,1600)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+driveThumb(f.id,500)+'" alt=""></a><div class="gbtns">'
-        +'<a class="btn" href="'+driveDl(f.id)+'" target="_blank" rel="noopener" title="Unduh asli"><i class="ic" data-ic="download"></i></a>'
-        +(adm?'<button class="btn" onclick="setDriveCover(\''+f.id+'\')" title="Jadikan sampul">'+(cur.coverId===f.id?'★':'☆')+'</button>':'')
-        +'</div></div>';
+        +(isAdmin()?'<button class="btn" onclick="setDriveCover(\''+f.id+'\')" title="Jadikan sampul">'+(cur.coverId===f.id?'★':'☆')+'</button>':'')
+        +'</div><a class="gdl" href="'+driveDl(f.id)+'" target="_blank" rel="noopener" title="Unduh file asli resolusi penuh"><i class="ic" data-ic="download"></i> Unduh Asli</a></div>';
     }).join('') : '<p class="small">Folder ini belum berisi foto, atau belum dibagikan ke "Siapa saja yang memiliki link".</p>';
     return;
   }
-  bar.innerHTML = (adm && cur) ? '<div class="album-head"><button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">Nama &amp; sampul</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button></div>' : '';
+  bar.innerHTML = (adm && cur) ? '<div class="album-head"><button class="btn" onclick="openAlbumModal(\''+cur.id+'\')">'+(isAdmin()?'Nama &amp; sampul':'Ubah nama')+'</button><button class="btn" style="color:var(--red);" onclick="deleteAlbum(\''+cur.id+'\')">Hapus album</button></div>' : '';
   add.style.display = adm ? 'block' : 'none';
   document.getElementById('galeriAddBtn').textContent = (galeriView==='all'||galeriView==='none') ? '+ Tambah Foto' : '+ Tambah Foto ke album ini';
   var list=photosOf(galeriView);
   grid.innerHTML = list.length ? list.map(function(g){
     return '<div class="gphoto"><img loading="lazy" decoding="async" src="'+g.photo+'"><div class="gbtns">'
-      +'<button class="btn" onclick="downloadPhoto(\''+g.id+'\')" title="Unduh"><i class="ic" data-ic="download"></i></button>'
       +(adm?'<button class="btn" onclick="openMovePhoto(\''+g.id+'\')" title="Pindah album"><i class="ic" data-ic="folder"></i></button><button class="btn" style="color:var(--red);" onclick="removeGaleri(\''+g.id+'\')" title="Hapus">✕</button>':'')
-      +'</div></div>';
+      +'</div><button class="gdl" onclick="downloadPhoto(\''+g.id+'\')" title="Unduh foto ke perangkat"><i class="ic" data-ic="download"></i> Unduh Foto</button></div>';
   }).join('') : '<p class="small">Belum ada foto di sini.</p>';
 }
 function reloadDriveAlbum(){ var a=albumList.find(function(x){return x.id===galeriView;}); if(!a) return; delete driveCache[a.driveFolderId]; renderGaleri(); }
 async function setDriveCover(fid){
-  if(!isStaff()||!galeriView) return;
+  if(!isAdmin()||!galeriView){ alertBox('Sampul album hanya bisa diatur Admin.'); return; }
   try{ await fbDb.collection('website').doc(session.roomId).collection('albums').doc(galeriView).set({coverId:fid},{merge:true}); alertBox('Sampul album diganti.'); }catch(e){ alertBox('Gagal: '+e.message); }
 }
 function openAlbumModal(id){
@@ -4074,8 +4106,9 @@ function openAlbumModal(id){
   document.getElementById('albumModalTitle').textContent=a?'Ubah Album':'Album Baru';
   document.getElementById('albumName').value=a?(a.name||''):'';
   document.getElementById('albumDrive').value=a&&a.driveFolderId?(a.driveUrl||('https://drive.google.com/drive/folders/'+a.driveFolderId)):'';
-  var isD=!!(a&&a.driveFolderId); document.getElementById('albumCoverBtns').style.display=isD?'none':''; document.getElementById('albumCoverHint').textContent=isD?'Sampul album Drive dipilih dari foto di dalam album (tekan ★ pada foto).':'Kosongkan untuk memakai foto pertama di album.';
-  var pv=document.getElementById('albumCoverPrev'); if(a&&a.cover){ pv.src=a.cover; pv.style.display='block'; } else { pv.style.display='none'; pv.removeAttribute('src'); }
+  var admC=isAdmin(); ['albumCoverLbl','albumCoverHint','albumCoverBtns'].forEach(function(i){ var e=document.getElementById(i); if(e) e.style.display=admC?'':'none'; });
+  var isD=!!(a&&a.driveFolderId); if(admC) document.getElementById('albumCoverBtns').style.display=isD?'none':''; document.getElementById('albumCoverHint').textContent=isD?'Sampul album Drive dipilih dari foto di dalam album (tekan ★ pada foto).':'Kosongkan untuk memakai foto pertama di album.';
+  var pv=document.getElementById('albumCoverPrev'); if(admC&&a&&a.cover){ pv.src=a.cover; pv.style.display='block'; } else { pv.style.display='none'; pv.removeAttribute('src'); }
   document.getElementById('modal-album').classList.add('open');
 }
 function albumPickCover(){
@@ -4097,8 +4130,8 @@ async function saveAlbum(){
   try{
     var data={name:name};
     if(fid){ data.driveFolderId=fid; data.driveUrl=durl; } else { data.driveFolderId=''; data.driveUrl=''; }
-    if(albumEditId){ if(albumCoverData!==undefined) data.cover=albumCoverData; await col.doc(albumEditId).set(data,{merge:true}); delete driveCache[fid]; }
-    else { data.cover=albumCoverData||''; data.coverId=''; data.createdAt=Date.now(); await col.add(data); }
+    if(albumEditId){ if(isAdmin()&&albumCoverData!==undefined) data.cover=albumCoverData; await col.doc(albumEditId).set(data,{merge:true}); delete driveCache[fid]; }
+    else { if(isAdmin()){ data.cover=albumCoverData||''; data.coverId=''; } data.createdAt=Date.now(); await col.add(data); }
     closeModal('album'); alertBox('Album disimpan.');
   }catch(e){ alertBox('Gagal menyimpan album: '+e.message+' (pastikan firestore.rules terbaru sudah dipublish)'); }
 }
@@ -4719,15 +4752,44 @@ var BAD_SUB=['anjing','anjink','bangsat','bajingan','brengsek','keparat','kontol
 var BAD_EXACT=['asu','babi','tai','taik','tolol','bego','idiot','dungu','lonte','jablay','pepek','titit','bokep','sundal','kimak','bacot','shit','dick','pussy','slut','whore','cunt','anjir','anjrit','kntl','ngntd'];
 function badNorm(w){ return w.replace(/(.)\1+/g,'$1'); }
 var BAD_SUB_N=BAD_SUB.map(badNorm), BAD_EXACT_N=BAD_EXACT.map(badNorm);
-function kasar(txt){
+var badCustom=[];
+function badTxt(txt){
   var t=String(txt==null?'':txt).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'');
-  t=t.replace(/[0-9@$!|]/g,function(c){ return {'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','$':'s','!':'i','|':'i'}[c]; });
-  var toks=t.split(/[^a-z]+/).filter(Boolean).map(badNorm), i, j;
-  for(i=0;i<toks.length;i++){ if(BAD_EXACT_N.indexOf(toks[i])>=0) return true; for(j=0;j<BAD_SUB_N.length;j++) if(toks[i].indexOf(BAD_SUB_N[j])>=0) return true; }
+  return t.replace(/[0-9@$!|]/g,function(c){ return {'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','$':'s','!':'i','|':'i'}[c]; });
+}
+function kasar(txt){
+  var t=badTxt(txt), SUB=BAD_SUB_N.slice(), EX=BAD_EXACT_N.slice(), i, j;
+  badCustom.forEach(function(w){ var n=badNorm(badTxt(w).replace(/[^a-z]/g,'')); if(n.length>=5) SUB.push(n); else if(n.length>=2) EX.push(n); });
+  var toks=t.split(/[^a-z]+/).filter(Boolean).map(badNorm);
+  for(i=0;i<toks.length;i++){ if(EX.indexOf(toks[i])>=0) return true; for(j=0;j<SUB.length;j++) if(toks[i].indexOf(SUB[j])>=0) return true; }
   var sq=badNorm(t.replace(/[^a-z]/g,''));
-  for(j=0;j<BAD_SUB_N.length;j++) if(BAD_SUB_N[j].length>=6&&sq.indexOf(BAD_SUB_N[j])>=0) return true;
+  for(j=0;j<SUB.length;j++) if(SUB[j].length>=6&&sq.indexOf(SUB[j])>=0) return true;
   return false;
 }
+async function badLoad(){
+  badCustom=[]; if(!session||session.dev) return;
+  try{ var d=await fbDb.collection('website').doc(session.roomId).collection('cfg').doc('bad').get(); if(d.exists&&Array.isArray(d.data().words)) badCustom=d.data().words.map(String).slice(0,100); }catch(e){}
+}
+function badRender(){
+  var box=document.getElementById('badList'); if(!box) return;
+  box.innerHTML=badCustom.length?badCustom.map(function(w,i){ return '<span class="chip">'+esc(w)+' <a href="#" onclick="badRemove('+i+');return false;" style="margin-left:6px;color:var(--red);text-decoration:none;">✕</a></span>'; }).join(''):'<span class="small">Belum ada kata tambahan. Kata kasar bawaan sudah otomatis disaring.</span>';
+}
+async function badSave(msg){
+  if(session.dev){ badRender(); return; }
+  try{ await fbDb.collection('website').doc(session.roomId).collection('cfg').doc('bad').set({words:badCustom,ts:Date.now()}); if(msg) alertBox(msg); }
+  catch(e){ alertBox('Gagal menyimpan: '+((e&&e.message)||'')+' (pastikan firestore.rules terbaru sudah aktif)'); await badLoad(); }
+  badRender();
+}
+function badAdd(){
+  var inp=document.getElementById('badInput'), raw=inp.value.trim().toLowerCase().replace(/\s+/g,' ');
+  if(!raw) return;
+  if(!/^[a-z0-9 ]{2,24}$/.test(raw)){ alertBox('Gunakan huruf/angka saja (2–24 karakter).'); return; }
+  if(badCustom.length>=100){ alertBox('Maksimal 100 kata tambahan.'); return; }
+  if(badCustom.indexOf(raw)>=0){ alertBox('Kata itu sudah ada.'); return; }
+  badCustom.push(raw); inp.value=''; badSave('Kata ditambahkan ke filter.');
+}
+function badRemove(i){ badCustom.splice(i,1); badSave(''); }
+function badTest(){ var v=document.getElementById('badTestInput').value; document.getElementById('badTestRes').textContent=v?(kasar(v)?'Terdeteksi sebagai kata kasar.':'Lolos filter.'):''; }
 function kasarTolak(){ for(var i=0;i<arguments.length;i++){ if(kasar(arguments[i])){ alertBox('Tulisan mengandung kata tidak pantas. Ganti dulu ya.'); return true; } } return false; }
 /* ---- Laporan bio/foto ---- */
 var lapTarget='';
@@ -4785,7 +4847,10 @@ function renderProfilSiswa(){
   let kelas=own?currentProfile().kelas:''; if(!kelas||kelas==='-') kelas=st.kelas||kasState.appTitle||'-';
   document.getElementById('psLong').textContent=st.long||st.short||'-';
   document.getElementById('psKelas').textContent='Kelas '+kelas+' · Absen '+abs;
-  document.getElementById('psMask').innerHTML='NISN: **********<br>NIS: ******<br>Tgl lahir: **-**';
+  if(isAdmin()){   // hanya token Admin yang melihat data asli; anggota, Admin Kelas, dan guru wali tetap disensor
+    let bdv=String(st.birthDate||''), byv=parseInt(st.birthYear||0), bp=bdParts(bdv), tgl=bp?(String(bp.d).padStart(2,'0')+'-'+String(bp.m).padStart(2,'0')+(byv?'-'+byv:'')):'-';
+    document.getElementById('psMask').innerHTML='NISN: '+esc(st.nisn||'-')+'<br>NIS: '+esc(st.nis||'-')+'<br>Tgl lahir: '+esc(tgl);
+  }else document.getElementById('psMask').innerHTML='NISN: **********<br>NIS: ******<br>Tgl lahir: **-**';
   document.getElementById('psEditBtn').style.display=own?'':'none';
   let av=document.getElementById('psAvatar'), bio=document.getElementById('psBio');
   av.innerHTML='<i class="ic" data-ic="person"></i>'; bio.textContent='Memuat…';
@@ -4795,7 +4860,7 @@ function renderProfilSiswa(){
   ['psBadges','psAge','psCount','psHob','psAch'].forEach(function(i){ document.getElementById(i).innerHTML=''; });
   ['psBdCard','psHobCard','psAchCard'].forEach(function(i){ document.getElementById(i).style.display='none'; });
   psStopTick();
-  Promise.all([fetchPubFor(abs),fetchAvatarFor(abs)]).then(function(r){ if(profAbs===abs) psFill(abs,r[0]||{},!!r[1],own); });
+  Promise.all([fetchPubFor(abs),fetchAvatarFor(abs),pbReady]).then(function(r){ if(profAbs===abs) psFill(abs,r[0]||{},!!r[1],own); });
 }
 /* ---- Isi profil: lencana, umur, hitung mundur ulang tahun, hobi, pencapaian ---- */
 var psTimer=null, psBd=null;
@@ -4834,7 +4899,7 @@ function cashInfo(abs){
 function chipH(cls,t){ return '<span class="chip '+cls+'">'+esc(t)+'</span>'; }
 function psFill(abs,pub,hasPhoto,own){
   var now=new Date(), badges=[], ach=[];
-  var bdS=own?String((session.me&&session.me.bd)||pub.bd||''):String(pub.bd||''), byN=own?parseInt((session.me&&session.me.by)||pub.by||0):parseInt(pub.by||0);
+  var pbx=pbMap[String(abs)]||{}, bdS=own?String((session.me&&session.me.bd)||pbx.bd||pub.bd||''):String(pbx.bd||pub.bd||''), byN=own?parseInt((session.me&&session.me.by)||pbx.by||pub.by||0):parseInt(pbx.by||pub.by||0);
   var b=bdParts(bdS), hidden=!!pub.hb&&!own, ageEl=document.getElementById('psAge');
   if(pub.role) badges.push(chipH('role',pub.role));
   if(b&&!hidden&&bdToday(b,now)){ badges.push(chipH('bday','Ulang tahun hari ini')); ach.push(chipH('bday','Berulang tahun hari ini')); }
@@ -4937,6 +5002,7 @@ function openModal(id){
   if(id==='editkontak') renderKontakEditList();
   if(id==='lihatlaporan') renderLaporanList();
   if(id==='laprofillist') renderLapProfilList();
+  if(id==='badwords'){ badRender(); document.getElementById('badTestInput').value=''; document.getElementById('badTestRes').textContent=''; }
   if(id==='loginlog') renderLoginLog();
   if(id==='arrears'){ renderArrearsModal(); ktView('Daftar tunggakan siswa'); }
   if(id==='rotate') rotReset();
@@ -4959,7 +5025,7 @@ if(fbInit()) ktWatchConfig();
 
 <script>
 /* ===== TEMA WARNA: penimpa developer → tema kelas → cadangan lokal (hanya saat belum masuk kelas) ===== */
-var KT_THEMES={"hijau-gelap": {"name": "Klasik Sekolah", "c1": "#14205a", "c2": "#f5b82e"}, "hijau-terang": {"name": "Hijau Terang", "c1": "#22c55e", "c2": "#86efac"}, "oranye": {"name": "Oranye Flipper", "c1": "#e56f00", "c2": "#ffa233"}, "biru-langit": {"name": "Biru Langit", "c1": "#0ea5e9", "c2": "#7dd3fc"}, "baby-pink": {"name": "Baby Pink", "c1": "#ec7fb4", "c2": "#fbc4e0"}, "ungu-muda": {"name": "Ungu Muda", "c1": "#a78bfa", "c2": "#d8ccff"}}, KT_THEME_DEFAULT='hijau-gelap';
+var KT_THEMES={"hijau-gelap": {"name": "Klasik Sekolah", "c1": "#14205a", "c2": "#f5b82e"}, "hijau-terang": {"name": "Hijau Terang", "c1": "#22c55e", "c2": "#86efac"}, "oranye": {"name": "Oranye Flipper", "c1": "#e56f00", "c2": "#ffa233"}, "biru-langit": {"name": "Biru Langit", "c1": "#0ea5e9", "c2": "#7dd3fc"}, "baby-pink": {"name": "Baby Pink", "c1": "#ec7fb4", "c2": "#fbc4e0"}, "ungu-muda": {"name": "Ungu Muda", "c1": "#a78bfa", "c2": "#d8ccff"}}, KT_THEME_DEFAULT='baby-pink';
 function ktThemeValid(t){ return !!t && Object.prototype.hasOwnProperty.call(KT_THEMES,t); }
 function ktResolveTheme(){
   var g=(typeof ktCfg!=='undefined' && ktCfg) ? ktCfg.themeAll : '';
@@ -4975,9 +5041,9 @@ function ktResolveMode(){
   var g=(typeof ktCfg!=='undefined' && ktCfg) ? ktCfg.modeAll : '';
   if(g==='light'||g==='dark') return {id:g, src:'global'};
   var c=null; try{ c=ktModeOfClass(); }catch(e){}
-  if(c!==null) return {id:ktModeValid(c)?c:'auto', src:'class'};
+  if(c!==null) return {id:ktModeValid(c)?c:'light', src:'class'};
   var cached=''; try{ cached=localStorage.getItem('kas_mode_class')||''; }catch(e){}
-  return {id:ktModeValid(cached)?cached:'auto', src:'cache'};
+  return {id:ktModeValid(cached)?cached:'light', src:'cache'};
 }
 function ktSystemDark(){ try{ return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }catch(e){ return false; } }
 function ktApplyTheme(){
@@ -5045,7 +5111,7 @@ function ktModeLockHtml(){
 }
 function renderModeSeg(){
   var box=document.getElementById('modeSeg'); if(!box) return;
-  var cur=(typeof kasState!=='undefined' && kasState && ktModeValid(kasState.mode)) ? kasState.mode : 'auto';
+  var cur=(typeof kasState!=='undefined' && kasState && ktModeValid(kasState.mode)) ? kasState.mode : 'light';
   box.innerHTML=ktModeBtnsHtml(cur,'setClassMode'); var l=document.getElementById('modeLock'); if(l) l.innerHTML=ktModeLockHtml();
 }
 async function setClassMode(m){
@@ -5350,9 +5416,12 @@ function cmtDelete(id){
     return;
   }
   cmtDelPending=null;
-  fbDb.collection('website').doc(session.roomId).collection('comments').doc(id).delete()
+  var delP = isStaff()||session.dev
+    ? fbDb.collection('website').doc(session.roomId).collection('comments').doc(id).delete()
+    : relayCall({cd:{t:session.token,pt:session.pt,id:id}}).then(function(r){ if(!r.ok){ var e=new Error(r.error||'Gagal'); e.code='perm'; e.msg=r.error; throw e; } });
+  delP
     .then(function(){ alertBox('Komentar dihapus.'); })
-    .catch(function(e){ alertBox((e&&e.code==='permission-denied') ? 'Tidak bisa menghapus: hanya pemilik komentar, Admin, atau Admin Kelas yang bisa.' : 'Gagal menghapus: '+((e&&e.message)||'')); renderComments(); });
+    .catch(function(e){ alertBox((e&&e.msg) ? e.msg : ((e&&e.code==='permission-denied') ? 'Tidak bisa menghapus: hanya pemilik komentar, Admin, atau Admin Kelas yang bisa.' : 'Gagal menghapus: '+((e&&e.message)||''))); renderComments(); });
 }
 cmtInitComposers();
 /* sesi tersimpan: enterSite() bisa berjalan sebelum skrip ini selesai dimuat -> langganan dijalankan di sini */

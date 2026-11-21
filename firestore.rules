@@ -196,7 +196,21 @@ service cloud.firestore {
       match /albums/{aid} {
         allow read, write: if isDev();
         allow get, list: if canRead(roomId);
-        allow create, update, delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
+        // Sampul album (cover / coverId) hanya boleh diatur Admin (editor); Admin Kelas boleh membuat, mengganti nama, dan menghapus album.
+        allow create: if notBlocked() && maintenanceOff() && isStaffOf(roomId)
+          && (isEditorOf(roomId) || !(('cover' in request.resource.data) || ('coverId' in request.resource.data)));
+        allow update: if notBlocked() && maintenanceOff() && isStaffOf(roomId)
+          && (isEditorOf(roomId) || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['cover','coverId']));
+        allow delete: if notBlocked() && maintenanceOff() && isStaffOf(roomId);
+      }
+
+      // KATA TERLARANG TAMBAHAN buatan Admin kelas (dibaca semua anggota dan Worker; ditulis hanya Admin).
+      match /cfg/{cid} {
+        allow read, write: if isDev();
+        allow get: if canRead(roomId);
+        allow create, update: if cid == 'bad' && notBlocked() && maintenanceOff() && isEditorOf(roomId)
+          && request.resource.data.keys().hasOnly(['words','ts'])
+          && request.resource.data.words is list && request.resource.data.words.size() <= 100;
       }
 
       // BIO PROFIL SISWA: ditulis Worker setelah bukti sesi siswa diperiksa; semua anggota kelas boleh membaca.
@@ -232,8 +246,8 @@ service cloud.firestore {
           && (request.resource.data.isAdmin == false || isEditorOf(roomId))
           && (!('mentions' in request.resource.data) || (request.resource.data.mentions is list && request.resource.data.mentions.size() <= 15))
           && (!('replyText' in request.resource.data) || (request.resource.data.replyText is string && request.resource.data.replyText.size() <= 130));
-        allow delete: if notBlocked() && maintenanceOff()
-          && (resource.data.uid == request.auth.uid || isStaffOf(roomId));   // pemilik, Admin, atau Admin Kelas
+        // Admin / Admin Kelas menghapus langsung; pemilik komentar menghapus lewat Worker (dicek dengan bukti sesi siswa, bukan hanya perangkat).
+        allow delete: if notBlocked() && (isWorker() || (maintenanceOff() && isStaffOf(roomId)));
       }
 
       // FOTO PROFIL per siswa: satu dokumen per absen, aturan hapus sama seperti galeri.
