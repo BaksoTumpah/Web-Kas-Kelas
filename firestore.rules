@@ -209,8 +209,9 @@ service cloud.firestore {
         allow read, write: if isDev();
         allow get: if canRead(roomId);
         allow create, update: if cid == 'bad' && notBlocked() && maintenanceOff() && isEditorOf(roomId)
-          && request.resource.data.keys().hasOnly(['words','ts'])
-          && request.resource.data.words is list && request.resource.data.words.size() <= 100;
+          && request.resource.data.keys().hasOnly(['words','off','ts'])
+          && request.resource.data.words is list && request.resource.data.words.size() <= 100
+          && (!('off' in request.resource.data) || (request.resource.data.off is list && request.resource.data.off.size() <= 400));
       }
 
       // BIO PROFIL SISWA: ditulis Worker setelah bukti sesi siswa diperiksa; semua anggota kelas boleh membaca.
